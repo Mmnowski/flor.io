@@ -87,15 +87,17 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center px-4">
-            <h1 className="text-4xl font-bold mb-4">{message}</h1>
-            <p className="text-lg text-gray-600 mb-8">{details}</p>
+      <body className="bg-gradient-to-br from-emerald-50 to-white">
+        <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="text-center max-w-2xl">
+            <h1 className="text-6xl font-bold text-emerald-600 mb-4">{message}</h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">{details}</p>
             {stack && import.meta.env.DEV && (
-              <pre className="w-full max-w-2xl bg-gray-100 p-4 rounded text-left text-xs overflow-x-auto mb-8">
-                <code>{stack}</code>
-              </pre>
+              <div className="bg-gray-900 text-gray-100 p-6 rounded-lg text-left text-sm overflow-x-auto mb-8 border border-gray-700">
+                <pre className="font-mono text-xs leading-relaxed">
+                  <code>{stack}</code>
+                </pre>
+              </div>
             )}
           </div>
         </div>

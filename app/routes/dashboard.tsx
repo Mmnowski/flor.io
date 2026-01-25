@@ -9,7 +9,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
       <Outlet />
     </div>
   );

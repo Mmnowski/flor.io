@@ -51,49 +51,68 @@ export default function LoginPage() {
   const actionData = useActionData() as { error: string | null } | undefined;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md shadow-lg border border-emerald-100">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-center mb-2">Welcome to Flor</h1>
-          <p className="text-center text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
+            Welcome to Flor
+          </h1>
+          <p className="text-center text-gray-600 mb-8 leading-relaxed">
             Sign in to your plant care companion
           </p>
 
           <FormError message={actionData?.error} />
 
-          <Form method="post" className="space-y-4">
+          <Form method="post" className="space-y-5">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700 mb-2 block"
+              >
+                Email
+              </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 placeholder="you@example.com"
                 required
-                className="mt-1"
+                className="w-full h-11 rounded-lg border border-emerald-200 px-4 py-2 text-base focus:border-emerald-500 focus:ring-2 focus:ring-emerald-300"
               />
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-gray-700 mb-2 block"
+              >
+                Password
+              </Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 placeholder="••••••••"
                 required
-                className="mt-1"
+                className="w-full h-11 rounded-lg border border-emerald-200 px-4 py-2 text-base focus:border-emerald-500 focus:ring-2 focus:ring-emerald-300"
               />
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
+            <Button
+              type="submit"
+              className="w-full h-11 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium rounded-lg focus:ring-2 focus:ring-emerald-300"
+              size="lg"
+            >
               Sign in
             </Button>
           </Form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-sm text-gray-600 mt-6 leading-relaxed">
             Don't have an account?{" "}
-            <Link to="/auth/register" className="font-medium text-primary hover:underline">
+            <Link
+              to="/auth/register"
+              className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors focus:ring-2 focus:ring-emerald-300 rounded px-1 focus:outline-none"
+            >
               Sign up
             </Link>
           </p>
