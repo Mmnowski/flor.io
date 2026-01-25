@@ -5,9 +5,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { Navigation } from "~/components/nav";
+import { getUserId } from "~/lib/session.server";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -23,16 +26,23 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const userId = await getUserId(request);
+  return { userId };
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Flor - Plant Care Companion</title>
+        <meta name="description" content="Track and manage your plant care with AI-powered insights" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-white">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -42,7 +52,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const { userId } = useLoaderData<typeof loader>();
+
+  return (
+    <>
+      <Navigation isAuthenticated={!!userId} />
+      <main className="min-h-screen">
+        <Outlet />
+      </main>
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -62,14 +81,27 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <html lang="en">
+      <head>
+        <title>{message}</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center px-4">
+            <h1 className="text-4xl font-bold mb-4">{message}</h1>
+            <p className="text-lg text-gray-600 mb-8">{details}</p>
+            {stack && import.meta.env.DEV && (
+              <pre className="w-full max-w-2xl bg-gray-100 p-4 rounded text-left text-xs overflow-x-auto mb-8">
+                <code>{stack}</code>
+              </pre>
+            )}
+          </div>
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
   );
 }
