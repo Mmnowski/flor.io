@@ -108,37 +108,61 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Background: Very dark slate background */
+  --background: #0f172a;
+  /* Foreground: Light text for contrast */
+  --foreground: #f1f5f9;
+
+  /* Card: Dark slate with subtle tone */
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+
+  /* Popover: Slightly lighter card */
+  --popover: #334155;
+  --popover-foreground: #f1f5f9;
+
+  /* Primary: Bright Emerald (maintained) */
+  --primary: #10b981;
+  --primary-foreground: #0f172a;
+
+  /* Secondary: Light Emerald for dark backgrounds */
+  --secondary: #6ee7b7;
+  --secondary-foreground: #0f172a;
+
+  /* Muted: Medium gray */
+  --muted: #475569;
+  --muted-foreground: #cbd5e1;
+
+  /* Accent: Bright Emerald */
+  --accent: #10b981;
+  --accent-foreground: #0f172a;
+
+  /* Destructive: Bright red for visibility in dark mode */
+  --destructive: #ff6b6b;
+
+  /* Border: Dark emerald tone */
+  --border: #1e7e74;
+  /* Input: Dark background */
+  --input: #334155;
+  /* Ring: Bright Emerald */
+  --ring: #10b981;
+
+  /* Charts - vibrant colors for dark backgrounds */
+  --chart-1: #10b981;
+  --chart-2: #6ee7b7;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #f59e0b;
+
+  /* Sidebar dark mode */
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #6ee7b7;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #1e7e74;
+  --sidebar-ring: #10b981;
 }
 
 @layer base {

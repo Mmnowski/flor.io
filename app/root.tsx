@@ -41,8 +41,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="description" content="Track and manage your plant care with AI-powered insights" />
         <Meta />
         <Links />
+        {/* Initialize theme from localStorage before rendering to prevent flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = theme === 'dark' || (theme === null && prefersDark);
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
-      <body className="bg-white">
+      <body className="bg-white dark:bg-slate-950">
         {children}
         <ScrollRestoration />
         <Scripts />
