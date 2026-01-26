@@ -6,9 +6,11 @@
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
 
-import { redirect, type Route } from "react-router";
+import { type Route } from "react-router";
 import { requireUserId } from "~/lib/require-auth.server";
 import { checkAIGenerationLimit, checkPlantLimit } from "~/lib/usage-limits.server";
+import { AIWizardPage } from "~/components/AIWizardPage";
+import { getUserRooms } from "~/lib/rooms.server";
 
 export const meta: Route.MetaFunction = () => [
   { title: "Create Plant with AI - Flor" },
@@ -23,28 +25,26 @@ export const loader: Route.LoaderFunction = async (args) => {
   // Check if user can create plants
   const plantLimitStatus = await checkPlantLimit(userId);
   if (!plantLimitStatus.allowed) {
-    return {
-      error: "Plant limit reached",
-      message: `You've reached the limit of ${plantLimitStatus.limit} plants`,
-      redirect: "/dashboard",
-    };
+    throw new Error(
+      `Plant limit reached: ${plantLimitStatus.limit} max plants`
+    );
   }
 
   // Check if user can use AI
   const aiLimitStatus = await checkAIGenerationLimit(userId);
   if (!aiLimitStatus.allowed) {
-    return {
-      error: "AI limit reached",
-      message: `You've used all ${aiLimitStatus.limit} AI generations this month`,
-      resetDate: aiLimitStatus.resetsOn,
-      redirect: "/dashboard",
-    };
+    throw new Error(
+      `AI generation limit reached: ${aiLimitStatus.limit} per month`
+    );
   }
+
+  // Get user's rooms for dropdown
+  const rooms = await getUserRooms(userId);
 
   return {
     userId,
     aiRemaining: aiLimitStatus.limit - aiLimitStatus.used,
-    plantCount: plantLimitStatus.count,
+    rooms: rooms || [],
   };
 };
 
@@ -96,55 +96,20 @@ export const action: Route.ActionFunction = async (args) => {
 /**
  * Component renders the AI wizard UI
  */
-export default function AIWizardPage({
+export default function AIWizardRoute({
   loaderData,
-  actionData,
 }: Route.ComponentProps) {
-  // Check for redirect needed (limits exceeded)
-  if (loaderData.redirect) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold">{loaderData.error}</h1>
-          <p className="mt-2 text-gray-600">{loaderData.message}</p>
-          {loaderData.resetDate && (
-            <p className="mt-2 text-sm text-gray-500">
-              Resets on {new Date(loaderData.resetDate).toLocaleDateString()}
-            </p>
-          )}
-          <a
-            href="/dashboard"
-            className="mt-4 inline-block bg-blue-500 px-4 py-2 text-white rounded"
-          >
-            Back to Dashboard
-          </a>
-        </div>
-      </div>
-    );
-  }
+  const handleComplete = (plantId: string) => {
+    // Navigate to plant details page
+    window.location.href = `/dashboard/plants/${plantId}`;
+  };
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-3xl font-bold">Identify Your Plant</h1>
-      <p className="mt-2 text-gray-600">
-        Upload a photo and let AI identify your plant and generate care instructions
-      </p>
-
-      {/* Usage indicator */}
-      {loaderData.aiRemaining && (
-        <div className="mt-4 rounded-lg bg-blue-50 p-4">
-          <p className="text-sm text-blue-900">
-            AI generations remaining this month: {loaderData.aiRemaining}/20
-          </p>
-        </div>
-      )}
-
-      {/* Wizard will be rendered here by step component */}
-      <div className="mt-8">
-        <p className="text-center text-gray-500">
-          Wizard steps component goes here
-        </p>
-      </div>
-    </div>
+    <AIWizardPage
+      userId={loaderData.userId}
+      aiRemaining={loaderData.aiRemaining}
+      rooms={loaderData.rooms}
+      onComplete={handleComplete}
+    />
   );
 }
