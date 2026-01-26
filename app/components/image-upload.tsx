@@ -62,6 +62,7 @@ export function ImageUpload({ currentPhotoUrl, onFileChange }: ImageUploadProps)
       <input
         ref={fileInputRef}
         type="file"
+        name="photo"
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
