@@ -4,11 +4,11 @@
  */
 
 export { PhotoUploadStep } from "./PhotoUploadStep";
+export { IdentifyingStep } from "./IdentifyingStep";
+export { IdentificationResultStep } from "./IdentificationResultStep";
+export { ManualNameStep } from "./ManualNameStep";
+export { GeneratingCareStep } from "./GeneratingCareStep";
+export { CarePreviewStep } from "./CarePreviewStep";
 
-// Additional steps coming in future commits:
-// export { IdentifyingStep } from "./IdentifyingStep";
-// export { IdentificationResultStep } from "./IdentificationResultStep";
-// export { ManualNameStep } from "./ManualNameStep";
-// export { GeneratingCareStep } from "./GeneratingCareStep";
-// export { CarePreviewStep } from "./CarePreviewStep";
+// Feedback step coming in next commit:
 // export { FeedbackStep } from "./FeedbackStep";
