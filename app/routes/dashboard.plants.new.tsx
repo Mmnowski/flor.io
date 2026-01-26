@@ -6,6 +6,7 @@ import { getUserRooms } from "~/lib/rooms.server";
 import { createPlant } from "~/lib/plants.server";
 import { processPlantImage, extractImageFromFormData, fileToBuffer } from "~/lib/image.server";
 import { uploadPlantPhoto } from "~/lib/storage.server";
+import { plantFormSchema } from "~/lib/validation";
 import { PlantForm } from "~/components/plant-form";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -23,24 +24,26 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const userId = await requireAuth(request);
     const formData = await request.formData();
 
-    // Extract and validate required fields
-    const name = formData.get("name");
-    const wateringFrequencyStr = formData.get("watering_frequency_days");
-    const roomId = formData.get("room_id");
-    const lightRequirements = formData.get("light_requirements");
-    const fertilizingTips = formData.get("fertilizing_tips");
-    const pruningTips = formData.get("pruning_tips");
-    const troubleshooting = formData.get("troubleshooting");
+    // Extract fields
+    const data = {
+      name: String(formData.get("name")),
+      watering_frequency_days: Number(formData.get("watering_frequency_days")),
+      room_id: formData.get("room_id"),
+      light_requirements: formData.get("light_requirements"),
+      fertilizing_tips: formData.get("fertilizing_tips"),
+      pruning_tips: formData.get("pruning_tips"),
+      troubleshooting: formData.get("troubleshooting"),
+    };
 
-    // Validate required fields
-    if (!name || typeof name !== "string" || !name.trim()) {
-      return { error: "Plant name is required" };
+    // Validate using Zod schema
+    const validation = plantFormSchema.safeParse(data);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      return { error: firstError || "Validation failed" };
     }
 
-    const wateringFrequency = Number(wateringFrequencyStr);
-    if (wateringFrequency < 1 || wateringFrequency > 365) {
-      return { error: "Watering frequency must be between 1 and 365 days" };
-    }
+    const validatedData = validation.data;
 
     // Extract and process photo if provided
     let photoUrl: string | null = null;
@@ -62,14 +65,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
     // Create plant
     const plant = await createPlant(userId, {
-      name: name.trim(),
-      watering_frequency_days: wateringFrequency,
+      name: validatedData.name,
+      watering_frequency_days: validatedData.watering_frequency_days,
       photo_url: photoUrl,
-      room_id: roomId && typeof roomId === "string" && roomId !== "" ? roomId : null,
-      light_requirements: lightRequirements && typeof lightRequirements === "string" ? lightRequirements.trim() || null : null,
-      fertilizing_tips: fertilizingTips && typeof fertilizingTips === "string" ? fertilizingTips.trim() || null : null,
-      pruning_tips: pruningTips && typeof pruningTips === "string" ? pruningTips.trim() || null : null,
-      troubleshooting: troubleshooting && typeof troubleshooting === "string" ? troubleshooting.trim() || null : null,
+      room_id: validatedData.room_id || null,
+      light_requirements: validatedData.light_requirements || null,
+      fertilizing_tips: validatedData.fertilizing_tips || null,
+      pruning_tips: validatedData.pruning_tips || null,
+      troubleshooting: validatedData.troubleshooting || null,
     });
 
     // Redirect to plant detail
