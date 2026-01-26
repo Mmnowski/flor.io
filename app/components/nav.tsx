@@ -98,7 +98,7 @@ export function Navigation({
                   variant="ghost"
                   size="icon"
                   onClick={() => setNotificationsOpen(true)}
-                  className="relative h-10 w-10 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
+                  className="relative h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
                   aria-label={`Notifications (${notifications.length})`}
                 >
                   <Bell className="h-5 w-5 text-gray-700 dark:text-slate-300" />
@@ -117,7 +117,7 @@ export function Navigation({
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="h-10 w-10 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
+                  className="h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
                   aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                 >
                   {isDark ? (
@@ -133,7 +133,7 @@ export function Navigation({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
+                      className="h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
                       aria-label="User menu"
                     >
                       <Menu className="h-5 w-5" />
@@ -165,7 +165,7 @@ export function Navigation({
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="h-10 w-10 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
+                  className="h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
                   aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                 >
                   {isDark ? (

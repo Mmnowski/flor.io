@@ -37,7 +37,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const session = await loginUser(email, password);
 
     if (!session?.user?.id) {
-      return { error: "Failed to login" };
+      return { error: "Email address or password is incorrect" };
     }
 
     return createUserSession(session.user.id);

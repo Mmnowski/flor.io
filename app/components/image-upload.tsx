@@ -75,7 +75,7 @@ export function ImageUpload({ currentPhotoUrl, onFileChange }: ImageUploadProps)
           <div className="relative w-full rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700">
             <img
               src={preview}
-              alt="Plant photo preview"
+              alt={`Preview of ${fileName || 'selected plant photo'}`}
               className="w-full h-64 object-cover"
             />
           </div>
@@ -103,6 +103,7 @@ export function ImageUpload({ currentPhotoUrl, onFileChange }: ImageUploadProps)
               variant="outline"
               onClick={handleRemovePhoto}
               className="px-3"
+              aria-label="Remove plant photo"
             >
               <X className="w-4 h-4" />
             </Button>

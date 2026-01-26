@@ -39,7 +39,11 @@ export function PlantCard({ plant }: PlantCardProps) {
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800">
+            <div
+              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800"
+              role="img"
+              aria-label={`No photo available for ${plant.name}`}
+            >
               <Leaf className="w-12 h-12 text-emerald-600 dark:text-emerald-400" />
             </div>
           )}
