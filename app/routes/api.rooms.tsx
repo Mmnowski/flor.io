@@ -8,7 +8,7 @@
  * - DELETE: Delete room
  */
 
-import { json, type Route } from 'react-router';
+import type { Route } from './+types/api.rooms';
 import { requireAuth } from '~/lib/require-auth.server';
 import {
   getUserRooms,
@@ -22,16 +22,16 @@ import { roomNameSchema } from '~/lib/validation';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   if (request.method !== 'GET') {
-    return json({ error: 'Method not allowed' }, { status: 405 });
+    throw new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
 
   try {
     const userId = await requireAuth(request);
     const rooms = await getUserRooms(userId);
-    return json({ rooms });
+    return { rooms };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch rooms';
-    return json({ error: message }, { status: 500 });
+    throw new Response(JSON.stringify({ error: message }), { status: 500 });
   }
 };
 
@@ -40,7 +40,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     const formData = await request.formData();
-    const method = formData.get('_method') as string || request.method;
+    const method = (formData.get('_method') as string) || request.method;
 
     switch (method) {
       case 'POST': {
@@ -50,14 +50,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
         // Validate room name
         const validation = roomNameSchema.safeParse(name);
         if (!validation.success) {
-          return json(
-            { error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name' },
+          throw new Response(
+            JSON.stringify({
+              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+            }),
             { status: 400 }
           );
         }
 
         const room = await createRoom(userId, validation.data);
-        return json({ room }, { status: 201 });
+        return new Response(JSON.stringify({ room }), { status: 201 });
       }
 
       case 'PATCH': {
@@ -68,20 +70,22 @@ export const action = async ({ request }: Route.ActionArgs) => {
         // Verify room ownership
         const room = await getRoomById(roomId, userId);
         if (!room) {
-          return json({ error: 'Room not found' }, { status: 404 });
+          throw new Response(JSON.stringify({ error: 'Room not found' }), { status: 404 });
         }
 
         // Validate new name
         const validation = roomNameSchema.safeParse(name);
         if (!validation.success) {
-          return json(
-            { error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name' },
+          throw new Response(
+            JSON.stringify({
+              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+            }),
             { status: 400 }
           );
         }
 
         const updated = await updateRoom(roomId, validation.data);
-        return json({ room: updated });
+        return { room: updated };
       }
 
       case 'DELETE': {
@@ -91,30 +95,33 @@ export const action = async ({ request }: Route.ActionArgs) => {
         // Verify room ownership
         const room = await getRoomById(roomId, userId);
         if (!room) {
-          return json({ error: 'Room not found' }, { status: 404 });
+          throw new Response(JSON.stringify({ error: 'Room not found' }), { status: 404 });
         }
 
         // Check if room has plants
         const plantCount = await countPlantsInRoom(roomId, userId);
         if (plantCount > 0) {
-          return json(
-            {
+          throw new Response(
+            JSON.stringify({
               error: `Cannot delete room with ${plantCount} plant${plantCount !== 1 ? 's' : ''}. Move plants to another room first.`,
-            },
+            }),
             { status: 400 }
           );
         }
 
         await deleteRoom(roomId);
-        return json({ success: true });
+        return { success: true };
       }
 
       default:
-        return json({ error: 'Method not allowed' }, { status: 405 });
+        throw new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
     }
   } catch (error) {
+    if (error instanceof Response) {
+      throw error;
+    }
     const message = error instanceof Error ? error.message : 'Operation failed';
     console.error('Room API error:', error);
-    return json({ error: message }, { status: 500 });
+    throw new Response(JSON.stringify({ error: message }), { status: 500 });
   }
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback } from 'react';
-import { revalidator } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import { CreateRoomDialog } from '~/components/create-room-dialog';
 import { cn } from '~/lib/utils';
@@ -26,11 +25,6 @@ export function RoomFilter({
     },
     [onFilterChange]
   );
-
-  const handleRoomCreated = () => {
-    // Trigger a revalidation of the loaders
-    revalidator.revalidate();
-  };
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
@@ -76,7 +70,7 @@ export function RoomFilter({
       ))}
 
       {/* Create Room button */}
-      <CreateRoomDialog onRoomCreated={handleRoomCreated} />
+      <CreateRoomDialog />
     </div>
   );
 }

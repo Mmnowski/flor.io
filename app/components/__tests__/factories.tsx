@@ -1,8 +1,9 @@
+import React from 'react';
 import {
   createMockPlantWithWatering,
   createMockPlantWithDetails,
   createMockRooms,
-} from '~/app/__tests__/factories';
+} from '../../__tests__/factories';
 import type { PlantWithWatering, PlantWithDetails, Room } from '~/types/plant.types';
 
 /**

@@ -68,7 +68,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     // Create plant
     const plant = await createPlant(userId, {
       name: validatedData.name,
-      watering_frequency_days: validatedData.watering_frequency_days,
+      watering_frequency_days: Number(validatedData.watering_frequency_days),
       photo_url: photoUrl,
       room_id: validatedData.room_id || null,
       light_requirements: validatedData.light_requirements || null,

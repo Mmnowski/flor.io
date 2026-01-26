@@ -15,11 +15,7 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Plus, AlertCircle } from 'lucide-react';
 
-interface CreateRoomDialogProps {
-  onRoomCreated?: () => void;
-}
-
-export function CreateRoomDialog({ onRoomCreated }: CreateRoomDialogProps) {
+export function CreateRoomDialog() {
   const fetcher = useFetcher();
   const [open, setOpen] = useState(false);
   const [roomName, setRoomName] = useState('');
@@ -45,7 +41,6 @@ export function CreateRoomDialog({ onRoomCreated }: CreateRoomDialogProps) {
   if (fetcher.state === 'idle' && fetcher.data?.room && open) {
     setOpen(false);
     setRoomName('');
-    onRoomCreated?.();
   }
 
   return (
