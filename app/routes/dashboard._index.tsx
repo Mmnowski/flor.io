@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useLoaderData, useNavigate, useSearchParams } from "react-router";
+import { useLoaderData, useNavigate, useSearchParams, useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard._index";
 import { Button } from "~/components/ui/button";
 import { EmptyState } from "~/components/empty-state";
+import { DashboardSkeleton } from "~/components/skeleton-loader";
 import { Plus, Leaf } from "lucide-react";
 import { requireAuth } from "~/lib/require-auth.server";
 import { getUserPlants } from "~/lib/plants.server";
@@ -30,9 +31,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function DashboardIndex() {
   const { plants, rooms, activeRoomId } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false);
+
+  const isLoading = navigation.state === 'loading';
 
   const handleFilterChange = (newRoomId: string | null) => {
     if (newRoomId) {
@@ -41,6 +45,10 @@ export default function DashboardIndex() {
       navigate('');
     }
   };
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

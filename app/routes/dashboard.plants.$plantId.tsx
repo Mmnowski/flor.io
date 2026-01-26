@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link, useLoaderData, redirect } from "react-router";
+import { Link, useLoaderData, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard.plants.$plantId";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Leaf, Pencil, Sun, Droplet, Bug, Leaf as LeafIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { PlantDetailsSkeleton } from "~/components/skeleton-loader";
 import { requireAuth } from "~/lib/require-auth.server";
 import { getPlantById, deletePlant } from "~/lib/plants.server";
 import { recordWatering } from "~/lib/watering.server";
@@ -65,7 +66,14 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
 export default function PlantDetail() {
   const { plant } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const isLoading = navigation.state === 'loading';
+
+  if (isLoading) {
+    return <PlantDetailsSkeleton />;
+  }
 
   const getWateringColor = () => {
     if (plant.is_overdue) {

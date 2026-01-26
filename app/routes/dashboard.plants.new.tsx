@@ -35,12 +35,14 @@ export const action = async ({ request }: Route.ActionArgs) => {
       troubleshooting: formData.get("troubleshooting"),
     };
 
-    // Validate using Zod schema
+    // Server-side validation using Zod
     const validation = plantFormSchema.safeParse(data);
     if (!validation.success) {
       const errors = validation.error.flatten().fieldErrors;
-      const firstError = Object.values(errors)[0]?.[0];
-      return { error: firstError || "Validation failed" };
+      return {
+        error: Object.values(errors)[0]?.[0] || "Validation failed",
+        fieldErrors: errors,
+      };
     }
 
     const validatedData = validation.data;
@@ -96,7 +98,7 @@ export default function NewPlant() {
         </Button>
       </Link>
       <h1 className="text-3xl font-bold mb-8">Add Plant</h1>
-      <PlantForm rooms={rooms} mode="create" error={actionData?.error} />
+      <PlantForm rooms={rooms} mode="create" error={actionData?.error} fieldErrors={actionData?.fieldErrors} />
     </div>
   );
 }

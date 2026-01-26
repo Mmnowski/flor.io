@@ -84,3 +84,59 @@ export async function countPlantsInRoom(
     return 0;
   }
 }
+
+/**
+ * Create a new room for a user
+ * @param userId - User ID
+ * @param name - Room name
+ * @returns Created room
+ */
+export async function createRoom(userId: string, name: string): Promise<Room> {
+  const { data, error } = await supabaseServer
+    .from('rooms')
+    .insert({ user_id: userId, name })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as Room;
+}
+
+/**
+ * Update room name
+ * @param roomId - Room ID
+ * @param name - New room name
+ * @returns Updated room
+ */
+export async function updateRoom(roomId: string, name: string): Promise<Room> {
+  const { data, error } = await supabaseServer
+    .from('rooms')
+    .update({ name })
+    .eq('id', roomId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as Room;
+}
+
+/**
+ * Delete a room
+ * @param roomId - Room ID
+ */
+export async function deleteRoom(roomId: string): Promise<void> {
+  const { error } = await supabaseServer
+    .from('rooms')
+    .delete()
+    .eq('id', roomId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

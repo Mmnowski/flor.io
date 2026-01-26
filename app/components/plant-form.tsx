@@ -19,22 +19,24 @@ import { ImageUpload } from '~/components/image-upload';
 import { plantNameSchema, wateringFrequencySchema, getFieldError } from '~/lib/validation';
 import type { PlantWithDetails, Room } from '~/types/plant.types';
 
+interface FieldErrors {
+  [key: string]: string[] | undefined;
+  name?: string[];
+  watering_frequency_days?: string[];
+}
+
 interface PlantFormProps {
   plant?: PlantWithDetails;
   rooms: Room[];
   error?: string | null;
+  fieldErrors?: FieldErrors;
   mode: 'create' | 'edit';
 }
 
-interface FieldErrors {
-  name?: string;
-  watering_frequency_days?: string;
-}
-
-export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
+export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors, mode }: PlantFormProps) {
   const isEdit = mode === 'edit';
   const [selectedRoom, setSelectedRoom] = useState<string>(isEdit && plant?.room_id ? plant.room_id : '');
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>(serverFieldErrors || {});
 
   const handleRoomChange = (value: string) => {
     setSelectedRoom(value);
@@ -118,7 +120,7 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
             role="alert"
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {fieldErrors.name}
+            {Array.isArray(fieldErrors.name) ? fieldErrors.name[0] : fieldErrors.name}
           </div>
         )}
         {!fieldErrors.name && (
@@ -160,7 +162,7 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
             role="alert"
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {fieldErrors.watering_frequency_days}
+            {Array.isArray(fieldErrors.watering_frequency_days) ? fieldErrors.watering_frequency_days[0] : fieldErrors.watering_frequency_days}
           </div>
         )}
         {!fieldErrors.watering_frequency_days && (
