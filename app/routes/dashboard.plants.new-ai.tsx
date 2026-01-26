@@ -7,7 +7,7 @@
  */
 
 import { redirect, type Route } from "react-router";
-import { requireUserId } from "~/lib/require-auth.server";
+import { requireAuth } from "~/lib/require-auth.server";
 import {
   checkAIGenerationLimit,
   checkPlantLimit,
@@ -26,8 +26,8 @@ export const meta: Route.MetaFunction = () => [
 /**
  * Loader validates authentication and limits before entering wizard
  */
-export const loader: Route.LoaderFunction = async (args) => {
-  const userId = await requireUserId(args);
+export const loader: Route.LoaderFunction = async ({ request }) => {
+  const userId = await requireAuth(request);
 
   // Check if user can create plants
   const plantLimitStatus = await checkPlantLimit(userId);
@@ -59,9 +59,9 @@ export const loader: Route.LoaderFunction = async (args) => {
  * Action handler processes form submissions from wizard steps
  * Handles plant creation and feedback recording
  */
-export const action: Route.ActionFunction = async (args) => {
-  const userId = await requireUserId(args);
-  const formData = await args.request.formData();
+export const action: Route.ActionFunction = async ({ request }) => {
+  const userId = await requireAuth(request);
+  const formData = await request.formData();
   const action = formData.get("_action") as string;
 
   // Validate action parameter
