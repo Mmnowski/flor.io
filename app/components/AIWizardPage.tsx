@@ -15,6 +15,7 @@ import {
   CarePreviewStep,
   FeedbackStep,
 } from "./ai-wizard-steps";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 
 interface AIWizardPageProps {
   userId: string;
@@ -41,6 +42,7 @@ function AIWizardPageContent({
 
     try {
       setIsSubmitting(true);
+      updateState({ error: null });
 
       // Create FormData with all plant information
       const formData = new FormData(formRef.current);
@@ -73,11 +75,17 @@ function AIWizardPageContent({
         formData.append("photoFile", state.photoFile);
       }
 
-      // Submit to server
+      // Submit to server with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const response = await fetch("", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const error = await response.json();
@@ -87,7 +95,6 @@ function AIWizardPageContent({
       const result = await response.json();
       updateState({
         error: null,
-        // Store plant ID for feedback step
       });
 
       // Store plant ID in state for feedback recording
@@ -96,9 +103,18 @@ function AIWizardPageContent({
       // Move to feedback step
       goToStep("feedback");
     } catch (error) {
+      let errorMessage = "Failed to save plant";
+
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          errorMessage = "Request timed out. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       updateState({
-        error:
-          error instanceof Error ? error.message : "Failed to save plant",
+        error: errorMessage,
         isLoading: false,
       });
     } finally {
@@ -118,6 +134,7 @@ function AIWizardPageContent({
 
     try {
       setIsSubmitting(true);
+      updateState({ error: null });
 
       const formData = new FormData();
       formData.append("_action", "save-feedback");
@@ -132,10 +149,17 @@ function AIWizardPageContent({
         })
       );
 
+      // Submit with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const response = await fetch("", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.redirected) {
         // Server issued redirect, let browser handle it
@@ -147,9 +171,25 @@ function AIWizardPageContent({
         onComplete?.(plantId);
       }
     } catch (error) {
+      let errorMessage = "Failed to save feedback";
+
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          errorMessage =
+            "Request timed out, but your plant was created successfully.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      // Log error but still allow user to continue
       console.error("Feedback error:", error);
-      // Still redirect even if feedback fails
-      onComplete?.(plantId);
+      updateState({ error: errorMessage });
+
+      // Still redirect to plant even if feedback fails
+      setTimeout(() => {
+        onComplete?.((window as any).__plantId);
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -206,11 +246,21 @@ function AIWizardPageContent({
   // Step 5: Care Preview & Edit
   if (state.currentStep === "care-preview") {
     return (
-      <form ref={formRef}>
+      <form ref={formRef} className="space-y-6">
+        {state.error && (
+          <Alert variant="destructive">
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        )}
         <CarePreviewStep
           onContinue={handleSavePlant}
           rooms={rooms}
         />
+        {state.isLoading && (
+          <div className="rounded-lg bg-blue-50 p-4">
+            <p className="text-sm text-blue-900">Saving your plant...</p>
+          </div>
+        )}
       </form>
     );
   }

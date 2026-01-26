@@ -67,6 +67,10 @@ export interface WizardState {
   // UI state
   isLoading: boolean;
   error: string | null;
+
+  // Error recovery
+  lastAttemptedStep?: WizardStep;
+  retryCount: number;
 }
 
 interface AIWizardProps {
@@ -92,6 +96,8 @@ const defaultState: WizardState = {
   feedbackComment: "",
   isLoading: false,
   error: null,
+  lastAttemptedStep: undefined,
+  retryCount: 0,
 };
 
 /**
@@ -103,6 +109,7 @@ export const AIWizardContext = React.createContext<{
   updateState: (updates: Partial<WizardState>) => void;
   completeCurrentStep: () => void;
   goBack: () => void;
+  incrementRetry: () => void;
 } | null>(null);
 
 /**
@@ -122,6 +129,8 @@ export function AIWizard({
       ...prev,
       currentStep: step,
       error: null,
+      retryCount: 0,
+      lastAttemptedStep: undefined,
     }));
     setStepHistory((prev) => [...prev, step]);
   };
@@ -149,9 +158,19 @@ export function AIWizard({
         ...prevState,
         currentStep: previousStep,
         error: null,
+        retryCount: 0,
+        lastAttemptedStep: undefined,
       }));
       return newHistory;
     });
+  };
+
+  const incrementRetry = () => {
+    setState((prev) => ({
+      ...prev,
+      retryCount: prev.retryCount + 1,
+      lastAttemptedStep: prev.currentStep,
+    }));
   };
 
   return (
@@ -162,6 +181,7 @@ export function AIWizard({
         updateState,
         completeCurrentStep,
         goBack,
+        incrementRetry,
       }}
     >
       <div className="w-full">

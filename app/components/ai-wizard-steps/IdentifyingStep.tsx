@@ -1,21 +1,27 @@
 /**
  * Step 2: Identifying
- * Loading state while AI identifies the plant
+ * Loading state while AI identifies the plant with timeout and retry support
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAIWizard } from "../ai-wizard";
+import { withTimeout, parseError } from "~/lib/error-handling";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 
 interface IdentifyingStepProps {
   onComplete?: () => void;
   onError?: (error: string) => void;
 }
 
+const IDENTIFY_TIMEOUT_MS = 30000; // 30 second timeout for identification
+
 export function IdentifyingStep({
   onComplete,
   onError,
 }: IdentifyingStepProps) {
-  const { state, updateState } = useAIWizard();
+  const { state, updateState, incrementRetry } = useAIWizard();
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     // Simulate API call to identify plant
@@ -38,8 +44,12 @@ export function IdentifyingStep({
         //   body: formData,
         // });
 
-        // For now, simulate the 2-second delay from plantnet.server.ts
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Simulate the 2-second delay from plantnet.server.ts with timeout
+        const apiCall = new Promise<void>((resolve) => {
+          setTimeout(resolve, 2000);
+        });
+
+        await withTimeout(apiCall, IDENTIFY_TIMEOUT_MS, "Plant identification took too long");
 
         // Mock: randomly select a plant (in real app, this comes from API)
         const mockPlants = [
@@ -66,19 +76,31 @@ export function IdentifyingStep({
         updateState({
           identification: randomPlant,
           isLoading: false,
+          retryCount: 0,
         });
 
         onComplete?.();
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to identify plant";
-        updateState({ isLoading: false, error: errorMessage });
-        onError?.(errorMessage);
+        const errorInfo = parseError(error);
+        updateState({
+          isLoading: false,
+          error: errorInfo.userMessage,
+        });
+        onError?.(errorInfo.userMessage);
+        setIsRetrying(false);
       }
     };
 
-    identifyPlant();
-  }, [state.photoFile, updateState, onComplete, onError]);
+    if (!isRetrying) {
+      identifyPlant();
+    }
+  }, [state.photoFile, updateState, onComplete, onError, isRetrying]);
+
+  const handleRetry = () => {
+    setIsRetrying(true);
+    incrementRetry();
+    setTimeout(() => setIsRetrying(false), 100);
+  };
 
   return (
     <div className="space-y-6">
@@ -89,43 +111,76 @@ export function IdentifyingStep({
         </p>
       </div>
 
+      {/* Error state */}
+      {state.error && (
+        <Alert variant="destructive">
+          <AlertDescription className="space-y-3">
+            <p>{state.error}</p>
+            {state.retryCount < 3 && (
+              <Button
+                onClick={handleRetry}
+                variant="outline"
+                size="sm"
+                className="mt-2"
+              >
+                Try Again
+              </Button>
+            )}
+            {state.retryCount >= 3 && (
+              <p className="text-sm text-red-700">
+                Maximum retry attempts reached. Please try a different photo.
+              </p>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Loading animation */}
-      <div className="flex justify-center py-12">
-        <div className="space-y-6 text-center">
-          {/* Spinner */}
-          <div className="flex justify-center">
-            <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-          </div>
+      {!state.error && (
+        <div className="flex justify-center py-12">
+          <div className="space-y-6 text-center">
+            {/* Spinner */}
+            <div className="flex justify-center">
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+            </div>
 
-          {/* Status text */}
-          <div>
-            <p className="text-lg font-semibold text-gray-900">
-              Analyzing your plant...
-            </p>
-            <p className="mt-1 text-sm text-gray-600">
-              This should take about 2 seconds
-            </p>
-          </div>
+            {/* Status text */}
+            <div>
+              <p className="text-lg font-semibold text-gray-900">
+                Analyzing your plant...
+              </p>
+              <p className="mt-1 text-sm text-gray-600">
+                This should take about 2 seconds
+              </p>
+              {state.retryCount > 0 && (
+                <p className="mt-2 text-xs text-amber-600">
+                  Attempt {state.retryCount + 1}/3
+                </p>
+              )}
+            </div>
 
-          {/* Progress bar */}
-          <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200">
-            <div className="h-1 w-full animate-pulse rounded-full bg-blue-600" />
+            {/* Progress bar */}
+            <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200">
+              <div className="h-1 w-full animate-pulse rounded-full bg-blue-600" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Cancel button */}
-      <div className="flex justify-center">
-        <button
-          type="button"
-          className="text-sm text-gray-500 hover:text-gray-700 underline"
-          onClick={() => {
-            updateState({ error: "Cancelled by user" });
-          }}
-        >
-          Cancel
-        </button>
-      </div>
+      {!state.error && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            onClick={() => {
+              updateState({ error: "Cancelled by user" });
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }
