@@ -3,7 +3,8 @@
  * Renders the full wizard with all steps
  */
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Form } from "react-router";
 import { AIWizard, useAIWizard, type WizardStep } from "./ai-wizard";
 import {
   PhotoUploadStep,
@@ -32,6 +33,127 @@ function AIWizardPageContent({
   onComplete,
 }: AIWizardPageProps) {
   const { state, goToStep, updateState } = useAIWizard();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSavePlant = async () => {
+    if (!formRef.current) return;
+
+    try {
+      setIsSubmitting(true);
+
+      // Create FormData with all plant information
+      const formData = new FormData(formRef.current);
+      formData.append("_action", "save-plant");
+      formData.append("name", state.manualPlantName);
+      formData.append(
+        "wateringFrequencyDays",
+        state.careInstructions?.wateringFrequencyDays.toString() || "7"
+      );
+      formData.append(
+        "lightRequirements",
+        state.careInstructions?.lightRequirements || ""
+      );
+      formData.append(
+        "fertilizingTips",
+        JSON.stringify(state.careInstructions?.fertilizingTips || [])
+      );
+      formData.append(
+        "pruningTips",
+        JSON.stringify(state.careInstructions?.pruningTips || [])
+      );
+      formData.append(
+        "troubleshooting",
+        JSON.stringify(state.careInstructions?.troubleshooting || [])
+      );
+      formData.append("roomId", state.selectedRoomId || "");
+
+      // Add photo file if exists
+      if (state.photoFile) {
+        formData.append("photoFile", state.photoFile);
+      }
+
+      // Submit to server
+      const response = await fetch("", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save plant");
+      }
+
+      const result = await response.json();
+      updateState({
+        error: null,
+        // Store plant ID for feedback step
+      });
+
+      // Store plant ID in state for feedback recording
+      (window as any).__plantId = result.plantId;
+
+      // Move to feedback step
+      goToStep("feedback");
+    } catch (error) {
+      updateState({
+        error:
+          error instanceof Error ? error.message : "Failed to save plant",
+        isLoading: false,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmitFeedback = async (feedbackData: {
+    feedbackType: "thumbs_up" | "thumbs_down" | null;
+    feedbackComment: string;
+  }) => {
+    const plantId = (window as any).__plantId;
+    if (!plantId || !feedbackData.feedbackType) {
+      onComplete?.(plantId);
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const formData = new FormData();
+      formData.append("_action", "save-feedback");
+      formData.append("plantId", plantId);
+      formData.append("feedbackType", feedbackData.feedbackType);
+      formData.append("comment", feedbackData.feedbackComment || "");
+      formData.append(
+        "aiResponseSnapshot",
+        JSON.stringify({
+          identification: state.identification,
+          careInstructions: state.careInstructions,
+        })
+      );
+
+      const response = await fetch("", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.redirected) {
+        // Server issued redirect, let browser handle it
+        window.location.href = response.url;
+      } else if (!response.ok) {
+        throw new Error("Failed to save feedback");
+      } else {
+        // Redirect to plant details
+        onComplete?.(plantId);
+      }
+    } catch (error) {
+      console.error("Feedback error:", error);
+      // Still redirect even if feedback fails
+      onComplete?.(plantId);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Step 1: Photo Upload
   if (state.currentStep === "photo-upload") {
@@ -84,10 +206,12 @@ function AIWizardPageContent({
   // Step 5: Care Preview & Edit
   if (state.currentStep === "care-preview") {
     return (
-      <CarePreviewStep
-        onContinue={() => goToStep("feedback")}
-        rooms={rooms}
-      />
+      <form ref={formRef}>
+        <CarePreviewStep
+          onContinue={handleSavePlant}
+          rooms={rooms}
+        />
+      </form>
     );
   }
 
@@ -99,15 +223,18 @@ function AIWizardPageContent({
     return (
       <FeedbackStep
         plantName={plantName}
-        onSubmit={() => {
-          // In real app: submit plant and feedback to server
-          // then redirect to plant details or dashboard
-          onComplete?.(Math.random().toString()); // Mock plant ID
-        }}
-        onSkip={() => {
-          // In real app: submit plant without feedback
-          onComplete?.(Math.random().toString()); // Mock plant ID
-        }}
+        onSubmit={() =>
+          handleSubmitFeedback({
+            feedbackType: state.feedbackType,
+            feedbackComment: state.feedbackComment,
+          })
+        }
+        onSkip={() =>
+          handleSubmitFeedback({
+            feedbackType: state.feedbackType,
+            feedbackComment: state.feedbackComment,
+          })
+        }
       />
     );
   }
