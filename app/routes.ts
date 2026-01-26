@@ -17,6 +17,7 @@ export default [
   route("dashboard", "routes/dashboard.tsx", [
     index("routes/dashboard._index.tsx"),
     route("plants/new", "routes/dashboard.plants.new.tsx"),
+    route("plants/new-ai", "routes/dashboard.plants.new-ai.tsx"),
     route("plants/:plantId", "routes/dashboard.plants.$plantId.tsx"),
     route("plants/:plantId/edit", "routes/dashboard.plants.$plantId.edit.tsx"),
   ]),
