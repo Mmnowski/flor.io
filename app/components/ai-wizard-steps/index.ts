@@ -9,6 +9,4 @@ export { IdentificationResultStep } from "./IdentificationResultStep";
 export { ManualNameStep } from "./ManualNameStep";
 export { GeneratingCareStep } from "./GeneratingCareStep";
 export { CarePreviewStep } from "./CarePreviewStep";
-
-// Feedback step coming in next commit:
-// export { FeedbackStep } from "./FeedbackStep";
+export { FeedbackStep } from "./FeedbackStep";
