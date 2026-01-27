@@ -1,61 +1,52 @@
 import type { Room } from '~/types/plant.types';
 
+import { deleteOne, fetchMany, fetchOne, insertOne, updateOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 /**
  * Get all rooms for a user
+ *
  * @param userId - User ID
  * @returns Array of rooms ordered by name
  */
 export async function getUserRooms(userId: string): Promise<Room[]> {
   try {
-    const { data, error } = await supabaseServer
-      .from('rooms')
-      .select('*')
-      .eq('user_id', userId)
-      .order('name', { ascending: true });
+    const rooms = await fetchMany(
+      supabaseServer,
+      'rooms',
+      { user_id: userId },
+      { orderBy: { column: 'name', ascending: true } }
+    );
 
-    if (error) {
-      console.error('Failed to fetch rooms:', error);
-      return [];
-    }
-
-    return (data || []) as Room[];
-  } catch (error) {
-    console.error('Error fetching rooms:', error);
+    return rooms as Room[];
+  } catch {
     return [];
   }
 }
 
 /**
  * Get a specific room by ID, verifying ownership
+ *
  * @param roomId - Room ID
  * @param userId - User ID
  * @returns Room object or null if not found
  */
 export async function getRoomById(roomId: string, userId: string): Promise<Room | null> {
   try {
-    const { data, error } = await supabaseServer
-      .from('rooms')
-      .select('*')
-      .eq('id', roomId)
-      .eq('user_id', userId)
-      .single();
+    const room = await fetchOne(supabaseServer, 'rooms', {
+      id: roomId,
+      user_id: userId,
+    });
 
-    if (error) {
-      console.error('Failed to fetch room:', error);
-      return null;
-    }
-
-    return (data || null) as Room | null;
-  } catch (error) {
-    console.error('Error fetching room:', error);
+    return (room || null) as Room | null;
+  } catch {
     return null;
   }
 }
 
 /**
  * Count plants in a room for a specific user
+ *
  * @param roomId - Room ID
  * @param userId - User ID
  * @returns Number of plants in room
@@ -69,66 +60,52 @@ export async function countPlantsInRoom(roomId: string, userId: string): Promise
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Failed to count plants:', error);
       return 0;
     }
 
     return count || 0;
-  } catch (error) {
-    console.error('Error counting plants:', error);
+  } catch {
     return 0;
   }
 }
 
 /**
  * Create a new room for a user
+ *
  * @param userId - User ID
  * @param name - Room name
  * @returns Created room
+ * @throws {Error} If creation fails
  */
 export async function createRoom(userId: string, name: string): Promise<Room> {
-  const { data, error } = await supabaseServer
-    .from('rooms')
-    .insert({ user_id: userId, name })
-    .select()
-    .single();
+  const room = await insertOne(supabaseServer, 'rooms', {
+    user_id: userId,
+    name,
+  });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as Room;
+  return room as Room;
 }
 
 /**
  * Update room name
+ *
  * @param roomId - Room ID
  * @param name - New room name
  * @returns Updated room
+ * @throws {Error} If update fails
  */
 export async function updateRoom(roomId: string, name: string): Promise<Room> {
-  const { data, error } = await supabaseServer
-    .from('rooms')
-    .update({ name })
-    .eq('id', roomId)
-    .select()
-    .single();
+  const room = await updateOne(supabaseServer, 'rooms', { id: roomId }, { name });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data as Room;
+  return room as Room;
 }
 
 /**
  * Delete a room
+ *
  * @param roomId - Room ID
+ * @throws {Error} If deletion fails
  */
 export async function deleteRoom(roomId: string): Promise<void> {
-  const { error } = await supabaseServer.from('rooms').delete().eq('id', roomId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await deleteOne(supabaseServer, 'rooms', { id: roomId });
 }
