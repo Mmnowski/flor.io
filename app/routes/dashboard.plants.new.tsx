@@ -6,6 +6,7 @@ import { getUserRooms } from '~/lib/rooms.server';
 import { uploadPlantPhoto } from '~/lib/storage.server';
 import { plantFormSchema } from '~/lib/validation';
 import { Button } from '~/shared/components';
+import { logger } from '~/shared/lib/logger';
 
 import { Link, redirect, useActionData, useLoaderData } from 'react-router';
 
@@ -83,7 +84,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return redirect(`/dashboard/plants/${plant.id}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create plant';
-    console.error('Error in create plant action:', error);
+    logger.error('Error in create plant action', error);
     return { error: message };
   }
 };

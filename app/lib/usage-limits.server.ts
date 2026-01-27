@@ -4,6 +4,8 @@
  * Tracks and enforces monthly quotas for AI generation and total plant count.
  * Uses Supabase database for persistence.
  */
+import { logger } from '~/shared/lib/logger';
+
 import { supabaseServer } from './supabase.server';
 
 // Configurable limits (can be moved to environment variables later)
@@ -86,7 +88,7 @@ export async function checkAIGenerationLimit(userId: string): Promise<AIGenerati
   }
 
   if (error) {
-    console.error('Error checking AI generation limit:', error);
+    logger.error('Error checking AI generation limit', error);
     // On error, allow the operation (fail open)
     return {
       allowed: true,
@@ -143,7 +145,7 @@ export async function incrementAIUsage(userId: string): Promise<void> {
       .eq('month_year', monthYear);
 
     if (error) {
-      console.error('Error incrementing AI usage:', error);
+      logger.error('Error incrementing AI usage', error);
       throw error;
     }
   } else {
@@ -159,7 +161,7 @@ export async function incrementAIUsage(userId: string): Promise<void> {
     ]);
 
     if (error) {
-      console.error('Error creating AI usage record:', error);
+      logger.error('Error creating AI usage record', error);
       throw error;
     }
   }
@@ -188,7 +190,7 @@ export async function checkPlantLimit(userId: string): Promise<PlantCountLimitSt
     .eq('user_id', userId);
 
   if (error) {
-    console.error('Error checking plant limit:', error);
+    logger.error('Error checking plant limit', error);
     // On error, allow the operation (fail open)
     return {
       allowed: true,

@@ -5,6 +5,7 @@ import { requireAuth } from '~/lib/require-auth.server';
 import { getUserRooms } from '~/lib/rooms.server';
 import { deletePlantPhoto, uploadPlantPhoto } from '~/lib/storage.server';
 import { Button } from '~/shared/components';
+import { logger } from '~/shared/lib/logger';
 
 import { Link, redirect, useActionData, useLoaderData } from 'react-router';
 
@@ -124,7 +125,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     return redirect(`/dashboard/plants/${plantId}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to update plant';
-    console.error('Error in edit plant action:', error);
+    logger.error('Error in edit plant action', error);
     return { error: message };
   }
 };

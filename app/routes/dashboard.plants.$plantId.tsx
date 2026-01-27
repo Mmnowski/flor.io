@@ -5,6 +5,7 @@ import { requireAuth } from '~/lib/require-auth.server';
 import { cn } from '~/lib/utils';
 import { recordWatering } from '~/lib/watering.server';
 import { Badge, Button, PlantDetailsSkeleton } from '~/shared/components';
+import { logger } from '~/shared/lib/logger';
 import type { PlantWithDetails } from '~/types/plant.types';
 
 import { useState } from 'react';
@@ -55,7 +56,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
         return redirect('/dashboard');
       }
     } catch (error) {
-      console.error('Error in plant action:', error);
+      logger.error('Error in plant action', error);
       const message = error instanceof Error ? error.message : 'An error occurred';
       return { error: message };
     }

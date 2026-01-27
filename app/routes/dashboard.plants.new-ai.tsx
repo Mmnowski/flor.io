@@ -16,6 +16,7 @@ import {
   checkPlantLimit,
   incrementAIUsage,
 } from '~/lib/usage-limits.server';
+import { logger } from '~/shared/lib/logger';
 
 import { type Route, redirect } from 'react-router';
 
@@ -132,7 +133,7 @@ export const action: Route.ActionFunction = async ({ request }) => {
         return { error: 'Unknown action' };
     }
   } catch (error) {
-    console.error('Wizard action error:', error);
+    logger.error('Wizard action error', error);
     return {
       error: error instanceof Error ? error.message : 'An error occurred',
     };

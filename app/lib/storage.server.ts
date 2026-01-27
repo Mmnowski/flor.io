@@ -1,3 +1,5 @@
+import { logger } from '~/shared/lib/logger';
+
 import { v4 as uuidv4 } from 'uuid';
 
 import { supabaseServer } from './supabase.server';
@@ -26,14 +28,14 @@ export async function uploadPlantPhoto(
     });
 
     if (error) {
-      console.error('Failed to upload photo:', error);
+      logger.error('Failed to upload photo', error);
       return null;
     }
 
     const url = getPlantPhotoUrl(path);
     return url;
   } catch (error) {
-    console.error('Error uploading plant photo:', error);
+    logger.error('Error uploading plant photo', error);
     return null;
   }
 }
@@ -51,7 +53,7 @@ export async function deletePlantPhoto(photoUrl: string): Promise<void> {
     const bucketIndex = urlParts.indexOf(BUCKET_NAME);
 
     if (bucketIndex === -1) {
-      console.warn('Could not extract path from photo URL');
+      logger.warn('Could not extract path from photo URL');
       return;
     }
 
@@ -60,10 +62,10 @@ export async function deletePlantPhoto(photoUrl: string): Promise<void> {
     const { error } = await supabaseServer.storage.from(BUCKET_NAME).remove([path]);
 
     if (error) {
-      console.error('Failed to delete photo:', error);
+      logger.error('Failed to delete photo', error);
     }
   } catch (error) {
-    console.error('Error deleting plant photo:', error);
+    logger.error('Error deleting plant photo', error);
   }
 }
 

@@ -3,6 +3,7 @@
  * Renders the full wizard with all steps
  */
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
+import { logger } from '~/shared/lib/logger';
 
 import { useRef, useState } from 'react';
 import { Form } from 'react-router';
@@ -172,7 +173,7 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       }
 
       // Log error but still allow user to continue
-      console.error('Feedback error:', error);
+      logger.error('Feedback error', error);
       updateState({ error: errorMessage });
 
       // Still redirect to plant even if feedback fails

@@ -17,6 +17,7 @@ import {
   updateRoom,
 } from '~/lib/rooms.server';
 import { roomNameSchema } from '~/lib/validation';
+import { logger } from '~/shared/lib/logger';
 
 import type { Route } from './+types/api.rooms';
 
@@ -121,7 +122,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       throw error;
     }
     const message = error instanceof Error ? error.message : 'Operation failed';
-    console.error('Room API error:', error);
+    logger.error('Room API error', error);
     throw new Response(JSON.stringify({ error: message }), { status: 500 });
   }
 };

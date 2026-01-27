@@ -1,6 +1,7 @@
 import { getPlantById } from '~/lib/plants.server';
 import { requireAuth } from '~/lib/require-auth.server';
 import { recordWatering } from '~/lib/watering.server';
+import { logger } from '~/shared/lib/logger';
 
 import type { Route } from '.react-router/types/app/routes/api.water.$plantId';
 
@@ -28,7 +29,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
     return { success: true, plantId };
   } catch (error) {
-    console.error('Error recording watering:', error);
+    logger.error('Error recording watering', error);
     return {
       error: error instanceof Error ? error.message : 'Failed to record watering',
     };
