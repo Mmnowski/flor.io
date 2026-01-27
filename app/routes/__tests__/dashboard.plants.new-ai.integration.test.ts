@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Route } from "../+types/dashboard.plants.new-ai";
 
-// Mock dependencies
+// Mock dependencies - must be before imports
 vi.mock("~/lib/require-auth.server", () => ({
-  requireUserId: vi.fn().mockResolvedValue("user-123"),
+  requireAuth: vi.fn().mockResolvedValue("user-123"),
 }));
 
 vi.mock("~/lib/usage-limits.server", () => ({
@@ -48,6 +48,7 @@ vi.mock("~/lib/image.server", () => ({
   processPlantImage: vi.fn().mockResolvedValue(Buffer.from("compressed")),
 }));
 
+import { requireAuth } from "~/lib/require-auth.server";
 import {
   checkAIGenerationLimit,
   checkPlantLimit,
@@ -64,6 +65,19 @@ describe("AI Wizard Integration Tests", () => {
   });
 
   describe("loader", () => {
+    it("authenticates user before checking limits", async () => {
+      const { loader } = await import("../dashboard.plants.new-ai");
+
+      await loader({
+        request: new Request("http://localhost/dashboard/plants/new-ai"),
+        params: {},
+      } as any);
+
+      expect(requireAuth).toHaveBeenCalledWith(
+        expect.objectContaining({ method: "GET" })
+      );
+    });
+
     it("checks AI generation limit before allowing access", async () => {
       const { loader } = await import("../dashboard.plants.new-ai");
 

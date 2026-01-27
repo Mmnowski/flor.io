@@ -9,10 +9,12 @@ import {
 
 // Mock the supabase server client
 vi.mock("../supabase.server", () => ({
-  createServerClient: vi.fn(),
+  supabaseServer: {
+    from: vi.fn(),
+  },
 }));
 
-import { createServerClient } from "../supabase.server";
+import { supabaseServer } from "../supabase.server";
 
 describe("usage-limits.server", () => {
   beforeEach(() => {
@@ -38,7 +40,7 @@ describe("usage-limits.server", () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit("user-123");
 

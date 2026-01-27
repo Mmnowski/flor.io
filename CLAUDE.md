@@ -10,8 +10,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build for production**: `yarn build`
 - **Start production server**: `yarn start` (serves the built app)
 
+### Testing
+- **Run tests**: `yarn test` (runs all tests once)
+- **Watch mode**: `yarn test:watch` (rerun on file changes)
+- **UI dashboard**: `yarn test:ui` (visual test interface)
+- **Coverage report**: `yarn test:coverage` (generates HTML report in `coverage/`)
+
+**Test Status**: 368/439 tests passing (84%)
+- See `.ai/TESTING.md` for comprehensive testing guide
+- Test files in `app/**/__tests__/` directories
+
+### Performance
+- **Lighthouse**: Target scores >80 on all metrics
+- **Bundle analysis**: `yarn build` creates `dist/stats.html`
+- **Performance targets**: <200KB main bundle (gzipped), <2.5s LCP
+- See `.ai/DEPLOYMENT.md` for performance optimization details
+
 ### Code Quality
-- No lint or test commands configured. TypeScript strict mode is enforced (tsconfig.json).
+- **Type checking**: `yarn typecheck` (react-router typegen && tsc)
+- TypeScript strict mode is enforced (tsconfig.json)
+- No linter currently configured (ESLint/Prettier can be added)
 
 ## Project Architecture
 
@@ -47,12 +65,26 @@ This is a **full-stack React application** using React Router v7 with server-sid
 ### File Structure
 ```
 app/
-  root.tsx          # Root layout, error boundary, links
-  routes.ts         # Route definitions
-  routes/           # Route components
-    home.tsx        # Index route
-  welcome/          # Welcome component assets
-  app.css           # Global styles
+  root.tsx                    # Root layout, error boundary, links
+  routes.ts                   # Route definitions
+  routes/                     # Route components
+    home.tsx                  # Index route
+    __tests__/                # Route integration tests
+  components/                 # React components
+    __tests__/                # Component unit tests
+  lib/                        # Server utilities and libraries
+    __tests__/                # Server function tests
+  __tests__/
+    setup.ts                  # Global test setup
+    factories.ts              # Test data factory functions
+  welcome/                    # Welcome component assets
+  app.css                     # Global styles
+
+.ai/
+  IMPLEMENTATION_PLAN.md      # Full implementation roadmap
+  PHASE_6_PLAN.md             # Phase 6 detailed plan
+  TESTING.md                  # Testing guide and patterns
+  DEPLOYMENT.md               # Deployment and production setup
 ```
 
 ## Key Patterns & Conventions
@@ -71,8 +103,17 @@ app/
 - Root error boundary catches unhandled errors and renders user-friendly messages
 - Stack traces shown only in development mode
 
+## Testing & Quality
+
+- **Test Framework**: Vitest with @testing-library/react
+- **Coverage Target**: >80% overall, >85% for core utilities
+- **Current Status**: 368/439 tests passing (84%)
+- **Test Commands**: See "Testing" section under Quick Commands
+
 ## Notes
 
-- No linter or test framework currently configured
 - Project uses ES2022 as compilation target
 - JSON module resolution is enabled (can import JSON files as modules)
+- Row Level Security (RLS) enforced in Supabase for data privacy
+- Server-side image processing with Sharp library
+- Session management via React Router cookie-based sessions
