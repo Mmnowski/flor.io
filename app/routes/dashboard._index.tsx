@@ -1,12 +1,9 @@
-import { AddPlantDialog } from '~/components/add-plant-dialog';
-import { EmptyState } from '~/components/empty-state';
-import { PlantCard } from '~/components/plant-card';
-import { RoomFilter } from '~/components/room-filter';
-import { DashboardSkeleton } from '~/components/skeleton-loader';
-import { Button } from '~/components/ui/button';
+import { AddPlantDialog, PlantCard } from '~/features/plants/components';
+import { RoomFilter } from '~/features/rooms/components';
 import { getUserPlants } from '~/lib/plants.server';
 import { requireAuth } from '~/lib/require-auth.server';
 import { getUserRooms } from '~/lib/rooms.server';
+import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
 import type { PlantWithWatering, Room } from '~/types/plant.types';
 
 import { useState } from 'react';

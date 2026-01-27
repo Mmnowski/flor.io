@@ -1,5 +1,5 @@
-import { Button } from '~/components/ui/button';
 import { getUserId } from '~/lib/session.server';
+import { Button } from '~/shared/components';
 
 import { Link, redirect } from 'react-router';
 

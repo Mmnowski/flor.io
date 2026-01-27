@@ -1,10 +1,10 @@
-import { PlantForm } from '~/components/plant-form';
-import { Button } from '~/components/ui/button';
+import { PlantForm } from '~/features/plants/components';
 import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib/image.server';
 import { getPlantById, updatePlant } from '~/lib/plants.server';
 import { requireAuth } from '~/lib/require-auth.server';
 import { getUserRooms } from '~/lib/rooms.server';
 import { deletePlantPhoto, uploadPlantPhoto } from '~/lib/storage.server';
+import { Button } from '~/shared/components';
 
 import { Link, redirect, useActionData, useLoaderData } from 'react-router';
 

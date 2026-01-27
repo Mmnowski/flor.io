@@ -1,13 +1,10 @@
-import { DeletePlantDialog } from '~/components/delete-plant-dialog';
-import { PlantInfoSection } from '~/components/plant-info-section';
-import { PlantDetailsSkeleton } from '~/components/skeleton-loader';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { WateringButton } from '~/components/watering-button';
+import { DeletePlantDialog, PlantInfoSection } from '~/features/plants/components';
+import { WateringButton } from '~/features/watering/components';
 import { deletePlant, getPlantById } from '~/lib/plants.server';
 import { requireAuth } from '~/lib/require-auth.server';
 import { cn } from '~/lib/utils';
 import { recordWatering } from '~/lib/watering.server';
+import { Badge, Button, PlantDetailsSkeleton } from '~/shared/components';
 import type { PlantWithDetails } from '~/types/plant.types';
 
 import { useState } from 'react';

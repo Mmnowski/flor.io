@@ -1,4 +1,4 @@
-import { ImageUpload } from '~/components/image-upload';
+import { ImageUpload } from '~/shared/components';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

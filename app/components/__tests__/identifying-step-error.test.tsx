@@ -1,9 +1,8 @@
+import { AIWizard, IdentifyingStep } from '~/features/ai-wizard/components';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { AIWizard } from '../ai-wizard';
-import { IdentifyingStep } from '../ai-wizard-steps/IdentifyingStep';
 
 describe('IdentifyingStep Error Handling', () => {
   const renderWithWizard = (props = {}) => {

@@ -1,4 +1,4 @@
-import { PlantCard } from '~/components/plant-card';
+import { PlantCard } from '~/features/plants/components';
 
 import { MemoryRouter } from 'react-router';
 

@@ -1,11 +1,7 @@
-import { FormError } from '~/components/form-error';
-import { Button } from '~/components/ui/button';
-import { Card } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
 import { registerUser } from '~/lib/auth.server';
 import { createUserSession, getUserId } from '~/lib/session.server';
 import { registerSchema } from '~/lib/validation';
+import { Button, Card, FormError, Input, Label } from '~/shared/components';
 
 import { Form, Link, redirect, useActionData } from 'react-router';
 

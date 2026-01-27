@@ -5,7 +5,7 @@
  * Entry point: /dashboard/plants/new-ai
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
-import { AIWizardPage } from '~/components/AIWizardPage';
+import { AIWizardPage } from '~/features/ai-wizard/components';
 import { processPlantImage } from '~/lib/image.server';
 import { createAIPlant, recordAIFeedback } from '~/lib/plants.server';
 import { requireAuth } from '~/lib/require-auth.server';

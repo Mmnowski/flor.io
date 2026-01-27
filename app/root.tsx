@@ -1,6 +1,6 @@
-import { Navigation } from '~/components/nav';
-import { NavigationProgressBar } from '~/components/progress-bar';
+import { Navigation } from '~/layout/components';
 import { getUserId } from '~/lib/session.server';
+import { NavigationProgressBar } from '~/shared/components';
 
 import {
   Links,

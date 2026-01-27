@@ -1,4 +1,4 @@
-import { WateringButton } from '~/components/watering-button';
+import { WateringButton } from '~/features/watering/components';
 
 import { RouterProvider, createMemoryRouter } from 'react-router';
 

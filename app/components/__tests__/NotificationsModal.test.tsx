@@ -1,10 +1,10 @@
+import { NotificationsModal, type PlantNeedingWater } from '~/features/watering/components';
+
 import { MemoryRouter } from 'react-router';
 
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { NotificationsModal, type PlantNeedingWater } from '../notifications-modal';
 
 describe('NotificationsModal', () => {
   const mockOnOpenChange = vi.fn();
