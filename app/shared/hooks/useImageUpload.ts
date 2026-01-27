@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_MB = 5;
-const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 /**
  * Handle image file uploads with preview and validation

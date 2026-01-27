@@ -1,9 +1,7 @@
 import { plantFormSchema } from '~/lib/validation';
 import type { PlantFormInput } from '~/lib/validation';
 
-import { useCallback, useState } from 'react';
-
-import { z } from 'zod';
+import { useCallback, useMemo, useState } from 'react';
 
 /**
  * Manage plant form state with validation
@@ -40,16 +38,19 @@ export function usePlantForm(initialData?: Partial<PlantFormInput>): {
   reset: () => void;
   isDirty: boolean;
 } {
-  const defaultData: Partial<PlantFormInput> = {
-    name: '',
-    watering_frequency_days: 7,
-    room_id: null,
-    light_requirements: '',
-    fertilizing_tips: '',
-    pruning_tips: '',
-    troubleshooting: '',
-    ...initialData,
-  };
+  const defaultData = useMemo<Partial<PlantFormInput>>(
+    () => ({
+      name: '',
+      watering_frequency_days: 7,
+      room_id: null,
+      light_requirements: '',
+      fertilizing_tips: '',
+      pruning_tips: '',
+      troubleshooting: '',
+      ...initialData,
+    }),
+    [initialData]
+  );
 
   const [formData, setFormData] = useState<Partial<PlantFormInput>>(defaultData);
   const [errors, setErrors] = useState<Record<string, string>>({});
