@@ -1,7 +1,8 @@
-import { NotificationsModal, type PlantNeedingWater } from '~/features/watering/components';
+import { NotificationsModal } from '~/features/watering/components';
+import { useNotifications, useWateringAction } from '~/shared/hooks';
 
-import { useEffect, useRef, useState } from 'react';
-import { Link, useFetcher, useLocation } from 'react-router';
+import { useCallback } from 'react';
+import { Link, useLocation } from 'react-router';
 
 import { AuthLinks } from './AuthLinks';
 import { NotificationBell } from './NotificationBell';
@@ -16,48 +17,16 @@ export function Navigation({
   userEmail?: string;
 }): React.ReactNode {
   const location = useLocation();
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<PlantNeedingWater[]>([]);
-  const notificationsFetcher = useFetcher<{
-    notifications: PlantNeedingWater[];
-    count: number;
-  }>();
-  const wateringFetcher = useFetcher();
-  const initialFetchDone = useRef(false);
+  const notifications = useNotifications(isAuthenticated);
+  const watering = useWateringAction(() => notifications.refetch());
 
-  // Fetch notifications on mount for authenticated users
-  useEffect(() => {
-    if (isAuthenticated && !initialFetchDone.current && notificationsFetcher.state === 'idle') {
-      initialFetchDone.current = true;
-      notificationsFetcher.load('/api/notifications');
-    }
-  }, [isAuthenticated]);
-
-  // Refetch notifications when modal opens
-  useEffect(() => {
-    if (isAuthenticated && notificationsOpen && notificationsFetcher.state === 'idle') {
-      notificationsFetcher.load('/api/notifications');
-    }
-  }, [isAuthenticated, notificationsOpen]);
-
-  // Update notifications when fetcher data changes
-  useEffect(() => {
-    if (notificationsFetcher.data?.notifications) {
-      setNotifications(notificationsFetcher.data.notifications);
-    }
-  }, [notificationsFetcher.data]);
-
-  // Refetch notifications after watering action completes
-  useEffect(() => {
-    if (wateringFetcher.state === 'idle' && wateringFetcher.data) {
-      notificationsFetcher.load('/api/notifications');
-    }
-  }, [wateringFetcher.state, wateringFetcher.data]);
-
-  // Handle watering action
-  const handleWatered = (plantId: string): void => {
-    wateringFetcher.submit({}, { method: 'post', action: `/api/water/${plantId}` });
-  };
+  // Handle watering and refetch notifications
+  const handleWatered = useCallback(
+    (plantId: string) => {
+      watering.waterPlant(plantId);
+    },
+    [watering]
+  );
 
   // Don't show nav on auth pages
   if (location.pathname.startsWith('/auth')) {
@@ -88,9 +57,9 @@ export function Navigation({
                 </Link>
 
                 <NotificationBell
-                  count={notifications.length}
-                  onClick={() => setNotificationsOpen(true)}
-                  isLoading={wateringFetcher.state !== 'idle'}
+                  count={notifications.notificationCount}
+                  onClick={() => notifications.setIsOpen(true)}
+                  isLoading={watering.isWatering}
                 />
 
                 <ThemeToggle />
@@ -110,11 +79,11 @@ export function Navigation({
       {/* Notifications Modal */}
       {isAuthenticated && (
         <NotificationsModal
-          open={notificationsOpen}
-          onOpenChange={setNotificationsOpen}
-          notifications={notifications}
+          open={notifications.isOpen}
+          onOpenChange={notifications.setIsOpen}
+          notifications={notifications.notifications}
           onWatered={handleWatered}
-          isLoading={wateringFetcher.state !== 'idle'}
+          isLoading={watering.isWatering}
         />
       )}
     </nav>
