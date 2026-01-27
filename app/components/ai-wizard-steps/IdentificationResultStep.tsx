@@ -2,10 +2,10 @@
  * Step 3: Identification Result
  * Shows identified plant and asks user to confirm or provide manual name
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
 
-import { useAIWizard } from "../ai-wizard";
-import { Button } from "~/components/ui/button";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { useAIWizard } from '../ai-wizard';
 
 interface IdentificationResultStepProps {
   onConfirm?: () => void;
@@ -21,9 +21,7 @@ export function IdentificationResultStep({
   if (!state.identification) {
     return (
       <div className="rounded-lg bg-red-50 p-4">
-        <p className="text-sm text-red-900">
-          Plant identification data missing. Please try again.
-        </p>
+        <p className="text-sm text-red-900">Plant identification data missing. Please try again.</p>
       </div>
     );
   }
@@ -96,10 +94,10 @@ export function IdentificationResultStep({
               <div
                 className={`h-full transition-all ${
                   confidence >= 0.9
-                    ? "bg-green-500"
+                    ? 'bg-green-500'
                     : confidence >= 0.7
-                      ? "bg-yellow-500"
-                      : "bg-orange-500"
+                      ? 'bg-yellow-500'
+                      : 'bg-orange-500'
                 }`}
                 style={{ width: `${confidencePercent}%` }}
               />
@@ -113,27 +111,18 @@ export function IdentificationResultStep({
       {confidence < 0.8 && (
         <Alert>
           <AlertDescription>
-            Confidence is lower than ideal. Consider entering the plant name
-            manually for better accuracy.
+            Confidence is lower than ideal. Consider entering the plant name manually for better
+            accuracy.
           </AlertDescription>
         </Alert>
       )}
 
       {/* Action buttons */}
       <div className="grid grid-cols-2 gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleManualEntry}
-          className="w-full"
-        >
+        <Button type="button" variant="outline" onClick={handleManualEntry} className="w-full">
           No, I'll enter it manually
         </Button>
-        <Button
-          type="button"
-          onClick={handleConfirm}
-          className="w-full"
-        >
+        <Button type="button" onClick={handleConfirm} className="w-full">
           Yes, that's it!
         </Button>
       </div>

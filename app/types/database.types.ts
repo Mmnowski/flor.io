@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
   public: {
@@ -101,7 +95,7 @@ export interface Database {
           id: string;
           user_id: string;
           plant_id: string;
-          feedback_type: "thumbs_up" | "thumbs_down";
+          feedback_type: 'thumbs_up' | 'thumbs_down';
           comment: string | null;
           ai_response_snapshot: Json | null;
           created_at: string;
@@ -110,7 +104,7 @@ export interface Database {
           id?: string;
           user_id: string;
           plant_id: string;
-          feedback_type: "thumbs_up" | "thumbs_down";
+          feedback_type: 'thumbs_up' | 'thumbs_down';
           comment?: string | null;
           ai_response_snapshot?: Json | null;
           created_at?: string;
@@ -119,7 +113,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           plant_id?: string;
-          feedback_type?: "thumbs_up" | "thumbs_down";
+          feedback_type?: 'thumbs_up' | 'thumbs_down';
           comment?: string | null;
           ai_response_snapshot?: Json | null;
           created_at?: string;
@@ -152,7 +146,9 @@ export interface Database {
         };
       };
     };
+    /* eslint-disable-next-line @typescript-eslint/no-empty-object-type */
     Views: {};
+
     Functions: {
       get_next_watering_date: {
         Args: {
@@ -174,6 +170,7 @@ export interface Database {
         }>;
       };
     };
+    /* eslint-disable-next-line @typescript-eslint/no-empty-object-type */
     Enums: {};
   };
 }

@@ -63,18 +63,16 @@ This applies to the **clickable/tappable area** - not the visual icon size.
 ### Navigation Buttons
 
 From `app/components/nav.tsx`:
+
 ```tsx
 // Notifications bell
-<Button
-  variant="ghost"
-  size="icon"
-  className="h-10 w-10 focus:ring-2 focus:ring-emerald-300"
->
+<Button variant="ghost" size="icon" className="h-10 w-10 focus:ring-2 focus:ring-emerald-300">
   <Bell className="h-5 w-5" />
 </Button>
 ```
 
 **Analysis:**
+
 - Visual size: `h-10 w-10` = 40×40 px (TOO SMALL) ❌
 - Icon size: `h-5 w-5` = 20×20 px (icon only)
 - Needs: Padding to make total 44×44 px
@@ -82,27 +80,26 @@ From `app/components/nav.tsx`:
 ### Form Elements
 
 From `app/components/plant-form.tsx`:
+
 ```tsx
-<Input
-  id="name"
-  name="name"
-  type="text"
-  className="mt-2"
-/>
+<Input id="name" name="name" type="text" className="mt-2" />
 ```
 
 **Analysis:**
+
 - Default height: 44px ✅
 - Good!
 
 ### Small Links
 
 In text content:
+
 ```tsx
 <a href="#">Learn more</a>
 ```
 
 **Problem:**
+
 - Small link in text might be < 44px
 - Needs padding or larger target area
 
@@ -113,20 +110,22 @@ In text content:
 ### 1. Icon Buttons - Add Padding
 
 **Current:**
+
 ```tsx
 <Button
   size="icon"
-  className="h-10 w-10"  // 40×40 - TOO SMALL
+  className="h-10 w-10" // 40×40 - TOO SMALL
 >
   <Bell className="h-5 w-5" />
 </Button>
 ```
 
 **Fixed:**
+
 ```tsx
 <Button
   size="icon"
-  className="h-11 w-11"  // 44×44 - GOOD
+  className="h-11 w-11" // 44×44 - GOOD
   aria-label="Notifications"
 >
   <Bell className="h-5 w-5" />
@@ -136,22 +135,21 @@ In text content:
 ### 2. Small Buttons - Ensure 44px
 
 **Current:**
+
 ```tsx
-<button className="px-2 py-1">
-  Delete
-</button>
+<button className="px-2 py-1">Delete</button>
 ```
 
 **Fixed:**
+
 ```tsx
-<button className="px-4 py-2 min-h-11">
-  Delete  // or icon with aria-label
-</button>
+<button className="px-4 py-2 min-h-11">Delete // or icon with aria-label</button>
 ```
 
 ### 3. Checkboxes - Increase Hit Area
 
 **Current:**
+
 ```tsx
 <input type="checkbox" />
 <label>I agree</label>
@@ -160,16 +158,18 @@ In text content:
 **Problem:** Checkbox is 16×16px
 
 **Fixed:**
+
 ```tsx
 <label className="flex items-center gap-2 cursor-pointer p-1">
   <input type="checkbox" />
-  <span>I agree</span>  // User can click text too
+  <span>I agree</span> // User can click text too
 </label>
 ```
 
 ### 4. Small Links - Add Background/Padding
 
 **Current:**
+
 ```tsx
 <a href="#" className="text-emerald-600">
   View details
@@ -177,11 +177,9 @@ In text content:
 ```
 
 **Fixed:**
+
 ```tsx
-<a
-  href="#"
-  className="text-emerald-600 px-2 py-1 hover:bg-emerald-50 rounded"
->
+<a href="#" className="text-emerald-600 px-2 py-1 hover:bg-emerald-50 rounded">
   View details
 </a>
 ```
@@ -227,6 +225,7 @@ In text content:
 ## Tailwind Classes Reference
 
 For reference, Tailwind sizing:
+
 ```
 h-8 w-8   = 32×32 px  ❌ Too small
 h-9 w-9   = 36×36 px  ❌ Too small
@@ -249,6 +248,7 @@ h-11 + icon 20×20 = 44×44 (good)
 ## Implementation Checklist
 
 ### Step 1: Check Current Sizes
+
 - [ ] Document all buttons in nav.tsx
 - [ ] Document all buttons in modal components
 - [ ] Document all buttons in plant details page
@@ -257,25 +257,30 @@ h-11 + icon 20×20 = 44×44 (good)
 ### Step 2: Update Navigation Buttons
 
 In `app/components/nav.tsx`:
+
 - Change `h-10 w-10` to `h-11 w-11` for:
   - Notifications bell button
   - Theme toggle button
   - User menu button
 
 ### Step 3: Check Plant Card Buttons
+
 - If there are edit/delete icons, ensure 44×44 total
 
 ### Step 4: Update Modal/Dialog Buttons
+
 - Ensure close button is 44×44
 - Ensure action buttons are 44×44+
 
 ### Step 5: Test on Mobile
+
 - Use real phone (not emulator)
 - Try tapping buttons with finger
 - Check if easy to tap accurately
 - Look for buttons too close together
 
 ### Step 6: Check Spacing
+
 - Buttons should be at least 8px apart
 - Click two buttons by accident shouldn't happen easily
 
@@ -284,24 +289,28 @@ In `app/components/nav.tsx`:
 ## Testing Methods
 
 ### Method 1: Browser DevTools
+
 1. Right-click button → Inspect
 2. Look at computed size
 3. Calculate: element width × element height
 4. Compare to 44×44 minimum
 
 ### Method 2: Measure Visually
+
 1. Open page on mobile
 2. Try to tap different buttons
 3. See if easy to tap or hard
 4. Zoomed out view (easier to assess)
 
 ### Method 3: axe DevTools
+
 1. Install axe DevTools extension
 2. Run scan
 3. Look for "Touch target size" failures
 4. Shows exact size of failing elements
 
 ### Method 4: Manual Calculation
+
 ```
 If button has:
 - height: h-10 (40px)
@@ -321,17 +330,15 @@ Total: 44×44 (PASSES)
 ### Before & After: Navigation Buttons
 
 **Before:**
+
 ```tsx
-<Button
-  variant="ghost"
-  size="icon"
-  className="h-10 w-10 focus:ring-2 focus:ring-emerald-300"
->
+<Button variant="ghost" size="icon" className="h-10 w-10 focus:ring-2 focus:ring-emerald-300">
   <Bell className="h-5 w-5" />
 </Button>
 ```
 
 **After:**
+
 ```tsx
 <Button
   variant="ghost"
@@ -360,7 +367,9 @@ Total: 44×44 (PASSES)
 ## Special Cases
 
 ### Icon Buttons with Text
+
 If button shows text + icon, calculate both:
+
 ```tsx
 <button className="px-3 py-2 flex items-center gap-2 h-11">
   <Trash className="h-4 w-4" />
@@ -370,14 +379,15 @@ If button shows text + icon, calculate both:
 ```
 
 ### Small Buttons in Dropdowns
+
 Dropdowns can have smaller items, but still aim for 44px height:
+
 ```tsx
-<DropdownMenuItem className="h-10">
-  Settings
-</DropdownMenuItem>
+<DropdownMenuItem className="h-10">Settings</DropdownMenuItem>
 ```
 
 ### Close Button (X) on Modal
+
 ```tsx
 // Current: small X button
 <button className="absolute top-4 right-4 text-gray-400">
@@ -393,4 +403,3 @@ Dropdowns can have smaller items, but still aim for 44px height:
   ×
 </button>
 ```
-

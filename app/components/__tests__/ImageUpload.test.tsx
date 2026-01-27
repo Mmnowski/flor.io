@@ -1,7 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { ImageUpload } from '~/components/image-upload';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ImageUpload } from '~/components/image-upload';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { createMockImageFile } from '../../__tests__/factories';
 
 describe('ImageUpload', () => {
@@ -27,9 +29,7 @@ describe('ImageUpload', () => {
 
     it('should render with initial photo url', async () => {
       const photoUrl = 'https://example.com/plant.jpg';
-      render(
-        <ImageUpload currentPhotoUrl={photoUrl} onFileChange={mockOnFileChange} />
-      );
+      render(<ImageUpload currentPhotoUrl={photoUrl} onFileChange={mockOnFileChange} />);
 
       const image = screen.getByAltText('Plant photo preview');
       expect(image).toHaveAttribute('src', photoUrl);
@@ -51,7 +51,7 @@ describe('ImageUpload', () => {
       render(<ImageUpload onFileChange={mockOnFileChange} />);
 
       const button = screen.getByRole('button', { name: /upload plant photo/i });
-      const fileInput = screen.getByLabelText('Upload plant photo') as HTMLInputElement;
+      const fileInput = screen.getByLabelText('Upload plant photo');
 
       // Spy on the click method to verify it's called
       const clickSpy = vi.spyOn(fileInput, 'click');
@@ -112,7 +112,7 @@ describe('ImageUpload', () => {
 
       // Create a non-image file
       const file = new File(['text content'], 'document.txt', { type: 'text/plain' });
-      const fileInput = screen.getByLabelText('Upload plant photo') as HTMLInputElement;
+      const fileInput = screen.getByLabelText('Upload plant photo');
 
       // Simulate file input change directly since Testing Library's upload might have issues with type validation
       const event = new Event('change', { bubbles: true });
@@ -179,7 +179,7 @@ describe('ImageUpload', () => {
       expect(screen.getByRole('button', { name: /change photo/i })).toBeInTheDocument();
       // Remove button only has an icon, so find it by checking for all buttons and the X icon
       const buttons = screen.getAllByRole('button');
-      const removeButton = buttons.find(btn => btn.querySelector('svg[class*="lucide-x"]'));
+      const removeButton = buttons.find((btn) => btn.querySelector('svg[class*="lucide-x"]'));
       expect(removeButton).toBeInTheDocument();
     });
 
@@ -211,7 +211,7 @@ describe('ImageUpload', () => {
 
       // Find remove button by its X icon
       const buttons = screen.getAllByRole('button');
-      const removeButton = buttons.find(btn => btn.querySelector('svg[class*="lucide-x"]'));
+      const removeButton = buttons.find((btn) => btn.querySelector('svg[class*="lucide-x"]'));
       expect(removeButton).toBeInTheDocument();
 
       await user.click(removeButton!);
@@ -231,7 +231,7 @@ describe('ImageUpload', () => {
 
       // Find remove button by its X icon
       const buttons = screen.getAllByRole('button');
-      const removeButton = buttons.find(btn => btn.querySelector('svg[class*="lucide-x"]'));
+      const removeButton = buttons.find((btn) => btn.querySelector('svg[class*="lucide-x"]'));
 
       await user.click(removeButton!);
 
@@ -249,7 +249,7 @@ describe('ImageUpload', () => {
 
       // Find remove button by its X icon
       const buttons = screen.getAllByRole('button');
-      const removeButton = buttons.find(btn => btn.querySelector('svg[class*="lucide-x"]'));
+      const removeButton = buttons.find((btn) => btn.querySelector('svg[class*="lucide-x"]'));
 
       await user.click(removeButton!);
 
@@ -280,7 +280,7 @@ describe('ImageUpload', () => {
         />
       );
 
-      const fileInput = screen.getByLabelText('Upload plant photo') as HTMLInputElement;
+      const fileInput = screen.getByLabelText('Upload plant photo');
       const clickSpy = vi.spyOn(fileInput, 'click');
 
       const changeButton = screen.getByRole('button', { name: /change photo/i });

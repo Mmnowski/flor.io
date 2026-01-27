@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useFetcher } from 'react-router';
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +9,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog';
-import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { Plus, AlertCircle } from 'lucide-react';
+
+import { useState } from 'react';
+import { useFetcher } from 'react-router';
+
+import { AlertCircle, Plus } from 'lucide-react';
 
 export function CreateRoomDialog() {
   const fetcher = useFetcher();
@@ -54,9 +56,7 @@ export function CreateRoomDialog() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Room</DialogTitle>
-          <DialogDescription>
-            Add a new room to organize your plants
-          </DialogDescription>
+          <DialogDescription>Add a new room to organize your plants</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

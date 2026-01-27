@@ -5,6 +5,7 @@
 **Users should be able to use your entire app with keyboard only** - no mouse needed.
 
 This includes:
+
 - Navigating between elements with Tab key
 - Activating elements with Enter or Space
 - Using arrow keys in dropdowns
@@ -16,14 +17,14 @@ This includes:
 
 ### Keys Used
 
-| Key | Action |
-|-----|--------|
-| Tab | Move to next focusable element |
-| Shift+Tab | Move to previous focusable element |
-| Enter | Activate button / Submit form |
-| Space | Activate button / Check checkbox |
-| Escape | Close modal / Cancel |
-| Arrow keys | Navigate within dropdowns/menus |
+| Key        | Action                             |
+| ---------- | ---------------------------------- |
+| Tab        | Move to next focusable element     |
+| Shift+Tab  | Move to previous focusable element |
+| Enter      | Activate button / Submit form      |
+| Space      | Activate button / Check checkbox   |
+| Escape     | Close modal / Cancel               |
+| Arrow keys | Navigate within dropdowns/menus    |
 
 ---
 
@@ -32,18 +33,21 @@ This includes:
 ### Test 1: Tab Through Page
 
 **Steps:**
+
 1. Open page in browser
 2. Press Tab repeatedly
 3. Watch which elements get focus
 4. Check if order is logical (top-to-bottom, left-to-right)
 
 **Good order:**
+
 ```
 Logo → Dashboard Link → Notifications → Theme Toggle → Login Button
                      (across, left to right first)
 ```
 
 **Bad order:**
+
 ```
 Notifications → Login Button → Logo → Dashboard
             (random jumping around)
@@ -52,14 +56,16 @@ Notifications → Login Button → Logo → Dashboard
 ### Test 2: Visible Focus Indicator
 
 **Look for:**
+
 - Blue ring/outline when focused
 - Color change
 - Underline for links
 - Background color change
 
 **Current code in Flor.io:**
+
 ```tsx
-className="focus:ring-2 focus:ring-emerald-300"
+className = 'focus:ring-2 focus:ring-emerald-300';
 ```
 
 ✅ This is good! Every interactive element needs this or similar.
@@ -67,6 +73,7 @@ className="focus:ring-2 focus:ring-emerald-300"
 ### Test 3: Form Submission
 
 **Steps:**
+
 1. Tab to submit button
 2. Press Enter
 3. Form should submit
@@ -76,6 +83,7 @@ className="focus:ring-2 focus:ring-emerald-300"
 ### Test 4: Modal/Dialog
 
 **Steps:**
+
 1. Open modal by clicking button
 2. Tab within modal only (not to background)
 3. Press Escape to close
@@ -86,6 +94,7 @@ This is called **focus trapping**.
 ### Test 5: Dropdown Navigation
 
 **Steps:**
+
 1. Tab to dropdown
 2. Press Arrow down/up
 3. Options should scroll
@@ -138,6 +147,7 @@ This is called **focus trapping**.
 ### Step 1: Test Tab Order
 
 Pages to test:
+
 - [ ] Login page - Tab: Email → Password → Login button → "Sign up" link
 - [ ] Register page - Tab: Email → Password → Confirm → Register button → "Sign in" link
 - [ ] Dashboard - Tab: Dashboard link → Notifications → Theme toggle → User menu
@@ -188,17 +198,17 @@ Check that all interactive elements use correct HTML:
 ### Step 4: Modal Focus Trapping
 
 Check that modals:
+
 1. Trap focus (Tab cycles within modal only)
 2. Escape closes modal
 3. Focus returns to trigger button
 
 **Current code in Flor.io:**
+
 ```tsx
 // shadcn Dialog component already has focus trap built-in ✅
 <Dialog open={open} onOpenChange={setOpen}>
-  <DialogContent>
-    {/* Escape key closes by default ✅ */}
-  </DialogContent>
+  <DialogContent>{/* Escape key closes by default ✅ */}</DialogContent>
 </Dialog>
 ```
 
@@ -207,14 +217,13 @@ Check that modals:
 Test that dropdowns work with arrow keys:
 
 **Current code:**
+
 ```tsx
 <Select value={selected} onValueChange={setSelected}>
   <SelectTrigger>
     <SelectValue placeholder="Choose..." />
   </SelectTrigger>
-  <SelectContent>
-    {/* Arrow keys should navigate items */}
-  </SelectContent>
+  <SelectContent>{/* Arrow keys should navigate items */}</SelectContent>
 </Select>
 ```
 
@@ -227,36 +236,35 @@ Test that dropdowns work with arrow keys:
 ### Issue 1: No Visible Focus Indicator
 
 **Problem:**
+
 ```tsx
-<button>Click me</button>  // No visible focus
+<button>Click me</button> // No visible focus
 ```
 
 **Fix:**
+
 ```tsx
-<button className="focus:ring-2 focus:ring-emerald-300 focus:outline-none">
-  Click me
-</button>
+<button className="focus:ring-2 focus:ring-emerald-300 focus:outline-none">Click me</button>
 ```
 
 ### Issue 2: Focus Outline Removed Without Replacement
 
 **Problem:**
+
 ```tsx
-<button className="focus:outline-none">
-  Click me
-</button>
+<button className="focus:outline-none">Click me</button>
 ```
 
 **Fix:**
+
 ```tsx
-<button className="focus:outline-none focus:ring-2 focus:ring-emerald-300">
-  Click me
-</button>
+<button className="focus:outline-none focus:ring-2 focus:ring-emerald-300">Click me</button>
 ```
 
 ### Issue 3: Div Used as Button
 
 **Problem:**
+
 ```tsx
 <div onClick={handleSubmit} className="cursor-pointer">
   Submit Form
@@ -265,15 +273,15 @@ Test that dropdowns work with arrow keys:
 ```
 
 **Fix:**
+
 ```tsx
-<button onClick={handleSubmit}>
-  Submit Form
-</button>
+<button onClick={handleSubmit}>Submit Form</button>
 ```
 
 ### Issue 4: Link Used as Button
 
 **Problem:**
+
 ```tsx
 <a href="#" onClick={handleAction}>
   Delete Plant
@@ -282,48 +290,55 @@ Test that dropdowns work with arrow keys:
 ```
 
 **Fix:**
+
 ```tsx
-<button onClick={handleAction}>
-  Delete Plant
-</button>
+<button onClick={handleAction}>Delete Plant</button>
 ```
 
 ### Issue 5: Form Doesn't Submit with Enter
 
 **Problem:**
+
 ```tsx
 <form>
   <input type="text" />
-  <div onClick={handleSubmit}>Submit</div>  {/* Not a button */}
+  <div onClick={handleSubmit}>Submit</div> {/* Not a button */}
 </form>
 ```
 
 **Fix:**
+
 ```tsx
 <form onSubmit={handleSubmit}>
   <input type="text" />
-  <button type="submit">Submit</button>  {/* Real button */}
+  <button type="submit">Submit</button> {/* Real button */}
 </form>
 ```
 
 ### Issue 6: Modal Doesn't Trap Focus
 
 **Problem:**
+
 ```tsx
-{/* Tab goes outside modal to page behind it */}
+{
+  /* Tab goes outside modal to page behind it */
+}
 <div className="modal">
   <button>Action</button>
-</div>
+</div>;
 ```
 
 **Fix:**
+
 ```tsx
-{/* shadcn Dialog already does this */}
+{
+  /* shadcn Dialog already does this */
+}
 <Dialog>
   <DialogContent>
     <button>Action</button>
   </DialogContent>
-</Dialog>
+</Dialog>;
 ```
 
 ---
@@ -353,7 +368,7 @@ const triggerRef = useRef<HTMLButtonElement>(null);
 
 const handleClose = () => {
   setOpen(false);
-  triggerRef.current?.focus();  // Return focus to button
+  triggerRef.current?.focus(); // Return focus to button
 };
 
 return (
@@ -390,22 +405,26 @@ return (
 ## Files to Check/Update
 
 ### Navigation (`app/components/nav.tsx`)
+
 - [ ] All buttons have `focus:ring-2 focus:ring-emerald-300`
 - [ ] Tab order is left-to-right
 - [ ] Logo → Dashboard → Notifications → Theme → User menu
 
 ### Plant Form (`app/components/plant-form.tsx`)
+
 - [ ] All inputs have visible focus
 - [ ] Tab order: Photo → Name → Frequency → Room → Care sections → Buttons
 - [ ] Submit button has visible focus
 - [ ] Form submits with Enter key
 
 ### Modals (`app/components/notifications-modal.tsx`, etc.)
+
 - [ ] Focus traps within modal
 - [ ] Escape closes modal
 - [ ] First element auto-focused
 
 ### Buttons & Links (All components)
+
 - [ ] Every button has focus style
 - [ ] Every link has focus style
 - [ ] No divs used as clickable elements
@@ -443,4 +462,3 @@ Different browsers handle keyboard differently!
 ✅ Dropdowns navigate with arrow keys
 ✅ Can use entire app with keyboard only
 ✅ No mouse/trackpad needed for basic tasks
-

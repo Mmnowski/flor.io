@@ -2,20 +2,21 @@
  * Complete AI Wizard Page
  * Renders the full wizard with all steps
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
 
-import { useState, useRef } from "react";
-import { Form } from "react-router";
-import { AIWizard, useAIWizard, type WizardStep } from "./ai-wizard";
+import { useRef, useState } from 'react';
+import { Form } from 'react-router';
+
+import { AIWizard, type WizardStep, useAIWizard } from './ai-wizard';
 import {
-  PhotoUploadStep,
-  IdentifyingStep,
-  IdentificationResultStep,
-  ManualNameStep,
-  GeneratingCareStep,
   CarePreviewStep,
   FeedbackStep,
-} from "./ai-wizard-steps";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+  GeneratingCareStep,
+  IdentificationResultStep,
+  IdentifyingStep,
+  ManualNameStep,
+  PhotoUploadStep,
+} from './ai-wizard-steps';
 
 interface AIWizardPageProps {
   userId: string;
@@ -27,12 +28,7 @@ interface AIWizardPageProps {
 /**
  * Inner component that uses wizard context
  */
-function AIWizardPageContent({
-  userId,
-  aiRemaining,
-  rooms = [],
-  onComplete,
-}: AIWizardPageProps) {
+function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AIWizardPageProps) {
   const { state, goToStep, updateState } = useAIWizard();
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,41 +42,35 @@ function AIWizardPageContent({
 
       // Create FormData with all plant information
       const formData = new FormData(formRef.current);
-      formData.append("_action", "save-plant");
-      formData.append("name", state.manualPlantName);
+      formData.append('_action', 'save-plant');
+      formData.append('name', state.manualPlantName);
       formData.append(
-        "wateringFrequencyDays",
-        state.careInstructions?.wateringFrequencyDays.toString() || "7"
+        'wateringFrequencyDays',
+        state.careInstructions?.wateringFrequencyDays.toString() || '7'
       );
+      formData.append('lightRequirements', state.careInstructions?.lightRequirements || '');
       formData.append(
-        "lightRequirements",
-        state.careInstructions?.lightRequirements || ""
-      );
-      formData.append(
-        "fertilizingTips",
+        'fertilizingTips',
         JSON.stringify(state.careInstructions?.fertilizingTips || [])
       );
+      formData.append('pruningTips', JSON.stringify(state.careInstructions?.pruningTips || []));
       formData.append(
-        "pruningTips",
-        JSON.stringify(state.careInstructions?.pruningTips || [])
-      );
-      formData.append(
-        "troubleshooting",
+        'troubleshooting',
         JSON.stringify(state.careInstructions?.troubleshooting || [])
       );
-      formData.append("roomId", state.selectedRoomId || "");
+      formData.append('roomId', state.selectedRoomId || '');
 
       // Add photo file if exists
       if (state.photoFile) {
-        formData.append("photoFile", state.photoFile);
+        formData.append('photoFile', state.photoFile);
       }
 
       // Submit to server with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const response = await fetch("", {
-        method: "POST",
+      const response = await fetch('', {
+        method: 'POST',
         body: formData,
         signal: controller.signal,
       });
@@ -89,7 +79,7 @@ function AIWizardPageContent({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to save plant");
+        throw new Error(error.error || 'Failed to save plant');
       }
 
       const result = await response.json();
@@ -101,13 +91,13 @@ function AIWizardPageContent({
       (window as any).__plantId = result.plantId;
 
       // Move to feedback step
-      goToStep("feedback");
+      goToStep('feedback');
     } catch (error) {
-      let errorMessage = "Failed to save plant";
+      let errorMessage = 'Failed to save plant';
 
       if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          errorMessage = "Request timed out. Please try again.";
+        if (error.name === 'AbortError') {
+          errorMessage = 'Request timed out. Please try again.';
         } else {
           errorMessage = error.message;
         }
@@ -123,7 +113,7 @@ function AIWizardPageContent({
   };
 
   const handleSubmitFeedback = async (feedbackData: {
-    feedbackType: "thumbs_up" | "thumbs_down" | null;
+    feedbackType: 'thumbs_up' | 'thumbs_down' | null;
     feedbackComment: string;
   }) => {
     const plantId = (window as any).__plantId;
@@ -137,12 +127,12 @@ function AIWizardPageContent({
       updateState({ error: null });
 
       const formData = new FormData();
-      formData.append("_action", "save-feedback");
-      formData.append("plantId", plantId);
-      formData.append("feedbackType", feedbackData.feedbackType);
-      formData.append("comment", feedbackData.feedbackComment || "");
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', plantId);
+      formData.append('feedbackType', feedbackData.feedbackType);
+      formData.append('comment', feedbackData.feedbackComment || '');
       formData.append(
-        "aiResponseSnapshot",
+        'aiResponseSnapshot',
         JSON.stringify({
           identification: state.identification,
           careInstructions: state.careInstructions,
@@ -153,8 +143,8 @@ function AIWizardPageContent({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const response = await fetch("", {
-        method: "POST",
+      const response = await fetch('', {
+        method: 'POST',
         body: formData,
         signal: controller.signal,
       });
@@ -165,25 +155,24 @@ function AIWizardPageContent({
         // Server issued redirect, let browser handle it
         window.location.href = response.url;
       } else if (!response.ok) {
-        throw new Error("Failed to save feedback");
+        throw new Error('Failed to save feedback');
       } else {
         // Redirect to plant details
         onComplete?.(plantId);
       }
     } catch (error) {
-      let errorMessage = "Failed to save feedback";
+      let errorMessage = 'Failed to save feedback';
 
       if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          errorMessage =
-            "Request timed out, but your plant was created successfully.";
+        if (error.name === 'AbortError') {
+          errorMessage = 'Request timed out, but your plant was created successfully.';
         } else {
           errorMessage = error.message;
         }
       }
 
       // Log error but still allow user to continue
-      console.error("Feedback error:", error);
+      console.error('Feedback error:', error);
       updateState({ error: errorMessage });
 
       // Still redirect to plant even if feedback fails
@@ -196,55 +185,47 @@ function AIWizardPageContent({
   };
 
   // Step 1: Photo Upload
-  if (state.currentStep === "photo-upload") {
-    return (
-      <PhotoUploadStep
-        onContinue={() => goToStep("identifying")}
-      />
-    );
+  if (state.currentStep === 'photo-upload') {
+    return <PhotoUploadStep onContinue={() => goToStep('identifying')} />;
   }
 
   // Step 2: Identifying
-  if (state.currentStep === "identifying") {
+  if (state.currentStep === 'identifying') {
     return (
       <IdentifyingStep
-        onComplete={() => goToStep("identification-result")}
+        onComplete={() => goToStep('identification-result')}
         onError={(error) => updateState({ error })}
       />
     );
   }
 
   // Step 3: Identification Result
-  if (state.currentStep === "identification-result") {
+  if (state.currentStep === 'identification-result') {
     return (
       <IdentificationResultStep
-        onConfirm={() => goToStep("generating-care")}
-        onManualEntry={() => goToStep("manual-name")}
+        onConfirm={() => goToStep('generating-care')}
+        onManualEntry={() => goToStep('manual-name')}
       />
     );
   }
 
   // Step 3b: Manual Name Entry
-  if (state.currentStep === "manual-name") {
-    return (
-      <ManualNameStep
-        onContinue={() => goToStep("generating-care")}
-      />
-    );
+  if (state.currentStep === 'manual-name') {
+    return <ManualNameStep onContinue={() => goToStep('generating-care')} />;
   }
 
   // Step 4: Generating Care Instructions
-  if (state.currentStep === "generating-care") {
+  if (state.currentStep === 'generating-care') {
     return (
       <GeneratingCareStep
-        onComplete={() => goToStep("care-preview")}
+        onComplete={() => goToStep('care-preview')}
         onError={(error) => updateState({ error })}
       />
     );
   }
 
   // Step 5: Care Preview & Edit
-  if (state.currentStep === "care-preview") {
+  if (state.currentStep === 'care-preview') {
     return (
       <form ref={formRef} className="space-y-6">
         {state.error && (
@@ -252,10 +233,7 @@ function AIWizardPageContent({
             <AlertDescription>{state.error}</AlertDescription>
           </Alert>
         )}
-        <CarePreviewStep
-          onContinue={handleSavePlant}
-          rooms={rooms}
-        />
+        <CarePreviewStep onContinue={handleSavePlant} rooms={rooms} />
         {state.isLoading && (
           <div className="rounded-lg bg-blue-50 p-4">
             <p className="text-sm text-blue-900">Saving your plant...</p>
@@ -266,9 +244,8 @@ function AIWizardPageContent({
   }
 
   // Step 6: Feedback
-  if (state.currentStep === "feedback") {
-    const plantName = state.manualPlantName ||
-      state.identification?.commonNames[0] || "your plant";
+  if (state.currentStep === 'feedback') {
+    const plantName = state.manualPlantName || state.identification?.commonNames[0] || 'your plant';
 
     return (
       <FeedbackStep
@@ -292,9 +269,7 @@ function AIWizardPageContent({
   // Fallback
   return (
     <div className="rounded-lg bg-yellow-50 p-4">
-      <p className="text-sm text-yellow-900">
-        Unknown step: {state.currentStep}
-      </p>
+      <p className="text-sm text-yellow-900">Unknown step: {state.currentStep}</p>
     </div>
   );
 }
@@ -302,12 +277,7 @@ function AIWizardPageContent({
 /**
  * Main component
  */
-export function AIWizardPage({
-  userId,
-  aiRemaining,
-  rooms = [],
-  onComplete,
-}: AIWizardPageProps) {
+export function AIWizardPage({ userId, aiRemaining, rooms = [], onComplete }: AIWizardPageProps) {
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <AIWizard userId={userId} aiRemaining={aiRemaining}>

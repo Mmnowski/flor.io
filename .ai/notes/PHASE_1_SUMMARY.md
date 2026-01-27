@@ -6,6 +6,7 @@
 ## What Was Built
 
 ### 1. **Infrastructure Setup**
+
 - ✅ Installed all core dependencies:
   - `@supabase/supabase-js` - Database and authentication
   - `sharp` - Server-side image processing
@@ -14,6 +15,7 @@
   - shadcn/ui components (13 essential components)
 
 ### 2. **Authentication System**
+
 - ✅ **Supabase Integration:**
   - Server-side client (`app/lib/supabase.server.ts`) with service role key
   - Client-side client (`app/lib/supabase.client.ts`) with anon key
@@ -27,6 +29,7 @@
   - Protected route middleware (`requireAuth`)
 
 ### 3. **UI Foundation**
+
 - ✅ **shadcn/ui Components Installed:**
   - Form components: Button, Input, Label, Select, Textarea
   - Layout: Card, Dialog, Dropdown Menu
@@ -40,6 +43,7 @@
   - `Navigation` - Header with auth-aware menu
 
 ### 4. **Application Structure**
+
 - ✅ **Updated root layout** with:
   - Navigation component (conditionally shown)
   - Proper semantic HTML (nav, main)
@@ -58,6 +62,7 @@
   - Includes database functions: get_next_watering_date, get_plants_needing_water
 
 ### 5. **Development Documentation**
+
 - ✅ `.ai/IMPLEMENTATION_TODO.md` - Detailed task checklist
 - ✅ `.ai/IMPLEMENTATION_PLAN.md` - Complete implementation guide
 - ✅ `.ai/PROCESS.md` - Development process rules
@@ -66,6 +71,7 @@
 ## Ready for Phase 2
 
 ### Next Steps:
+
 1. **Create Supabase Project:**
    - Go to https://supabase.com and create a new project
    - Get your Supabase URL and API keys
@@ -104,18 +110,21 @@ yarn dev
 ## Architecture Highlights
 
 ### Authentication Flow:
+
 ```
 User Input → Form → Login/Register Action → Supabase Auth
 → Create Session → Set Cookie → Redirect to Dashboard
 ```
 
 ### Protected Routes:
+
 - All dashboard routes use `requireAuth` middleware
 - Unauthenticated requests redirect to `/auth/login`
 - Session stored in encrypted HTTP-only cookie
 - 30-day expiration
 
 ### Database First:
+
 - Database types are generated from Supabase schema
 - Row Level Security ensures user data isolation
 - Functions for complex queries (watering date calculations)
@@ -123,6 +132,7 @@ User Input → Form → Login/Register Action → Supabase Auth
 ## Files Created (Phase 1)
 
 **Core Libraries:**
+
 - `app/lib/supabase.server.ts` - Server Supabase client
 - `app/lib/supabase.client.ts` - Browser Supabase client
 - `app/lib/auth.server.ts` - Auth functions
@@ -131,6 +141,7 @@ User Input → Form → Login/Register Action → Supabase Auth
 - `app/lib/utils.ts` - Utility functions (cn for classnames)
 
 **Components:**
+
 - `app/components/nav.tsx` - Navigation header
 - `app/components/loading-spinner.tsx` - Loading animation
 - `app/components/empty-state.tsx` - Empty placeholder
@@ -138,6 +149,7 @@ User Input → Form → Login/Register Action → Supabase Auth
 - `app/components/ui/*` - shadcn UI components (13 files)
 
 **Routes:**
+
 - `app/routes/home.tsx` - Landing page
 - `app/routes/auth.login.tsx` - Login page
 - `app/routes/auth.register.tsx` - Registration page
@@ -149,6 +161,7 @@ User Input → Form → Login/Register Action → Supabase Auth
 - `app/routes/dashboard.plants.$plantId.edit.tsx` - Edit plant (stub)
 
 **Types & Config:**
+
 - `app/types/database.types.ts` - Database schema types
 - `components.json` - shadcn/ui configuration
 - `.env.example` - Environment variable template
@@ -157,12 +170,14 @@ User Input → Form → Login/Register Action → Supabase Auth
 ## Testing the Phase 1 Setup
 
 ### Before Database Setup:
+
 ```bash
 yarn typecheck  # Should pass with no errors
 yarn dev        # Should start server on http://localhost:5173
 ```
 
 ### After Database Setup:
+
 ```bash
 # 1. Create account
 curl -X POST http://localhost:5173/auth/register \

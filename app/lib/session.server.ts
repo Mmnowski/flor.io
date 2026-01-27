@@ -1,9 +1,9 @@
-import { createCookieSessionStorage, redirect } from "react-router";
+import { createCookieSessionStorage, redirect } from 'react-router';
 
 const sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionSecret) {
-  throw new Error("SESSION_SECRET environment variable is required");
+  throw new Error('SESSION_SECRET environment variable is required');
 }
 
 /**
@@ -12,12 +12,12 @@ if (!sessionSecret) {
  */
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: "__session",
+    name: '__session',
     httpOnly: true,
-    path: "/",
-    sameSite: "lax",
+    path: '/',
+    sameSite: 'lax',
     secrets: [sessionSecret],
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
 });
@@ -28,8 +28,8 @@ export const { getSession, commitSession, destroySession } = sessionStorage;
  * Get the user ID from the session
  */
 export async function getUserId(request: Request): Promise<string | null> {
-  const session = await getSession(request.headers.get("Cookie"));
-  return session.get("userId") ?? null;
+  const session = await getSession(request.headers.get('Cookie'));
+  return session.get('userId') ?? null;
 }
 
 /**
@@ -39,7 +39,7 @@ export async function requireUserId(request: Request): Promise<string> {
   const userId = await getUserId(request);
 
   if (!userId) {
-    throw redirect("/auth/login");
+    throw redirect('/auth/login');
   }
 
   return userId;
@@ -48,12 +48,12 @@ export async function requireUserId(request: Request): Promise<string> {
 /**
  * Create a session cookie for a user
  */
-export async function createUserSession(userId: string, redirectTo = "/dashboard") {
+export async function createUserSession(userId: string, redirectTo = '/dashboard') {
   const session = await getSession();
-  session.set("userId", userId);
+  session.set('userId', userId);
   return redirect(redirectTo, {
     headers: {
-      "Set-Cookie": await commitSession(session),
+      'Set-Cookie': await commitSession(session),
     },
   });
 }
@@ -62,10 +62,10 @@ export async function createUserSession(userId: string, redirectTo = "/dashboard
  * Logout the user by destroying the session
  */
 export async function logout(request: Request) {
-  const session = await getSession(request.headers.get("Cookie"));
-  return redirect("/", {
+  const session = await getSession(request.headers.get('Cookie'));
+  return redirect('/', {
     headers: {
-      "Set-Cookie": await destroySession(session),
+      'Set-Cookie': await destroySession(session),
     },
   });
 }

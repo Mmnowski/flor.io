@@ -1,6 +1,6 @@
 'use client';
 
-import { Form } from 'react-router';
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { Button } from '~/components/ui/button';
+
+import { Form } from 'react-router';
+
 import { AlertTriangle } from 'lucide-react';
 
 interface DeletePlantDialogProps {
@@ -34,19 +36,15 @@ export function DeletePlantDialog({
             <div>
               <DialogTitle>Delete Plant</DialogTitle>
               <DialogDescription className="mt-2">
-                Are you sure you want to delete <strong>{plantName}</strong>?
-                This action cannot be undone.
+                Are you sure you want to delete <strong>{plantName}</strong>? This action cannot be
+                undone.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Form method="post" onSubmit={() => onOpenChange(false)}>

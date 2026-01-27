@@ -7,18 +7,18 @@
  * - PATCH: Update room name
  * - DELETE: Delete room
  */
-
-import type { Route } from './+types/api.rooms';
 import { requireAuth } from '~/lib/require-auth.server';
 import {
-  getUserRooms,
-  getRoomById,
-  createRoom,
-  updateRoom,
-  deleteRoom,
   countPlantsInRoom,
+  createRoom,
+  deleteRoom,
+  getRoomById,
+  getUserRooms,
+  updateRoom,
 } from '~/lib/rooms.server';
 import { roomNameSchema } from '~/lib/validation';
+
+import type { Route } from './+types/api.rooms';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   if (request.method !== 'GET') {

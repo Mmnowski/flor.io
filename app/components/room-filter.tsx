@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback } from 'react';
-import { Badge } from '~/components/ui/badge';
 import { CreateRoomDialog } from '~/components/create-room-dialog';
+import { Badge } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';
 import type { Room } from '~/types/plant.types';
+
+import { useCallback } from 'react';
 
 interface RoomFilterProps {
   rooms: Room[];
@@ -57,11 +58,7 @@ export function RoomFilter({
           {plantCounts[room.id] !== undefined && (
             <Badge
               variant="secondary"
-              className={cn(
-                'text-xs ml-1',
-                activeRoomId === room.id &&
-                  'bg-white/20 text-white'
-              )}
+              className={cn('text-xs ml-1', activeRoomId === room.id && 'bg-white/20 text-white')}
             >
               {plantCounts[room.id]}
             </Badge>

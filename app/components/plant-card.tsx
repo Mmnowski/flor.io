@@ -1,11 +1,13 @@
 'use client';
 
-import { Link } from 'react-router';
-import { Card } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
-import { Leaf } from 'lucide-react';
+import { Card } from '~/components/ui/card';
 import { cn } from '~/lib/utils';
 import type { PlantWithWatering } from '~/types/plant.types';
+
+import { Link } from 'react-router';
+
+import { Leaf } from 'lucide-react';
 
 interface PlantCardProps {
   plant: PlantWithWatering;
@@ -65,7 +67,12 @@ export function PlantCard({ plant }: PlantCardProps) {
 
           {/* Watering status */}
           <div className="mt-auto">
-            <div className={cn('px-3 py-2 rounded-md text-sm font-medium text-center', getWateringColor())}>
+            <div
+              className={cn(
+                'px-3 py-2 rounded-md text-sm font-medium text-center',
+                getWateringColor()
+              )}
+            >
               {getWateringText()}
             </div>
           </div>

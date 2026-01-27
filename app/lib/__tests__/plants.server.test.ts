@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-
-vi.mock('../supabase.server');
+import { describe, expect, it, vi } from 'vitest';
 
 import { createPlant, updatePlant } from '../plants.server';
+
+vi.mock('../supabase.server');
 
 // Test input validation without mocking Supabase complexity
 describe('Plants Server Utilities - Input Validation', () => {

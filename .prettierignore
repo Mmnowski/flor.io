@@ -1,0 +1,11 @@
+node_modules
+build
+dist
+.react-router
+coverage
+*.min.js
+*.min.css
+.git
+.next
+out
+public

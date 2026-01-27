@@ -1,10 +1,10 @@
 import type {
   Plant,
-  PlantWithWatering,
+  PlantFormData,
   PlantWithDetails,
+  PlantWithWatering,
   Room,
   WateringHistory,
-  PlantFormData,
 } from '~/types/plant.types';
 
 /**
@@ -114,9 +114,7 @@ export function createMockRooms(count: number = 3): Room[] {
 /**
  * Create a mock WateringHistory entry
  */
-export function createMockWateringHistory(
-  overrides?: Partial<WateringHistory>
-): WateringHistory {
+export function createMockWateringHistory(overrides?: Partial<WateringHistory>): WateringHistory {
   const now = new Date().toISOString();
   return {
     id: `watering-${Math.random().toString(36).substr(2, 9)}`,
@@ -179,14 +177,7 @@ export function createMockPlantsWithWatering(
   baseOverrides?: Partial<PlantWithWatering>
 ): PlantWithWatering[] {
   const plants: PlantWithWatering[] = [];
-  const plantNames = [
-    'Monstera',
-    'Succulent',
-    'Snake Plant',
-    'Pothos',
-    'Fern',
-    'Orchid',
-  ];
+  const plantNames = ['Monstera', 'Succulent', 'Snake Plant', 'Pothos', 'Fern', 'Orchid'];
 
   for (let i = 0; i < count; i++) {
     const daysUntil = Math.floor(Math.random() * 7) - 2; // -2 to 5 days
@@ -212,9 +203,7 @@ export function createMockPlantsWithWatering(
  * Create mock form data for plant creation
  * Useful for testing forms and submissions
  */
-export function createMockPlantFormData(
-  overrides?: Partial<PlantFormData>
-): PlantFormData {
+export function createMockPlantFormData(overrides?: Partial<PlantFormData>): PlantFormData {
   return {
     name: 'Test Plant',
     photo: null,
@@ -231,9 +220,7 @@ export function createMockPlantFormData(
 /**
  * Create a mock File object for testing file uploads
  */
-export function createMockImageFile(
-  overrides?: Partial<File>
-): File {
+export function createMockImageFile(overrides?: Partial<File>): File {
   const buffer = Buffer.from('mock-image-data');
   const blob = new Blob([buffer], { type: 'image/jpeg' });
 
@@ -245,9 +232,7 @@ export function createMockImageFile(
 /**
  * Create overdue plant (for testing overdue status)
  */
-export function createMockOverduePlant(
-  overrides?: Partial<PlantWithWatering>
-): PlantWithWatering {
+export function createMockOverduePlant(overrides?: Partial<PlantWithWatering>): PlantWithWatering {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
@@ -262,9 +247,7 @@ export function createMockOverduePlant(
 /**
  * Create plant due today (for testing due today status)
  */
-export function createMockPlantDueToday(
-  overrides?: Partial<PlantWithWatering>
-): PlantWithWatering {
+export function createMockPlantDueToday(overrides?: Partial<PlantWithWatering>): PlantWithWatering {
   const today = new Date();
 
   return createMockPlantWithWatering({
@@ -290,8 +273,7 @@ export function createMockPlantWithAllFields(
     light_requirements: 'Bright indirect light, tolerates low light',
     fertilizing_tips: 'Fertilize monthly during growing season (spring/summer)',
     pruning_tips: 'Prune in spring for bushier growth, remove dead leaves',
-    troubleshooting:
-      'Brown leaf tips: underwatering. Yellow leaves: overwatering',
+    troubleshooting: 'Brown leaf tips: underwatering. Yellow leaves: overwatering',
     ...overrides,
   });
 }
@@ -299,9 +281,7 @@ export function createMockPlantWithAllFields(
 /**
  * Create plant with minimal fields (for testing required fields only)
  */
-export function createMockPlantMinimal(
-  overrides?: Partial<PlantWithWatering>
-): PlantWithWatering {
+export function createMockPlantMinimal(overrides?: Partial<PlantWithWatering>): PlantWithWatering {
   return createMockPlantWithWatering({
     photo_url: null,
     room_id: null,

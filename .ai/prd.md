@@ -14,16 +14,19 @@
 ## 2. USER PERSONAS
 
 ### Persona 1: Beginner/Neurodivergent User
+
 - No experience in plant care
 - Needs simple, concrete step-by-step instructions
 - Requires high-contrast UI, clear labels, simple language
 
 ### Persona 2: Forgetful Users
+
 - Elderly people, people with ADHD, or very busy individuals
 - Main problem: forget whether/when they watered plants
 - Need clear reminders and action history
 
 ### Persona 3: Experienced Collectors
+
 - Large plant collection (20-50+)
 - Need a database and organization system
 - Want ability to customize AI-generated content
@@ -33,11 +36,13 @@
 ## 3. PRODUCT GOALS & SUCCESS METRICS
 
 ### Business Goals:
+
 - Build MVP with core functionality in 10-14 weeks
 - Achieve product-market fit for future monetization
 - Collect data for AI optimization (fine-tuning)
 
 ### Success Metrics (KPIs):
+
 - **AI Acceptance Rate:** 75% of AI cards are accepted by users
 - **AI Usage Rate:** 75% of cards created using AI
 - **7-day Retention:** >40% of users return after a week
@@ -52,6 +57,7 @@
 ### 4.1 Core Features (Must-Have for MVP)
 
 #### Authentication & User Management
+
 - Email/password + Google OAuth (Supabase Auth)
 - No email verification required in MVP
 - One user = one plant database (no sharing)
@@ -59,6 +65,7 @@
 #### Plant Card Management
 
 **Manual Creation:**
+
 - Upload photo (JPG/PNG, max 10MB, auto-compress to 500KB/1920px)
 - Enter plant name
 - Set watering frequency (days)
@@ -66,6 +73,7 @@
 - Save to database
 
 **AI-Powered Creation Flow:**
+
 1. Upload photo
 2. Loading: "Identifying plant..." (PlantNet API call)
 3. Display: Name + "Is this your plant?" [Yes/No]
@@ -76,6 +84,7 @@
 7. Save to database
 
 **Generated Plant Care Information:**
+
 - **Basics (always visible):**
   - Watering frequency (e.g., "Every 7 days")
   - Light requirements (e.g., "Full sun, 6-8h daily")
@@ -88,6 +97,7 @@
   - Problem symptoms
 
 **CRUD Operations:**
+
 - **Read:** Dashboard with all cards + individual card details
 - **Update:** Edit all fields (name, photo, frequency, room, AI advice)
 - **Delete:** Remove card with confirmation modal
@@ -95,12 +105,14 @@
 #### Dashboard & Navigation
 
 **Main Dashboard:**
+
 - List of all plant cards (tiles/grid view)
 - Each card shows: photo, name, "Last watered: X days ago | Next: in Y days"
 - [+ Add Plant] button → choice [Manual] or [With AI]
 - [🔔 Notifications] button/icon → opens modal
 
 **Notifications Modal:**
+
 - List of plants to water (sorted by urgency)
 - Color coding:
   - Today = orange
@@ -112,6 +124,7 @@
 - X button → closes modal (notification returns next day if not marked "Watered")
 
 **Plant Details View:**
+
 - Full plant photo
 - Name
 - Room (tag)
@@ -122,6 +135,7 @@
 - [Edit] [Delete] buttons
 
 #### Rooms/Organization
+
 - Optional tags for organization
 - Create rooms: inline during card creation/editing or in filter
 - Dashboard filtering: horizontal scroll with chip buttons
@@ -130,12 +144,14 @@
   - State in URL params for bookmarking
 
 #### Watering Tracking
+
 - Clicking [Watered] saves: date + time
 - Automatic calculation of next date: last_watered + frequency_days
 - History: stored in database (plant_id, watered_at timestamp)
 - Display last 10 in details view
 
 #### AI Feedback System
+
 - After accepting/rejecting AI-generated content:
   - Thumbs up / Thumbs down
   - Optional comment field (textarea)
@@ -147,6 +163,7 @@
 ### 4.2 Non-Functional Requirements
 
 #### Accessibility (WCAG 2.1 AA)
+
 - High-contrast colors (min 4.5:1 ratio)
 - Touch-friendly buttons (min 44x44px)
 - Clear, concrete labels ("Watered Today" instead of "Refresh")
@@ -156,24 +173,28 @@
 - Keyboard navigation support
 
 #### Performance
+
 - Client-side image compression before upload
 - PlantNet response time: <5s (with loading state)
 - GPT-5 response time: <10s (with loading state)
 - Page load: <3s (Lighthouse score >80)
 
 #### Responsive Design (Mobile-First)
+
 - Primary: iPhone SE (375px) → desktop 1920px
 - Touch-friendly UI
 - 80% of functionality works great on mobile
 - Horizontal scroll for chip filters (mobile-friendly)
 
 #### Security & Privacy
+
 - Supabase RLS (Row Level Security) policies
 - User can only see/edit their own plants
 - No data sharing in MVP
 - HTTPS only
 
 #### Scalability Limits (MVP)
+
 - 50 plants per user (soft limit with notification)
 - 20 AI generations per user per month (soft limit)
 - After exceeding: message + CTA to future Premium
@@ -190,6 +211,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can securely store and access my plant collection
 
 **Acceptance Criteria:**
+
 - Given I'm on the registration page
 - When I enter valid email, password (min 8 chars), and confirm password
 - Then my account is created and I'm redirected to the empty dashboard
@@ -206,6 +228,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can quickly sign up without creating a new password
 
 **Acceptance Criteria:**
+
 - Given I'm on the registration page
 - When I click "Continue with Google"
 - Then I'm redirected to Google OAuth consent screen
@@ -223,6 +246,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can access my saved plant cards
 
 **Acceptance Criteria:**
+
 - Given I'm on the login page
 - When I enter correct email and password (or use Google OAuth)
 - Then I'm authenticated and redirected to my dashboard
@@ -243,6 +267,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can quickly add plants I already know well without AI assistance
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard
 - When I click "Add Plant" → "Create Manually"
 - Then I see a form with fields: plant name (required), photo upload (optional), watering frequency in days (required), room (optional)
@@ -261,6 +286,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can visually identify it on my dashboard
 
 **Acceptance Criteria:**
+
 - Given I'm in the plant creation form
 - When I click "Upload Photo" and select a JPG or PNG file (up to 10MB)
 - Then the image is automatically compressed to max 1920px width and 500KB
@@ -282,6 +308,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I don't need to know the plant's name to start caring for it
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard
 - When I click "Add Plant" → "Use AI"
 - And I upload a plant photo
@@ -302,6 +329,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can still use AI to generate care instructions
 
 **Acceptance Criteria:**
+
 - Given PlantNet API fails to identify the plant OR I clicked [No] on identification result
 - When I see the prompt "Plant not recognized. Enter plant name:"
 - And I type the plant name (e.g., "Snake Plant") and click "Continue"
@@ -320,6 +348,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I know exactly how to care for my plant
 
 **Acceptance Criteria:**
+
 - Given the plant has been identified (or name provided manually)
 - When the system calls GPT-5 API with the plant name
 - Then I see a loading state "Generating care instructions..." (5-15 seconds)
@@ -343,6 +372,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can ensure the information is accurate and customize it to my needs
 
 **Acceptance Criteria:**
+
 - Given I've received AI-generated care instructions
 - When I see the preview screen
 - Then I can see: photo, plant name, watering frequency, room field (editable dropdown), and all care instruction sections (collapsible)
@@ -362,6 +392,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** the system can improve over time
 
 **Acceptance Criteria:**
+
 - Given I just saved an AI-generated plant card
 - When the card is saved, I see a feedback modal
 - Then I can choose Thumbs Up or Thumbs Down
@@ -383,6 +414,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can quickly get an overview of my collection
 
 **Acceptance Criteria:**
+
 - Given I'm logged in and have plant cards saved
 - When I navigate to the dashboard
 - Then I see all my plant cards displayed as tiles/cards in a responsive grid
@@ -402,6 +434,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can review care instructions and watering history
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard
 - When I click on a plant card
 - Then I'm redirected to the plant details page
@@ -421,6 +454,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can update details as I learn more or conditions change
 
 **Acceptance Criteria:**
+
 - Given I'm viewing plant details
 - When I click [Edit]
 - Then all fields become editable: name, photo (re-upload), watering frequency, room, all care instruction sections
@@ -441,6 +475,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** my dashboard only shows plants I currently own
 
 **Acceptance Criteria:**
+
 - Given I'm viewing plant details
 - When I click [Delete]
 - Then I see a confirmation modal "Are you sure you want to delete [Plant Name]? This action cannot be undone."
@@ -461,6 +496,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** the system can track my watering schedule and remind me for the next one
 
 **Acceptance Criteria:**
+
 - Given I'm on the plant details page OR in the notifications modal
 - When I click [Watered Today]
 - Then the system records: plant_id, watered_at (current timestamp)
@@ -480,6 +516,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can confirm whether I already watered it and see patterns
 
 **Acceptance Criteria:**
+
 - Given I'm viewing plant details
 - When I scroll to the "Watering History" section
 - Then I see the last 10 watering events listed
@@ -499,6 +536,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can efficiently water only the plants that need it
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard
 - When I click the notification bell icon/button
 - Then a modal opens showing all plants where next_watering_date <= today
@@ -523,6 +561,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can prioritize which plants need urgent attention
 
 **Acceptance Criteria:**
+
 - Given a plant's next_watering_date is in the past
 - When I view the notifications modal
 - Then the plant shows "Overdue by X days" instead of "Due today"
@@ -542,6 +581,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can clean up my notifications modal but be reminded tomorrow
 
 **Acceptance Criteria:**
+
 - Given I'm in the notifications modal
 - When I click [X] to close the modal OR click outside the modal
 - Then the modal closes
@@ -562,6 +602,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can organize my plants by their physical location
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard
 - When I click [+New Room] in the horizontal chip filter scroll
 - Then an inline input field appears
@@ -580,6 +621,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can filter and view plants by location
 
 **Acceptance Criteria:**
+
 - Given I'm creating or editing a plant card
 - When I see the "Room" field (dropdown)
 - Then I can select from existing rooms or choose "None"
@@ -598,6 +640,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can focus on watering plants in one location at a time
 
 **Acceptance Criteria:**
+
 - Given I'm on the dashboard with plants assigned to different rooms
 - When I see the horizontal chip filter: [All] [Living Room] [Kitchen] [Balcony]
 - And I click on [Kitchen]
@@ -618,6 +661,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can quickly navigate to it later
 
 **Acceptance Criteria:**
+
 - Given I've filtered plants by a specific room (e.g., Kitchen)
 - When I look at the browser URL
 - Then I see `/dashboard?room=kitchen`
@@ -638,6 +682,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** we can control database growth and prepare for future premium tiers
 
 **Acceptance Criteria:**
+
 - Given I'm a user with 50 plants already created
 - When I try to click [Add Plant]
 - Then I see a message: "You've reached the limit of 50 plants on the free plan. Consider upgrading to Premium in the future."
@@ -656,6 +701,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** we can control API costs (PlantNet + GPT-5)
 
 **Acceptance Criteria:**
+
 - Given I'm a user who has used AI generation 20 times this calendar month
 - When I try to click [Use AI] to create a plant
 - Then I see a message: "You've used your 20 AI generations this month. Try again on [first day of next month] or create plants manually."
@@ -677,6 +723,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can easily navigate and understand the interface
 
 **Acceptance Criteria:**
+
 - Given I'm using the application
 - Then all text has a minimum contrast ratio of 4.5:1 against backgrounds (WCAG 2.1 AA)
 - And interactive elements (buttons, links) have minimum 44x44px touch targets
@@ -694,6 +741,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can understand exactly what actions to take
 
 **Acceptance Criteria:**
+
 - Given I'm using any feature in the app
 - Then all button labels are action-oriented and specific:
   - ✅ "Watered Today" instead of "Refresh" or "Update"
@@ -714,6 +762,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 **So that** I can use the app without a mouse
 
 **Acceptance Criteria:**
+
 - Given I'm using the application with only keyboard
 - When I press Tab, focus moves to the next interactive element
 - And focused elements have visible focus indicators (outline/highlight)
@@ -729,6 +778,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 ### Priority Summary for MVP:
 
 **Must-Have (Core MVP):**
+
 - All authentication stories (US-1.1 to 1.3)
 - Manual plant creation (US-2.1, 2.2)
 - AI plant creation and identification (US-3.1 to 3.5)
@@ -737,11 +787,13 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 - High contrast UI and clear language (US-8.1, 8.2)
 
 **Should-Have (Important for MVP):**
+
 - Rooms/organization (US-6.1 to 6.3)
 - Usage limits (US-7.1, 7.2)
 - Keyboard navigation (US-8.3)
 
 **Could-Have (Nice to have, can be post-MVP):**
+
 - Bookmarking filtered views (US-6.4)
 
 ---
@@ -749,6 +801,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 ## 5. TECHNICAL STACK & ARCHITECTURE
 
 ### Frontend
+
 - **Framework:** React Router v7 (SSR - Server-Side Rendering)
   - React Router v7 is the merged version of React Router + Remix
   - Supports Server Components and Route-based code splitting
@@ -759,6 +812,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 - **State Management:** React Context or Zustand (minimal)
 
 ### Backend
+
 - **BaaS:** Supabase
   - PostgreSQL database
   - Auth (email/password + Google OAuth)
@@ -766,15 +820,18 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
   - Row Level Security policies
 
 ### External APIs
+
 - **PlantNet API:** Free tier (5000 requests/month, then $9/m)
 - **OpenAI GPT-5 API:** Pay-as-you-go (~$0.01-0.03 per generation)
 
 ### Hosting & Deployment
+
 - **Hosting:** Vercel (supports React Router v7 SSR)
 - **CI/CD:** Vercel Git integration (auto-deploy from main branch)
 - **Env Management:** Vercel environment variables
 
 ### Cost Breakdown (Monthly)
+
 - Vercel: ~$0-20 (Hobby tier may suffice for MVP)
 - Supabase: ~$25 (Pro tier for production)
 - PlantNet: $0-9 (depending on usage)
@@ -786,6 +843,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 ## 6. USER FLOWS
 
 ### Flow 1: Onboarding (First-Time User)
+
 1. Landing page → [Get Started Free]
 2. Sign up (email/password or Google)
 3. Dashboard (empty state)
@@ -793,6 +851,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 5. Choice: [Create Manually] or [Use AI (recommended)]
 
 ### Flow 2: Creating Plant Card (AI)
+
 1. [Use AI] → Upload photo
 2. Loading (5-10s): "Identifying plant..."
 3. Result: "This is Monstera Deliciosa" + photo preview
@@ -810,6 +869,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 10. Card visible on Dashboard
 
 ### Flow 3: Daily Watering Routine
+
 1. User opens app
 2. Dashboard → Click [🔔 Notifications]
 3. Modal: list of 3 plants (2 today, 1 overdue)
@@ -823,6 +883,7 @@ User stories are organized by functionality and prioritized for MVP. Format: **A
 11. Card updates status: "Last watered: today | Next: in 7 days"
 
 ### Flow 4: Organizing with Rooms
+
 1. Dashboard → Horizontal chip scroll
 2. [All] [+New Room]
 3. Click [+New Room] → inline input "Room name"

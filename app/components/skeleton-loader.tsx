@@ -3,7 +3,6 @@
  *
  * Provides placeholder skeletons while data is loading
  */
-
 import { cn } from '~/lib/utils';
 
 interface SkeletonProps {
@@ -14,14 +13,7 @@ interface SkeletonProps {
  * Generic skeleton element (animated gray box)
  */
 export function Skeleton({ className }: SkeletonProps) {
-  return (
-    <div
-      className={cn(
-        'bg-slate-200 dark:bg-slate-700 rounded animate-pulse',
-        className
-      )}
-    />
-  );
+  return <div className={cn('bg-slate-200 dark:bg-slate-700 rounded animate-pulse', className)} />;
 }
 
 /**

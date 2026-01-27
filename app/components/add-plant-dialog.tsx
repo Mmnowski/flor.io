@@ -2,18 +2,19 @@
  * Add Plant Dialog
  * Lets users choose between manual or AI-assisted plant creation
  */
-
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { Button } from "~/components/ui/button";
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog";
-import { Sparkles, Pencil } from "lucide-react";
+} from '~/components/ui/dialog';
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+
+import { Pencil, Sparkles } from 'lucide-react';
 
 interface AddPlantDialogProps {
   open: boolean;
@@ -24,12 +25,12 @@ export function AddPlantDialog({ open, onOpenChange }: AddPlantDialogProps) {
   const navigate = useNavigate();
 
   const handleManual = () => {
-    navigate("/dashboard/plants/new");
+    navigate('/dashboard/plants/new');
     onOpenChange(false);
   };
 
   const handleAI = () => {
-    navigate("/dashboard/plants/new-ai");
+    navigate('/dashboard/plants/new-ai');
     onOpenChange(false);
   };
 
@@ -54,9 +55,7 @@ export function AddPlantDialog({ open, onOpenChange }: AddPlantDialogProps) {
                 <Pencil className="h-5 w-5 text-blue-600 dark:text-blue-300" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-slate-100">
-                  Manual Entry
-                </h3>
+                <h3 className="font-semibold text-gray-900 dark:text-slate-100">Manual Entry</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
                   Add plant details manually with optional photo
                 </p>

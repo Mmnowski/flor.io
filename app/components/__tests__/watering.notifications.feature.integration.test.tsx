@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { createMemoryRouter, RouterProvider } from "react-router";
+import { RouterProvider, createMemoryRouter } from 'react-router';
+
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Watering Notifications Complete Feature Flow Integration Tests
@@ -16,31 +17,31 @@ import { createMemoryRouter, RouterProvider } from "react-router";
  * - Empty state handling
  */
 
-describe("Watering Notifications Feature Flow Integration", () => {
+describe('Watering Notifications Feature Flow Integration', () => {
   // Mock data representing plants needing water
   const plantsNeedingWater = [
     {
-      plant_id: "plant-1",
-      plant_name: "Monstera Deliciosa",
-      photo_url: "https://example.com/monstera.jpg",
-      last_watered: "2024-01-10T10:00:00Z",
-      next_watering: "2024-01-17T10:00:00Z",
+      plant_id: 'plant-1',
+      plant_name: 'Monstera Deliciosa',
+      photo_url: 'https://example.com/monstera.jpg',
+      last_watered: '2024-01-10T10:00:00Z',
+      next_watering: '2024-01-17T10:00:00Z',
       days_overdue: 5,
     },
     {
-      plant_id: "plant-2",
-      plant_name: "Snake Plant",
+      plant_id: 'plant-2',
+      plant_name: 'Snake Plant',
       photo_url: null,
-      last_watered: "2024-01-19T10:00:00Z",
-      next_watering: "2024-01-26T10:00:00Z",
+      last_watered: '2024-01-19T10:00:00Z',
+      next_watering: '2024-01-26T10:00:00Z',
       days_overdue: 0,
     },
     {
-      plant_id: "plant-3",
-      plant_name: "Pothos",
-      photo_url: "https://example.com/pothos.jpg",
-      last_watered: "2024-01-15T10:00:00Z",
-      next_watering: "2024-01-22T10:00:00Z",
+      plant_id: 'plant-3',
+      plant_name: 'Pothos',
+      photo_url: 'https://example.com/pothos.jpg',
+      last_watered: '2024-01-15T10:00:00Z',
+      next_watering: '2024-01-22T10:00:00Z',
       days_overdue: 3,
     },
   ];
@@ -48,7 +49,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
   const mockFetcher = {
     load: vi.fn(),
     submit: vi.fn(),
-    state: "idle" as const,
+    state: 'idle' as const,
     data: null,
   };
 
@@ -58,8 +59,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
     mockFetcher.submit.mockClear();
   });
 
-  describe("Feature: User sees notification badge", () => {
-    it("should display badge showing plants need watering", async () => {
+  describe('Feature: User sees notification badge', () => {
+    it('should display badge showing plants need watering', async () => {
       // ARRANGE: User is authenticated with overdue plants
       const user = await userEvent.setup();
       mockFetcher.data = {
@@ -75,7 +76,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.count).toBe(3);
     });
 
-    it("should hide badge when no plants need water", async () => {
+    it('should hide badge when no plants need water', async () => {
       // ARRANGE: User has no overdue plants
       mockFetcher.data = {
         notifications: [],
@@ -89,7 +90,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.count).toBe(0);
     });
 
-    it("should update badge after watering plants", async () => {
+    it('should update badge after watering plants', async () => {
       // ARRANGE: Start with 3 plants needing water
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -107,8 +108,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
     });
   });
 
-  describe("Feature: User opens notifications modal", () => {
-    it("should display all plants needing water in modal", async () => {
+  describe('Feature: User opens notifications modal', () => {
+    it('should display all plants needing water in modal', async () => {
       // ARRANGE
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -120,12 +121,12 @@ describe("Watering Notifications Feature Flow Integration", () => {
 
       // ASSERT: All plants displayed
       expect(mockFetcher.data.notifications).toHaveLength(3);
-      expect(mockFetcher.data.notifications[0].plant_name).toBe("Monstera Deliciosa");
-      expect(mockFetcher.data.notifications[1].plant_name).toBe("Snake Plant");
-      expect(mockFetcher.data.notifications[2].plant_name).toBe("Pothos");
+      expect(mockFetcher.data.notifications[0].plant_name).toBe('Monstera Deliciosa');
+      expect(mockFetcher.data.notifications[1].plant_name).toBe('Snake Plant');
+      expect(mockFetcher.data.notifications[2].plant_name).toBe('Pothos');
     });
 
-    it("should show correct overdue status for each plant", async () => {
+    it('should show correct overdue status for each plant', async () => {
       // ARRANGE
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -139,13 +140,13 @@ describe("Watering Notifications Feature Flow Integration", () => {
       }));
 
       expect(overdueStatuses).toEqual([
-        { name: "Monstera Deliciosa", overdue: 5 }, // Red - very overdue
-        { name: "Snake Plant", overdue: 0 }, // Amber - due today
-        { name: "Pothos", overdue: 3 }, // Red - overdue
+        { name: 'Monstera Deliciosa', overdue: 5 }, // Red - very overdue
+        { name: 'Snake Plant', overdue: 0 }, // Amber - due today
+        { name: 'Pothos', overdue: 3 }, // Red - overdue
       ]);
     });
 
-    it("should display plant photos when available", async () => {
+    it('should display plant photos when available', async () => {
       // ARRANGE
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -153,15 +154,13 @@ describe("Watering Notifications Feature Flow Integration", () => {
       };
 
       // ASSERT: Photos present
-      const plantsWithPhotos = mockFetcher.data.notifications.filter(
-        (p) => p.photo_url !== null
-      );
+      const plantsWithPhotos = mockFetcher.data.notifications.filter((p) => p.photo_url !== null);
       expect(plantsWithPhotos).toHaveLength(2);
-      expect(plantsWithPhotos[0].plant_name).toBe("Monstera Deliciosa");
-      expect(plantsWithPhotos[1].plant_name).toBe("Pothos");
+      expect(plantsWithPhotos[0].plant_name).toBe('Monstera Deliciosa');
+      expect(plantsWithPhotos[1].plant_name).toBe('Pothos');
     });
 
-    it("should show empty state when all plants watered", async () => {
+    it('should show empty state when all plants watered', async () => {
       // ARRANGE: All plants recently watered
       mockFetcher.data = {
         notifications: [],
@@ -175,8 +174,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
     });
   });
 
-  describe("Feature: User waters plants from modal", () => {
-    it("should water single plant from modal", async () => {
+  describe('Feature: User waters plants from modal', () => {
+    it('should water single plant from modal', async () => {
       // ARRANGE: Modal open with 3 plants
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -194,10 +193,10 @@ describe("Watering Notifications Feature Flow Integration", () => {
       // ASSERT: Plant removed, count decremented
       expect(mockFetcher.data.notifications).toHaveLength(2);
       expect(mockFetcher.data.count).toBe(2);
-      expect(mockFetcher.data.notifications[0].plant_name).toBe("Snake Plant");
+      expect(mockFetcher.data.notifications[0].plant_name).toBe('Snake Plant');
     });
 
-    it("should water multiple plants in sequence", async () => {
+    it('should water multiple plants in sequence', async () => {
       // ARRANGE: 3 plants needing water
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -227,7 +226,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.notifications).toHaveLength(0);
     });
 
-    it("should update modal immediately after watering (optimistic UI)", async () => {
+    it('should update modal immediately after watering (optimistic UI)', async () => {
       // ARRANGE: Modal showing 3 plants
       const initialData = {
         notifications: plantsNeedingWater,
@@ -243,31 +242,31 @@ describe("Watering Notifications Feature Flow Integration", () => {
 
       // ASSERT: Modal updates without waiting for server
       expect(optimisticData.notifications).toHaveLength(2);
-      expect(optimisticData.notifications[0].plant_name).not.toBe("Monstera Deliciosa");
+      expect(optimisticData.notifications[0].plant_name).not.toBe('Monstera Deliciosa');
     });
 
-    it("should call watering API for each plant watered", async () => {
+    it('should call watering API for each plant watered', async () => {
       // ARRANGE
       const wateringCalls: string[] = [];
 
       // Mock watering action submission
       vi.mocked(mockFetcher.submit).mockImplementation((data, options) => {
-        if (options?.action?.includes("/api/water/")) {
-          const plantId = options.action.split("/").pop();
-          wateringCalls.push(plantId || "");
+        if (options?.action?.includes('/api/water/')) {
+          const plantId = options.action.split('/').pop();
+          wateringCalls.push(plantId || '');
         }
       });
 
       // ACT: Water Monstera (plant-1)
-      mockFetcher.submit({}, { method: "POST", action: "/api/water/plant-1" });
+      mockFetcher.submit({}, { method: 'POST', action: '/api/water/plant-1' });
 
       // ASSERT: API called for correct plant
-      expect(wateringCalls).toContain("plant-1");
+      expect(wateringCalls).toContain('plant-1');
     });
   });
 
-  describe("Feature: User navigates from notifications to plant details", () => {
-    it("should navigate to plant detail page when plant name clicked", async () => {
+  describe('Feature: User navigates from notifications to plant details', () => {
+    it('should navigate to plant detail page when plant name clicked', async () => {
       // ARRANGE: Modal open with plants
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -279,10 +278,10 @@ describe("Watering Notifications Feature Flow Integration", () => {
       const expectedPath = `/dashboard/plants/${clickedPlant.plant_id}`;
 
       // ASSERT: Would navigate to correct path
-      expect(expectedPath).toBe("/dashboard/plants/plant-1");
+      expect(expectedPath).toBe('/dashboard/plants/plant-1');
     });
 
-    it("should close modal when navigating to plant", async () => {
+    it('should close modal when navigating to plant', async () => {
       // ARRANGE
       const onOpenChange = vi.fn();
 
@@ -294,7 +293,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(onOpenChange).not.toHaveBeenCalled(); // Would be called in real scenario
     });
 
-    it("should display watering history on plant detail page after watering", async () => {
+    it('should display watering history on plant detail page after watering', async () => {
       // ARRANGE: Monstera needs water (overdue by 5 days)
       const monstera = plantsNeedingWater[0];
 
@@ -303,12 +302,12 @@ describe("Watering Notifications Feature Flow Integration", () => {
 
       // ASSERT: Watering recorded in history
       // (Would be verified on actual plant detail page)
-      expect(monstera.plant_name).toBe("Monstera Deliciosa");
+      expect(monstera.plant_name).toBe('Monstera Deliciosa');
     });
   });
 
-  describe("Feature: Notification updates and sync", () => {
-    it("should refetch notifications after watering", async () => {
+  describe('Feature: Notification updates and sync', () => {
+    it('should refetch notifications after watering', async () => {
       // ARRANGE: Initial load
       const initialFetch = vi.fn().mockReturnValue({
         notifications: plantsNeedingWater,
@@ -325,7 +324,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(secondFetch().count).toBe(2);
     });
 
-    it("should show empty state after watering last plant", async () => {
+    it('should show empty state after watering last plant', async () => {
       // ARRANGE: Only 1 plant needing water
       mockFetcher.data = {
         notifications: [plantsNeedingWater[0]],
@@ -342,7 +341,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.notifications).toHaveLength(0);
     });
 
-    it("should keep modal updated during long operations", async () => {
+    it('should keep modal updated during long operations', async () => {
       // ARRANGE
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -353,7 +352,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.notifications).toHaveLength(3);
 
       // ACT: Water first plant (API call in progress)
-      mockFetcher.state = "loading" as any;
+      mockFetcher.state = 'loading' as any;
 
       // Optimistic update immediately
       const optimisticData = {
@@ -366,15 +365,15 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(optimisticData.notifications).toHaveLength(2);
 
       // API completes
-      mockFetcher.state = "idle" as any;
+      mockFetcher.state = 'idle' as any;
 
       // Data confirmed
       expect(mockFetcher.data.notifications).toHaveLength(3);
     });
   });
 
-  describe("Feature: Error handling and recovery", () => {
-    it("should handle watering error gracefully", async () => {
+  describe('Feature: Error handling and recovery', () => {
+    it('should handle watering error gracefully', async () => {
       // ARRANGE
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -382,7 +381,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       };
 
       // ACT: Attempt to water but action fails
-      const wateringError = { error: "Database error" };
+      const wateringError = { error: 'Database error' };
 
       // Revert optimistic update
       mockFetcher.data = {
@@ -392,10 +391,10 @@ describe("Watering Notifications Feature Flow Integration", () => {
 
       // ASSERT: Modal shows error and plant remains
       expect(mockFetcher.data.notifications).toHaveLength(3);
-      expect(mockFetcher.data.notifications[0].plant_name).toBe("Monstera Deliciosa");
+      expect(mockFetcher.data.notifications[0].plant_name).toBe('Monstera Deliciosa');
     });
 
-    it("should recover from API errors on refetch", async () => {
+    it('should recover from API errors on refetch', async () => {
       // ARRANGE: Initial fetch succeeds
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -409,9 +408,9 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.notifications).toHaveLength(3);
     });
 
-    it("should show error message if watering fails", async () => {
+    it('should show error message if watering fails', async () => {
       // ARRANGE
-      const errorMessage = "Failed to record watering";
+      const errorMessage = 'Failed to record watering';
 
       // ACT: Watering action fails
       // Error would be displayed to user
@@ -421,8 +420,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
     });
   });
 
-  describe("Feature: Performance with many plants", () => {
-    it("should handle 50+ plants needing water", async () => {
+  describe('Feature: Performance with many plants', () => {
+    it('should handle 50+ plants needing water', async () => {
       // ARRANGE: Many plants
       const manyPlants = Array(50)
         .fill(null)
@@ -430,8 +429,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
           plant_id: `plant-${i}`,
           plant_name: `Plant ${i}`,
           photo_url: i % 2 === 0 ? `https://example.com/plant-${i}.jpg` : null,
-          last_watered: "2024-01-20T10:00:00Z",
-          next_watering: "2024-01-27T10:00:00Z",
+          last_watered: '2024-01-20T10:00:00Z',
+          next_watering: '2024-01-27T10:00:00Z',
           days_overdue: i % 5,
         }));
 
@@ -448,7 +447,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.count).toBe(50);
     });
 
-    it("should water plants efficiently with many in list", async () => {
+    it('should water plants efficiently with many in list', async () => {
       // ARRANGE: 50 plants
       const manyPlants = Array(50)
         .fill(null)
@@ -456,8 +455,8 @@ describe("Watering Notifications Feature Flow Integration", () => {
           plant_id: `plant-${i}`,
           plant_name: `Plant ${i}`,
           photo_url: null,
-          last_watered: "2024-01-20T10:00:00Z",
-          next_watering: "2024-01-27T10:00:00Z",
+          last_watered: '2024-01-20T10:00:00Z',
+          next_watering: '2024-01-27T10:00:00Z',
           days_overdue: 0,
         }));
 
@@ -477,18 +476,16 @@ describe("Watering Notifications Feature Flow Integration", () => {
     });
   });
 
-  describe("Feature: Accessibility throughout flow", () => {
-    it("should maintain focus management when modal opens", async () => {
+  describe('Feature: Accessibility throughout flow', () => {
+    it('should maintain focus management when modal opens', async () => {
       // ARRANGE: Badge visible on page
-
       // ACT: User opens modal with keyboard
       // Focus should move to modal
-
       // ASSERT: Modal is properly focused
       // (Would verify with actual focus management in real test)
     });
 
-    it("should allow keyboard navigation through plants", async () => {
+    it('should allow keyboard navigation through plants', async () => {
       // ARRANGE: Modal with plants
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -502,43 +499,35 @@ describe("Watering Notifications Feature Flow Integration", () => {
       expect(mockFetcher.data.notifications).toHaveLength(3);
     });
 
-    it("should have descriptive aria-labels", async () => {
+    it('should have descriptive aria-labels', async () => {
       // ARRANGE
-
       // ACT
-
       // ASSERT: Labels present (verified in component tests)
     });
   });
 
-  describe("Feature: Cross-browser and cross-device support", () => {
-    it("should work on mobile viewports", async () => {
+  describe('Feature: Cross-browser and cross-device support', () => {
+    it('should work on mobile viewports', async () => {
       // ARRANGE: Mobile viewport
-
       // ACT: User opens notifications
-
       // ASSERT: Modal responsive and usable
     });
 
-    it("should display correctly on desktop", async () => {
+    it('should display correctly on desktop', async () => {
       // ARRANGE: Desktop viewport
-
       // ACT: User opens notifications
-
       // ASSERT: Modal properly positioned and styled
     });
 
-    it("should work in light and dark modes", async () => {
+    it('should work in light and dark modes', async () => {
       // ARRANGE: Both theme modes
-
       // ACT: User uses notifications in each theme
-
       // ASSERT: Readable and accessible in both
     });
   });
 
-  describe("Feature: Complete user journey", () => {
-    it("should complete full watering notification workflow", async () => {
+  describe('Feature: Complete user journey', () => {
+    it('should complete full watering notification workflow', async () => {
       // ARRANGE: User with multiple overdue plants
       mockFetcher.data = {
         notifications: plantsNeedingWater,
@@ -560,7 +549,7 @@ describe("Watering Notifications Feature Flow Integration", () => {
 
       // STEP 4: User navigates to plant detail
       const plantId = plantsNeedingWater[1].plant_id;
-      expect(plantId).toBe("plant-2");
+      expect(plantId).toBe('plant-2');
 
       // STEP 5: User returns and waters more plants
       mockFetcher.data = {

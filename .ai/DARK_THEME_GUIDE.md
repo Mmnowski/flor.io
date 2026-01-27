@@ -3,6 +3,7 @@
 ## Overview
 
 A comprehensive dark theme system has been implemented for Flor.io that:
+
 - ✅ Automatically detects system preference (prefers-color-scheme)
 - ✅ Persists user preference in localStorage
 - ✅ Includes a theme toggle button in the navbar
@@ -15,31 +16,20 @@ A comprehensive dark theme system has been implemented for Flor.io that:
 ## Color Scheme
 
 ### Light Theme (Default)
+
 ```css
---background: #ffffff
---foreground: #1f2937 (gray-900)
---card: #ffffff
---primary: #10b981 (emerald-600)
---secondary: #78a982 (sage-600)
---accent: #d1fae5 (emerald-100)
---border: #d1fae5
---input: #f3f4f6
---ring: #10b981
---destructive: #ef4444 (red-500)
+--background: #ffffff --foreground: #1f2937 (gray-900) --card: #ffffff --primary: #10b981
+  (emerald-600) --secondary: #78a982 (sage-600) --accent: #d1fae5 (emerald-100) --border: #d1fae5
+  --input: #f3f4f6 --ring: #10b981 --destructive: #ef4444 (red-500);
 ```
 
 ### Dark Theme
+
 ```css
---background: #0f172a (slate-950)
---foreground: #f1f5f9 (slate-100)
---card: #1e293b (slate-900)
---primary: #10b981 (emerald-600) [maintained for consistency]
---secondary: #6ee7b7 (emerald-500)
---accent: #10b981
---border: #1e7e74 (emerald-900)
---input: #334155 (slate-800)
---ring: #10b981
---destructive: #ff6b6b (bright red for visibility)
+--background: #0f172a (slate-950) --foreground: #f1f5f9 (slate-100) --card: #1e293b (slate-900)
+  --primary: #10b981 (emerald-600) [maintained for consistency] --secondary: #6ee7b7 (emerald-500)
+  --accent: #10b981 --border: #1e7e74 (emerald-900) --input: #334155 (slate-800) --ring: #10b981
+  --destructive: #ff6b6b (bright red for visibility);
 ```
 
 ---
@@ -61,6 +51,7 @@ const { theme, toggleTheme, isDark } = useTheme();
 ```
 
 **Features:**
+
 - Reads stored preference from localStorage
 - Falls back to system `prefers-color-scheme` media query
 - Updates HTML element with `dark` class for Tailwind
@@ -174,17 +165,20 @@ For gradient backgrounds:
 ## Accessibility Considerations
 
 ### Color Contrast
+
 - All text meets WCAG 2.1 AA standards in both themes
 - Light mode: Dark text on light backgrounds (4.5:1+)
 - Dark mode: Light text on dark backgrounds (4.5:1+)
 - Emerald accent maintains visibility in both modes
 
 ### Focus States
+
 - Focus indicators use `focus:ring-2 focus:ring-emerald-300` in both modes
 - Ring color is bright and visible against all backgrounds
 - Minimum 3px visible outline
 
 ### Transition Smoothness
+
 - `transition-colors` class prevents jarring switches
 - Smooth 300ms default Tailwind transition
 - Does not cause motion sensitivity issues
@@ -196,6 +190,7 @@ For gradient backgrounds:
 All components have been updated with dark mode support:
 
 ### Pages
+
 - ✅ `home.tsx` - Landing page
 - ✅ `auth.login.tsx` - Login page
 - ✅ `auth.register.tsx` - Registration page
@@ -203,12 +198,14 @@ All components have been updated with dark mode support:
 - ✅ `dashboard._index.tsx` - Plant list
 
 ### Components
+
 - ✅ `nav.tsx` - Navigation with theme toggle
 - ✅ `empty-state.tsx` - Empty state placeholder
 - ✅ `form-error.tsx` - Error display
 - ✅ `root.tsx` - Root layout with theme script
 
 ### shadcn/ui Components
+
 - All shadcn components automatically support dark mode through CSS variables
 - No modifications needed to individual component files
 
@@ -234,6 +231,7 @@ All components have been updated with dark mode support:
    - Theme should persist
 
 ### Browser Support
+
 - Works in all modern browsers (Chrome, Firefox, Safari, Edge)
 - Graceful fallback to system preference if localStorage unavailable
 - No JavaScript required for basic display (CSS variables apply)
@@ -263,6 +261,7 @@ All components have been updated with dark mode support:
 If you need colors not in Tailwind:
 
 1. Add to `:root` and `.dark` in `app/app.css`:
+
 ```css
 :root {
   --custom-color: #color-light;
@@ -274,6 +273,7 @@ If you need colors not in Tailwind:
 ```
 
 2. Use with Tailwind arbitrary values:
+
 ```typescript
 <div style={{ color: 'var(--custom-color)' }}>
 ```
@@ -283,12 +283,14 @@ If you need colors not in Tailwind:
 ## Performance
 
 ### Optimization
+
 - ✅ Theme script runs before React hydration (no layout shift)
 - ✅ localStorage is only 11 bytes for string 'light' or 'dark'
 - ✅ No network requests for theme preference
 - ✅ CSS variables are native browser feature (zero overhead)
 
 ### Bundle Size Impact
+
 - `useTheme.ts`: ~500 bytes (gzipped)
 - CSS variables: Already in `app.css` (negligible added size)
 - Total: < 1KB additional bundle size
@@ -298,9 +300,11 @@ If you need colors not in Tailwind:
 ## Troubleshooting
 
 ### Theme doesn't persist
+
 **Problem:** Closing and reopening app shows wrong theme
 
 **Solution:** Check browser localStorage is enabled
+
 ```javascript
 // In browser console:
 localStorage.setItem('test', 'value');
@@ -308,26 +312,32 @@ localStorage.getItem('test'); // Should return 'value'
 ```
 
 ### FOWT (Flash of Wrong Theme)
+
 **Problem:** Page briefly shows light theme before switching to dark
 
 **Solution:** Already solved with inline script in `Layout` component. If still occurring:
+
 - Check script is in `<head>` before `<Links />`
 - Verify `dangerouslySetInnerHTML` is rendering
 - Check for JavaScript errors in console
 
 ### Contrast issues
+
 **Problem:** Text hard to read in dark mode
 
 **Solution:**
+
 - Add `dark:` class with appropriate color
 - Use `dark:text-slate-100` for primary text
 - Use `dark:text-slate-400` for secondary text
 - Check contrast with WebAIM tool
 
 ### Selective dark mode not working
+
 **Problem:** Some pages still show light theme in dark mode
 
 **Solution:** Ensure all needed elements have dark classes
+
 - `bg-white` needs `dark:bg-slate-900`
 - `text-gray-900` needs `dark:text-slate-100`
 - Check parent elements for background inheritance
@@ -358,6 +368,7 @@ Possible improvements for Phase 2+:
 ## Summary
 
 The dark theme system is production-ready and:
+
 - Respects user preference (system or localStorage)
 - Provides smooth visual transitions
 - Maintains accessibility standards

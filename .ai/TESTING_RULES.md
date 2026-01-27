@@ -1,6 +1,7 @@
 # Testing Rules for Flor.io Project
 
 ## Overview
+
 Testing framework: **Vitest + React Testing Library**
 Coverage target: **70-85%** (good coverage)
 Mocking strategy: **Strategic mocking** (mock external deps, test real logic)
@@ -11,6 +12,7 @@ Test scope: **Components + utilities** (React components AND server utilities)
 ## 1. File Organization & Naming Conventions
 
 ### Test File Locations
+
 - Component tests: `app/components/__tests__/{ComponentName}.test.tsx`
 - Hook tests: `app/hooks/__tests__/{hookName}.test.ts`
 - Server utility tests: `app/lib/__tests__/{utilityName}.server.test.ts`
@@ -18,15 +20,17 @@ Test scope: **Components + utilities** (React components AND server utilities)
 - Type tests: `app/types/__tests__/{typeName}.test.ts`
 
 ### Test File Naming
+
 - Single component: `PlantCard.test.tsx` (mirrors source file name)
 - Multiple related tests in file: `components.test.tsx`
 - Utilities: `plants.server.test.ts` (mirrors server utility)
 
 ### Test Structure
+
 ```typescript
 // 1. Imports (organized: external, internal, types)
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // 2. Test describe block (file level, feature level)
 describe('PlantCard Component', () => {
@@ -56,7 +60,9 @@ describe('PlantCard Component', () => {
 ## 2. Component Testing Rules
 
 ### What to Test
+
 ✅ **DO TEST:**
+
 - Rendering with different props
 - User interactions (clicks, form input, selection)
 - Conditional rendering based on props/state
@@ -66,12 +72,14 @@ describe('PlantCard Component', () => {
 - Dark mode support (if applicable)
 
 ❌ **DON'T TEST:**
+
 - Third-party library internals (e.g., Radix UI Dialog internals)
 - Exact CSS class names (test behavior, not styles)
 - Implementation details (internal state that doesn't affect output)
 - External library behavior (just verify it's called correctly)
 
 ### Component Test Template
+
 ```typescript
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -114,7 +122,9 @@ describe('PlantCard', () => {
 ```
 
 ### React Router Component Testing
+
 For components used in routes, wrap with Router context:
+
 ```typescript
 import { MemoryRouter } from 'react-router';
 
@@ -133,7 +143,9 @@ it('should render within router context', () => {
 ## 3. Server Utility Testing Rules
 
 ### What to Test
+
 ✅ **DO TEST:**
+
 - Function inputs and outputs (happy path)
 - Error handling and error messages
 - Ownership/permission verification (security)
@@ -143,16 +155,19 @@ it('should render within router context', () => {
 - Async behavior and promise resolution
 
 ❌ **DON'T TEST:**
+
 - Supabase library internals (just mock and verify it's called)
 - Exact SQL queries (mock at API level)
 - Database schema details (mock Supabase responses)
 - Network latency or timeouts (use short timeouts in tests)
 
 ### Server Utility Test Template
+
 ```typescript
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getUserPlants } from '~/lib/plants.server';
 import * as supabaseServer from '~/lib/supabase.server';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the Supabase client
 vi.mock('~/lib/supabase.server', () => ({
@@ -211,7 +226,9 @@ describe('getUserPlants', () => {
 ## 4. Hook Testing Rules
 
 ### What to Test
+
 ✅ **DO TEST:**
+
 - State changes and updates
 - Effects (mounting, unmounting, dependencies)
 - Return values and functions
@@ -219,10 +236,12 @@ describe('getUserPlants', () => {
 - Event listeners and cleanup
 
 ### Hook Test Template
+
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
 import { useTheme } from '~/hooks/useTheme';
+
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useTheme Hook', () => {
   beforeEach(() => {
@@ -254,7 +273,9 @@ describe('useTheme Hook', () => {
 ## 5. Mocking Strategy
 
 ### Supabase Mocking
+
 Always mock `supabaseServer` and `supabaseClient`:
+
 ```typescript
 vi.mock('~/lib/supabase.server', () => ({
   supabaseServer: {
@@ -272,7 +293,9 @@ vi.mocked(supabaseServer.from).mockReturnValue({
 ```
 
 ### File System & Image Processing
+
 Mock Sharp and file operations:
+
 ```typescript
 vi.mock('sharp', () => ({
   default: vi.fn(() => ({
@@ -285,7 +308,9 @@ vi.mock('sharp', () => ({
 ```
 
 ### API/External Calls
+
 Mock fetch and external API calls:
+
 ```typescript
 global.fetch = vi.fn().mockResolvedValue({
   json: vi.fn().mockResolvedValue({ success: true }),
@@ -294,7 +319,9 @@ global.fetch = vi.fn().mockResolvedValue({
 ```
 
 ### React Router
+
 Provide Router context or use `MemoryRouter`:
+
 ```typescript
 import { MemoryRouter } from 'react-router';
 
@@ -310,6 +337,7 @@ render(
 ## 6. Test Data & Fixtures
 
 ### Factory Functions (NOT Fixtures)
+
 Create factory functions instead of static fixtures to avoid test pollution:
 
 ```typescript
@@ -348,6 +376,7 @@ it('should show overdue status', () => {
 ```
 
 ### Where to Store Factories
+
 - Component test factories: `app/components/__tests__/factories.ts`
 - Server utility factories: `app/lib/__tests__/factories.ts`
 - Shared factories: `app/__tests__/factories.ts`
@@ -357,12 +386,15 @@ it('should show overdue status', () => {
 ## 7. Testing Patterns & Best Practices
 
 ### Assertions
+
 - Use semantic assertions: `expect(screen.getByRole('button')).toBeInTheDocument()`
 - NOT: `expect(wrapper.find('.button')).toHaveLength(1)`
 - Test behavior, not implementation
 
 ### User Interactions
+
 Always use `userEvent` over `fireEvent`:
+
 ```typescript
 // ✅ GOOD
 const user = userEvent.setup();
@@ -374,7 +406,9 @@ fireEvent.click(button);
 ```
 
 ### Async Tests
+
 Always handle async properly:
+
 ```typescript
 // ✅ GOOD
 it('should load data', async () => {
@@ -393,7 +427,9 @@ it('should update state', async () => {
 ```
 
 ### Cleanup & Isolation
+
 Each test should be independent:
+
 ```typescript
 beforeEach(() => {
   vi.clearAllMocks();
@@ -407,17 +443,19 @@ afterEach(() => {
 ```
 
 ### Test Naming
+
 Test names should describe the behavior:
+
 ```typescript
 // ✅ GOOD
-it('should show overdue status when days_until_watering is negative')
-it('should disable submit button when name is empty')
-it('should call recordWatering when user clicks water button')
+it('should show overdue status when days_until_watering is negative');
+it('should disable submit button when name is empty');
+it('should call recordWatering when user clicks water button');
 
 // ❌ AVOID
-it('works correctly')
-it('test component')
-it('negative test')
+it('works correctly');
+it('test component');
+it('negative test');
 ```
 
 ---
@@ -425,6 +463,7 @@ it('negative test')
 ## 8. Coverage Guidelines
 
 ### Target Coverage by Category
+
 - **Components**: 80-90% (test user interactions, rendering, edge cases)
 - **Hooks**: 80%+ (all state changes and effects)
 - **Server utilities**: 70-80% (happy path, error handling, security)
@@ -432,11 +471,13 @@ it('negative test')
 - **Types**: No testing needed (TypeScript handles validation)
 
 ### What Counts Toward Coverage
+
 ✅ Line coverage (lines executed)
 ✅ Branch coverage (if/else paths)
 ✅ Function coverage (functions called)
 
 ### What Doesn't Need 100% Coverage
+
 - Error boundaries (rarely hit in tests)
 - Unreachable catch blocks (defensive programming)
 - External library integration (mock it instead)
@@ -447,6 +488,7 @@ it('negative test')
 ## 9. What to Avoid
 
 ### ❌ Don't
+
 - **Test internal component state**: Test inputs/outputs, not `useState` directly
 - **Test CSS classes directly**: Test behavior (e.g., button color with data-attributes)
 - **Test library internals**: If mocking Radix UI Dialog, don't test Dialog internals
@@ -457,6 +499,7 @@ it('negative test')
 - **Skip error cases**: Always test error paths
 
 ### ✅ Do
+
 - **Test user-visible behavior**: What the user sees and does
 - **Test error handling**: All error paths should be tested
 - **Test accessibility**: Check aria-labels, roles, keyboard navigation
@@ -469,6 +512,7 @@ it('negative test')
 ## 10. Common Testing Scenarios
 
 ### Testing Form Submission
+
 ```typescript
 it('should submit form with correct data', async () => {
   const onSubmit = vi.fn();
@@ -487,6 +531,7 @@ it('should submit form with correct data', async () => {
 ```
 
 ### Testing Conditional Rendering
+
 ```typescript
 it('should show watering status with correct color', () => {
   const { rerender } = render(
@@ -502,6 +547,7 @@ it('should show watering status with correct color', () => {
 ```
 
 ### Testing Error States
+
 ```typescript
 it('should display error message on failure', async () => {
   vi.mocked(createPlant).mockRejectedValue(new Error('DB Error'));
@@ -514,6 +560,7 @@ it('should display error message on failure', async () => {
 ```
 
 ### Testing Modal/Dialog
+
 ```typescript
 it('should open and close dialog', async () => {
   const user = userEvent.setup();
@@ -531,11 +578,13 @@ it('should open and close dialog', async () => {
 ## 11. Configuration & Setup
 
 ### Vitest Configuration File
+
 Location: `vitest.config.ts`
+
 ```typescript
-import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
@@ -546,12 +595,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'app/__tests__/',
-        '**/*.d.ts',
-        '**/index.ts',
-      ],
+      exclude: ['node_modules/', 'app/__tests__/', '**/*.d.ts', '**/index.ts'],
     },
   },
   resolve: {
@@ -563,11 +607,13 @@ export default defineConfig({
 ```
 
 ### Test Setup File
+
 Location: `app/__tests__/setup.ts`
+
 ```typescript
-import { expect, afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterEach, expect, vi } from 'vitest';
 
 // Cleanup after each test
 afterEach(() => {
@@ -578,7 +624,7 @@ afterEach(() => {
 // Mock window.matchMedia for dark mode tests
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -592,6 +638,7 @@ Object.defineProperty(window, 'matchMedia', {
 ```
 
 ### Package.json Scripts
+
 ```json
 {
   "scripts": {
@@ -608,6 +655,7 @@ Object.defineProperty(window, 'matchMedia', {
 ## 12. Running Tests
 
 ### CLI Commands
+
 ```bash
 # Run all tests once
 yarn test
@@ -635,6 +683,7 @@ yarn test --grep "watering"
 When AI agents generate tests, they MUST:
 
 ### ✅ DO
+
 1. **Follow the structure**: Imports → Describe → Setup → Tests
 2. **Use factories**: Create mock data with `createMockPlant()` etc.
 3. **Test behavior**: Focus on user interactions and outputs
@@ -649,6 +698,7 @@ When AI agents generate tests, they MUST:
 12. **Create separate test files**: Don't cram too many tests in one file
 
 ### ❌ DON'T
+
 1. **Write snapshot tests**: Too brittle for component changes
 2. **Test implementation details**: Test behavior, not internal state
 3. **Use `render` without Router context**: Wrap components that need routing
@@ -669,18 +719,21 @@ When AI agents generate tests, they MUST:
 When generating tests for a feature, prioritize:
 
 ### Tier 1 (Must Test)
+
 - User interactions (clicks, form input, navigation)
 - Happy path (main feature flow)
 - Error handling (validation errors, API failures)
 - Security (permission checks, user isolation)
 
 ### Tier 2 (Should Test)
+
 - Edge cases (empty lists, null values, boundary values)
 - Conditional rendering (if/else branches)
 - State changes (loading → loaded, error states)
 - Accessibility (aria attributes, keyboard navigation)
 
 ### Tier 3 (Nice to Have)
+
 - Visual regression (with visual testing tools)
 - Performance (load time, render time)
 - Integration scenarios (complex multi-component flows)

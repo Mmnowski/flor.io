@@ -66,12 +66,18 @@ function PlantForm() {
 
 ```typescript
 import {
-  emailSchema,           // Email format
-  passwordSchema,        // Min 8 chars, 1 uppercase, 1 number, 1 special
-  plantNameSchema,       // 1-100 characters
-  wateringFrequencySchema, // 1-365
-  roomNameSchema,        // 1-50 characters
-  imageFileSchema,       // JPG/PNG/WebP, max 10MB
+  emailSchema,
+  // 1-50 characters
+  imageFileSchema,
+  // JPG/PNG/WebP, max 10MB
+  // Email format
+  passwordSchema,
+  // Min 8 chars, 1 uppercase, 1 number, 1 special
+  plantNameSchema,
+  // 1-365
+  roomNameSchema,
+  // 1-100 characters
+  wateringFrequencySchema,
 } from '~/lib/validation';
 
 // Usage
@@ -85,10 +91,13 @@ if (result.success) {
 
 ```typescript
 import {
-  loginSchema,         // { email, password }
-  registerSchema,      // { email, password, confirmPassword }
-  plantFormSchema,     // { name, watering_frequency_days, room_id, ... }
-  roomFormSchema,      // { name }
+  loginSchema,
+  // { email, password, confirmPassword }
+  plantFormSchema,
+  // { email, password }
+  registerSchema,
+  // { name, watering_frequency_days, room_id, ... }
+  roomFormSchema, // { name }
 } from '~/lib/validation';
 
 // These include all related field validation
@@ -116,6 +125,9 @@ function createPlant(data: PlantFormInput) {
 ### Simple Single Field
 
 ```typescript
+// Or reuse existing schema as base
+import { plantNameSchema } from '~/lib/validation';
+
 import { z } from 'zod';
 
 export const maxLengthSchema = z
@@ -123,8 +135,6 @@ export const maxLengthSchema = z
   .min(1, 'Required')
   .max(50, 'Must be 50 characters or less');
 
-// Or reuse existing schema as base
-import { plantNameSchema } from '~/lib/validation';
 export const extendedPlantNameSchema = plantNameSchema.max(200);
 ```
 
@@ -149,13 +159,10 @@ export const newPasswordSchema = z
     newPassword: passwordSchema,
     confirmPassword: z.string(),
   })
-  .refine(
-    (data) => data.newPassword === data.confirmPassword,
-    {
-      message: 'Passwords must match',
-      path: ['confirmPassword'],
-    }
-  );
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords must match',
+    path: ['confirmPassword'],
+  });
 ```
 
 ### Custom Validation
@@ -164,22 +171,16 @@ export const newPasswordSchema = z
 export const customSchema = z
   .string()
   .min(1, 'Required')
-  .refine(
-    (val) => !val.includes('admin'),
-    'Cannot contain word "admin"'
-  );
+  .refine((val) => !val.includes('admin'), 'Cannot contain word "admin"');
 
 // Or for async validation (DB checks)
 export const uniqueEmailSchema = z
   .string()
   .email()
-  .refine(
-    async (email) => {
-      const exists = await checkEmailExists(email);
-      return !exists;
-    },
-    'Email already registered'
-  );
+  .refine(async (email) => {
+    const exists = await checkEmailExists(email);
+    return !exists;
+  }, 'Email already registered');
 ```
 
 ---
@@ -189,7 +190,7 @@ export const uniqueEmailSchema = z
 ### validateForm() - Validate Entire Form
 
 ```typescript
-import { validateForm, plantFormSchema } from '~/lib/validation';
+import { plantFormSchema, validateForm } from '~/lib/validation';
 
 const result = validateForm(plantFormSchema, {
   name: 'My Plant',
@@ -216,7 +217,7 @@ const error = getFieldError(plantNameSchema, 'name', 'M');
 // In event handler
 const handleChange = (e) => {
   const error = getFieldError(plantNameSchema, 'name', e.target.value);
-  setErrors(prev => ({ ...prev, name: error }));
+  setErrors((prev) => ({ ...prev, name: error }));
 };
 ```
 
@@ -301,11 +302,13 @@ if (!validation.success) {
 ### Updating Existing Forms
 
 1. **Import schema:**
+
    ```typescript
    import { plantFormSchema } from '~/lib/validation';
    ```
 
 2. **Replace validation code:**
+
    ```typescript
    // OLD
    if (!name || !name.trim()) return { error: 'Name required' };
@@ -313,7 +316,8 @@ if (!validation.success) {
 
    // NEW
    const validation = plantFormSchema.safeParse({
-     name, watering_frequency_days: frequency
+     name,
+     watering_frequency_days: frequency,
    });
    if (!validation.success) {
      const errors = validation.error.flatten().fieldErrors;
@@ -322,6 +326,7 @@ if (!validation.success) {
    ```
 
 3. **Use validated data:**
+
    ```typescript
    // OLD - type unsafe
    const plant = await createPlant(name, frequency);
@@ -340,4 +345,3 @@ if (!validation.success) {
 - **Test schemas independently** - they're functions too
 - **Use type inference** - `z.infer<typeof schema>` for type safety
 - **Error messages are user-friendly** - they show in UI
-

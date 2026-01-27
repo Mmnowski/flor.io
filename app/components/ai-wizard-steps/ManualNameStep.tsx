@@ -2,12 +2,12 @@
  * Step 3b: Manual Name Entry (Fallback)
  * User manually enters plant name if AI identification is rejected
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 
-import { useAIWizard } from "../ai-wizard";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { useAIWizard } from '../ai-wizard';
 
 interface ManualNameStepProps {
   onContinue?: () => void;
@@ -22,7 +22,7 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
     // Validate name (1-100 chars, alphanumeric + spaces)
     if (name.length > 100) {
       updateState({
-        error: "Plant name must be 100 characters or less",
+        error: 'Plant name must be 100 characters or less',
       });
       return;
     }
@@ -38,14 +38,14 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
 
     if (!name) {
       updateState({
-        error: "Please enter a plant name",
+        error: 'Please enter a plant name',
       });
       return;
     }
 
     if (name.length < 2) {
       updateState({
-        error: "Plant name must be at least 2 characters",
+        error: 'Plant name must be at least 2 characters',
       });
       return;
     }
@@ -55,7 +55,7 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       handleContinue();
     }
   };
@@ -65,8 +65,7 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
       <div>
         <h2 className="text-2xl font-bold">Enter Plant Name</h2>
         <p className="mt-2 text-gray-600">
-          What is the name of your plant? You can use the common name or
-          scientific name.
+          What is the name of your plant? You can use the common name or scientific name.
         </p>
       </div>
 
@@ -80,11 +79,7 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
       {/* Photo preview */}
       {state.photoPreviewUrl && (
         <div className="overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
-          <img
-            src={state.photoPreviewUrl}
-            alt="Plant"
-            className="h-48 w-full object-contain"
-          />
+          <img src={state.photoPreviewUrl} alt="Plant" className="h-48 w-full object-contain" />
         </div>
       )}
 
@@ -102,9 +97,7 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
           maxLength={100}
           autoFocus
         />
-        <p className="text-xs text-gray-500">
-          {state.manualPlantName.length}/100 characters
-        </p>
+        <p className="text-xs text-gray-500">{state.manualPlantName.length}/100 characters</p>
       </div>
 
       {/* Common plant names suggestion */}
@@ -112,13 +105,13 @@ export function ManualNameStep({ onContinue }: ManualNameStepProps) {
         <p className="text-sm font-semibold text-blue-900">Popular plants:</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {[
-            "Monstera",
-            "Pothos",
-            "Snake Plant",
-            "Spider Plant",
-            "Philodendron",
-            "Rubber Plant",
-            "Peace Lily",
+            'Monstera',
+            'Pothos',
+            'Snake Plant',
+            'Spider Plant',
+            'Philodendron',
+            'Rubber Plant',
+            'Peace Lily',
           ].map((name) => (
             <button
               key={name}

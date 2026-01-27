@@ -2,13 +2,14 @@
  * Step 1: Photo Upload
  * User uploads a plant photo for identification
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
 
-import { useRef } from "react";
-import { useAIWizard } from "../ai-wizard";
-import { Button } from "~/components/ui/button";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { useRef } from 'react';
 
-const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+import { useAIWizard } from '../ai-wizard';
+
+const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface PhotoUploadStepProps {
@@ -26,7 +27,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
     // Validate file type
     if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
       updateState({
-        error: "Please upload a JPG, PNG, or WebP image",
+        error: 'Please upload a JPG, PNG, or WebP image',
       });
       return;
     }
@@ -34,7 +35,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       updateState({
-        error: "Image must be smaller than 10MB",
+        error: 'Image must be smaller than 10MB',
       });
       return;
     }
@@ -69,7 +70,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
   const handleContinue = () => {
     if (!state.photoFile) {
       updateState({
-        error: "Please select a photo",
+        error: 'Please select a photo',
       });
       return;
     }
@@ -92,7 +93,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
     });
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -101,8 +102,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
       <div>
         <h2 className="text-2xl font-bold">Upload Plant Photo</h2>
         <p className="mt-2 text-gray-600">
-          Take or upload a clear photo of your plant's leaves. This helps AI
-          identify it accurately.
+          Take or upload a clear photo of your plant's leaves. This helps AI identify it accurately.
         </p>
       </div>
 
@@ -137,18 +137,10 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClear}
-              className="flex-1"
-            >
+            <Button type="button" variant="outline" onClick={handleClear} className="flex-1">
               Choose Different Photo
             </Button>
-            <Button
-              onClick={handleContinue}
-              className="flex-1"
-            >
+            <Button onClick={handleContinue} className="flex-1">
               Continue →
             </Button>
           </div>
@@ -182,9 +174,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
 
             {/* Text */}
             <div>
-              <p className="text-lg font-semibold text-gray-900">
-                Drag & drop your photo here
-              </p>
+              <p className="text-lg font-semibold text-gray-900">Drag & drop your photo here</p>
               <p className="mt-1 text-sm text-gray-600">or</p>
             </div>
 
@@ -193,7 +183,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={ACCEPTED_FILE_TYPES.join(",")}
+                accept={ACCEPTED_FILE_TYPES.join(',')}
                 onChange={handleFileSelect}
                 className="hidden"
               />
@@ -207,9 +197,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
             </label>
 
             {/* Supported formats */}
-            <p className="text-xs text-gray-500">
-              JPG, PNG, or WebP • Max 10MB
-            </p>
+            <p className="text-xs text-gray-500">JPG, PNG, or WebP • Max 10MB</p>
           </div>
         </div>
       )}

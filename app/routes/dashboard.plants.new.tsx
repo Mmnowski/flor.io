@@ -1,13 +1,15 @@
-import { Link, useLoaderData, useActionData, redirect } from "react-router";
-import type { Route } from "./+types/dashboard.plants.new";
-import { Button } from "~/components/ui/button";
-import { requireAuth } from "~/lib/require-auth.server";
-import { getUserRooms } from "~/lib/rooms.server";
-import { createPlant } from "~/lib/plants.server";
-import { processPlantImage, extractImageFromFormData, fileToBuffer } from "~/lib/image.server";
-import { uploadPlantPhoto } from "~/lib/storage.server";
-import { plantFormSchema } from "~/lib/validation";
-import { PlantForm } from "~/components/plant-form";
+import { PlantForm } from '~/components/plant-form';
+import { Button } from '~/components/ui/button';
+import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib/image.server';
+import { createPlant } from '~/lib/plants.server';
+import { requireAuth } from '~/lib/require-auth.server';
+import { getUserRooms } from '~/lib/rooms.server';
+import { uploadPlantPhoto } from '~/lib/storage.server';
+import { plantFormSchema } from '~/lib/validation';
+
+import { Link, redirect, useActionData, useLoaderData } from 'react-router';
+
+import type { Route } from './+types/dashboard.plants.new';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await requireAuth(request);
@@ -16,7 +18,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 };
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  if (request.method !== "POST") {
+  if (request.method !== 'POST') {
     return null;
   }
 
@@ -26,13 +28,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
     // Extract fields
     const data = {
-      name: String(formData.get("name")),
-      watering_frequency_days: Number(formData.get("watering_frequency_days")),
-      room_id: formData.get("room_id"),
-      light_requirements: formData.get("light_requirements"),
-      fertilizing_tips: formData.get("fertilizing_tips"),
-      pruning_tips: formData.get("pruning_tips"),
-      troubleshooting: formData.get("troubleshooting"),
+      name: String(formData.get('name')),
+      watering_frequency_days: Number(formData.get('watering_frequency_days')),
+      room_id: formData.get('room_id'),
+      light_requirements: formData.get('light_requirements'),
+      fertilizing_tips: formData.get('fertilizing_tips'),
+      pruning_tips: formData.get('pruning_tips'),
+      troubleshooting: formData.get('troubleshooting'),
     };
 
     // Server-side validation using Zod
@@ -40,7 +42,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     if (!validation.success) {
       const errors = validation.error.flatten().fieldErrors;
       return {
-        error: Object.values(errors)[0]?.[0] || "Validation failed",
+        error: Object.values(errors)[0]?.[0] || 'Validation failed',
         fieldErrors: errors,
       };
     }
@@ -50,18 +52,18 @@ export const action = async ({ request }: Route.ActionArgs) => {
     // Extract and process photo if provided
     let photoUrl: string | null = null;
     try {
-      const photoFile = await extractImageFromFormData(formData, "photo");
+      const photoFile = await extractImageFromFormData(formData, 'photo');
       if (photoFile) {
         const buffer = await fileToBuffer(photoFile);
         const processedBuffer = await processPlantImage(buffer);
-        photoUrl = await uploadPlantPhoto(userId, processedBuffer, "image/jpeg");
+        photoUrl = await uploadPlantPhoto(userId, processedBuffer, 'image/jpeg');
 
         if (!photoUrl) {
-          return { error: "Failed to upload photo. Please try again." };
+          return { error: 'Failed to upload photo. Please try again.' };
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Image processing failed";
+      const message = error instanceof Error ? error.message : 'Image processing failed';
       return { error: message };
     }
 
@@ -80,8 +82,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
     // Redirect to plant detail
     return redirect(`/dashboard/plants/${plant.id}`);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to create plant";
-    console.error("Error in create plant action:", error);
+    const message = error instanceof Error ? error.message : 'Failed to create plant';
+    console.error('Error in create plant action:', error);
     return { error: message };
   }
 };
@@ -98,7 +100,12 @@ export default function NewPlant() {
         </Button>
       </Link>
       <h1 className="text-3xl font-bold mb-8">Add Plant</h1>
-      <PlantForm rooms={rooms} mode="create" error={actionData?.error} fieldErrors={actionData?.fieldErrors} />
+      <PlantForm
+        rooms={rooms}
+        mode="create"
+        error={actionData?.error}
+        fieldErrors={actionData?.fieldErrors}
+      />
     </div>
   );
 }

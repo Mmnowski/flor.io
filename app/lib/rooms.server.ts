@@ -1,5 +1,6 @@
-import { supabaseServer } from './supabase.server';
 import type { Room } from '~/types/plant.types';
+
+import { supabaseServer } from './supabase.server';
 
 /**
  * Get all rooms for a user
@@ -32,10 +33,7 @@ export async function getUserRooms(userId: string): Promise<Room[]> {
  * @param userId - User ID
  * @returns Room object or null if not found
  */
-export async function getRoomById(
-  roomId: string,
-  userId: string
-): Promise<Room | null> {
+export async function getRoomById(roomId: string, userId: string): Promise<Room | null> {
   try {
     const { data, error } = await supabaseServer
       .from('rooms')
@@ -62,10 +60,7 @@ export async function getRoomById(
  * @param userId - User ID
  * @returns Number of plants in room
  */
-export async function countPlantsInRoom(
-  roomId: string,
-  userId: string
-): Promise<number> {
+export async function countPlantsInRoom(roomId: string, userId: string): Promise<number> {
   try {
     const { count, error } = await supabaseServer
       .from('plants')
@@ -131,10 +126,7 @@ export async function updateRoom(roomId: string, name: string): Promise<Room> {
  * @param roomId - Room ID
  */
 export async function deleteRoom(roomId: string): Promise<void> {
-  const { error } = await supabaseServer
-    .from('rooms')
-    .delete()
-    .eq('id', roomId);
+  const { error } = await supabaseServer.from('rooms').delete().eq('id', roomId);
 
   if (error) {
     throw new Error(error.message);

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-type Theme = "light" | "dark";
+type Theme = 'light' | 'dark';
 
 /**
  * Hook to manage theme preference
@@ -12,21 +12,21 @@ export function useTheme(): {
   toggleTheme: () => void;
   isDark: boolean;
 } {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
     // Check localStorage first
-    const stored = localStorage.getItem("theme") as Theme | null;
+    const stored = localStorage.getItem('theme') as Theme | null;
 
     if (stored) {
       setTheme(stored);
       applyTheme(stored);
     } else {
       // Check system preference
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const initialTheme: Theme = prefersDark ? "dark" : "light";
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme: Theme = prefersDark ? 'dark' : 'light';
       setTheme(initialTheme);
       applyTheme(initialTheme);
     }
@@ -35,16 +35,16 @@ export function useTheme(): {
   }, []);
 
   const toggleTheme = () => {
-    const newTheme: Theme = theme === "light" ? "dark" : "light";
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     applyTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   return {
-    theme: mounted ? theme : "light",
+    theme: mounted ? theme : 'light',
     toggleTheme,
-    isDark: theme === "dark",
+    isDark: theme === 'dark',
   };
 }
 
@@ -54,9 +54,9 @@ export function useTheme(): {
 function applyTheme(theme: Theme) {
   const html = document.documentElement;
 
-  if (theme === "dark") {
-    html.classList.add("dark");
+  if (theme === 'dark') {
+    html.classList.add('dark');
   } else {
-    html.classList.remove("dark");
+    html.classList.remove('dark');
   }
 }

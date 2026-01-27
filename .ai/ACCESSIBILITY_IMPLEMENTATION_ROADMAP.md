@@ -15,30 +15,35 @@ All five accessibility tasks (5.2.1 - 5.2.5) have detailed implementation guides
 ## Quick Summary of What We're Checking
 
 ### Task 5.2.1: Color Contrast ✔️
+
 **What:** Text colors have enough contrast against backgrounds
 **Standard:** 4.5:1 ratio (or 3:1 for large text)
 **Why:** People with low vision need readable text
 **Files:** `.ai/ACCESSIBILITY_TASK_5.2.1_CONTRAST_AUDIT.md`
 
 ### Task 5.2.2: Touch Targets ✔️
+
 **What:** All buttons and links are 44×44 pixels minimum
 **Standard:** 44×44px clickable area
 **Why:** Mobile users and people with tremors need bigger targets
 **Files:** `.ai/ACCESSIBILITY_TASK_5.2.2_TOUCH_TARGETS.md`
 
 ### Task 5.2.3: Keyboard Navigation ✔️
+
 **What:** App works with keyboard only (no mouse)
 **Standard:** Tab, Enter, Escape, Arrow keys all work
 **Why:** Blind users and power users rely on keyboard
 **Files:** `.ai/ACCESSIBILITY_TASK_5.2.3_KEYBOARD_NAVIGATION.md`
 
 ### Task 5.2.4: Screen Readers ✔️
+
 **What:** Content makes sense when read aloud
 **Standard:** Semantic HTML, labels, alt text, aria attributes
 **Why:** Blind users use screen readers to access content
 **Files:** `.ai/ACCESSIBILITY_TASK_5.2.4_SCREEN_READERS.md`
 
 ### Task 5.2.5: Language & Labels ✔️
+
 **What:** Clear, specific, non-technical language
 **Standard:** No jargon, action-oriented buttons, specific error messages
 **Why:** Everyone understands simple language better
@@ -84,18 +89,21 @@ All five accessibility tasks (5.2.1 - 5.2.5) have detailed implementation guides
 **Decide order of fixes:**
 
 **High Priority (Blocking):**
+
 - Color contrast failures (text unreadable)
 - Missing form labels (users confused)
 - No keyboard navigation (keyboard users locked out)
 - Broken screen reader structure (blind users can't use app)
 
 **Medium Priority (Important):**
+
 - Small buttons (hard to tap on mobile)
 - Missing alt text (images not described)
 - Generic error messages (users confused)
 - Unclear button labels (users confused)
 
 **Low Priority (Nice to Have):**
+
 - Button spacing improvements
 - Advanced ARIA attributes
 - Detailed help text improvements
@@ -103,6 +111,7 @@ All five accessibility tasks (5.2.1 - 5.2.5) have detailed implementation guides
 ### Phase 3: Implement Fixes
 
 **Order:**
+
 1. **Semantic HTML** - Use correct tags (1-2 hours)
 2. **Form Labels** - Connect labels to inputs (1-2 hours)
 3. **Color Fixes** - Update colors if needed (1-2 hours)
@@ -115,6 +124,7 @@ All five accessibility tasks (5.2.1 - 5.2.5) have detailed implementation guides
 ### Phase 4: Testing & Verification
 
 **Comprehensive testing:**
+
 1. **Run WebAIM** on all color combinations
 2. **Test keyboard** on all pages
 3. **Test with NVDA** screen reader
@@ -152,6 +162,7 @@ All five accessibility tasks (5.2.1 - 5.2.5) have detailed implementation guides
 ### Step 1: Set Up Testing Tools
 
 **Free tools needed:**
+
 ```
 1. WebAIM Contrast Checker - https://webaim.org/resources/contrastchecker/
 2. NVDA (Screen Reader) - https://www.nvaccess.org/download/
@@ -205,18 +216,21 @@ Task 5.2.5 - Language & Labels
 ### Step 3: Fix Issues (Prioritized)
 
 **Priority 1 - Critical (Do First):**
+
 - [ ] Update icon button sizes (40×40 → 44×44)
 - [ ] Verify color contrast on all main elements
 - [ ] Ensure all form labels have `htmlFor`
 - [ ] Add missing aria-labels
 
 **Priority 2 - Important:**
+
 - [ ] Add alt text to images
 - [ ] Update vague button labels
 - [ ] Improve error message specificity
 - [ ] Fix tab order if needed
 
 **Priority 3 - Nice to Have:**
+
 - [ ] Improve help text
 - [ ] Add advanced ARIA
 - [ ] Refine dark mode colors
@@ -288,6 +302,7 @@ Task 5.2.5 - Language & Labels
 ### Priority Order
 
 **1. Navigation Component** (`app/components/nav.tsx`)
+
 ```
 - Change h-10 w-10 to h-11 w-11 (44×44 buttons)
 - Verify aria-labels present
@@ -295,6 +310,7 @@ Task 5.2.5 - Language & Labels
 ```
 
 **2. Plant Form** (`app/components/plant-form.tsx`)
+
 ```
 - Verify all labels have htmlFor
 - Check error messages are specific
@@ -302,18 +318,21 @@ Task 5.2.5 - Language & Labels
 ```
 
 **3. Root Layout** (`app/root.tsx`)
+
 ```
 - Wrap main content in <main>
 - Ensure proper semantic structure
 ```
 
 **4. Color Variables** (`app/app.css`)
+
 ```
 - May need to adjust if contrast fails
 - Update both light and dark themes
 ```
 
 **5. Individual Components**
+
 ```
 - app/components/plant-card.tsx - Add alt text
 - app/routes/dashboard._index.tsx - Heading structure
@@ -327,22 +346,26 @@ Task 5.2.5 - Language & Labels
 When all tasks complete, you'll have:
 
 ### ✅ Color Contrast
+
 - All text is readable (4.5:1 minimum)
 - Both light and dark modes pass
 - No color-only indicators (icons/text added)
 
 ### ✅ Touch Targets
+
 - All buttons 44×44 pixels
 - Buttons spaced 8px+ apart
 - Easy to tap on mobile
 
 ### ✅ Keyboard Navigation
+
 - Tab through all pages
 - Logical, consistent order
 - All buttons/links accessible
 - Forms submit with Enter
 
 ### ✅ Screen Readers
+
 - Semantic HTML structure
 - All images have alt text
 - All form labels connected
@@ -350,6 +373,7 @@ When all tasks complete, you'll have:
 - Modals announced as dialogs
 
 ### ✅ Language & Labels
+
 - All buttons action-oriented
 - Error messages are specific
 - No jargon used
@@ -385,6 +409,7 @@ Or if doing in one session: 8-12 hours
 6. **Then test again**
 
 **Recommended order:**
+
 1. 5.2.5 (Language) - easiest, quick wins
 2. 5.2.2 (Touch Targets) - straightforward
 3. 5.2.1 (Colors) - needs external tools
@@ -396,6 +421,7 @@ Or if doing in one session: 8-12 hours
 ## Questions?
 
 Each task guide has:
+
 - ✅ What we're checking
 - ✅ Why it matters
 - ✅ How to test
@@ -405,4 +431,3 @@ Each task guide has:
 - ✅ Checklists
 
 **Read the specific task guide for your question!**
-

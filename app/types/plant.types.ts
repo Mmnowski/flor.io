@@ -34,4 +34,6 @@ export type PlantFormData = {
 
 // Database insert type (without user_id, which is added by server)
 export type PlantInsertData = Omit<PlantInsert, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
-export type PlantUpdateData = Partial<Omit<PlantInsert, 'id' | 'created_at' | 'updated_at' | 'user_id'>>;
+export type PlantUpdateData = Partial<
+  Omit<PlantInsert, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+>;

@@ -1,139 +1,132 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  parseError,
-  withTimeout,
-  withRetry,
-  isNetworkError,
-  isRetryable,
-} from "../error-handling";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe("Error Handling Utilities", () => {
-  describe("parseError", () => {
-    it("parses network errors", () => {
-      const error = new Error("Network request failed");
+import { isNetworkError, isRetryable, parseError, withRetry, withTimeout } from '../error-handling';
+
+describe('Error Handling Utilities', () => {
+  describe('parseError', () => {
+    it('parses network errors', () => {
+      const error = new Error('Network request failed');
       const parsed = parseError(error);
 
-      expect(parsed.type).toBe("network");
+      expect(parsed.type).toBe('network');
       expect(parsed.canRetry).toBe(true);
-      expect(parsed.userMessage).toContain("Network");
+      expect(parsed.userMessage).toContain('Network');
     });
 
-    it("parses timeout errors", () => {
-      const error = new Error("Request timeout");
+    it('parses timeout errors', () => {
+      const error = new Error('Request timeout');
       const parsed = parseError(error);
 
-      expect(parsed.type).toBe("timeout");
+      expect(parsed.type).toBe('timeout');
       expect(parsed.canRetry).toBe(true);
-      expect(parsed.userMessage).toContain("too long");
+      expect(parsed.userMessage).toContain('too long');
     });
 
-    it("parses file/validation errors", () => {
-      const error = new Error("Invalid file format");
+    it('parses file/validation errors', () => {
+      const error = new Error('Invalid file format');
       const parsed = parseError(error);
 
-      expect(parsed.type).toBe("invalid_file");
+      expect(parsed.type).toBe('invalid_file');
       expect(parsed.canRetry).toBe(false);
     });
 
-    it("parses API errors", () => {
-      const error = new Error("API server error");
+    it('parses API errors', () => {
+      const error = new Error('API server error');
       const parsed = parseError(error);
 
-      expect(parsed.type).toBe("api_error");
+      expect(parsed.type).toBe('api_error');
       expect(parsed.canRetry).toBe(true);
     });
 
-    it("parses cancellation errors", () => {
-      const error = new Error("Operation cancelled");
+    it('parses cancellation errors', () => {
+      const error = new Error('Operation cancelled');
       const parsed = parseError(error);
 
-      expect(parsed.type).toBe("cancelled");
+      expect(parsed.type).toBe('cancelled');
       expect(parsed.canRetry).toBe(false);
     });
 
-    it("handles unknown errors", () => {
-      const parsed = parseError("Some random string");
+    it('handles unknown errors', () => {
+      const parsed = parseError('Some random string');
 
-      expect(parsed.type).toBe("unknown");
+      expect(parsed.type).toBe('unknown');
       expect(parsed.canRetry).toBe(true);
-      expect(parsed.userMessage).toBe("An unexpected error occurred. Please try again.");
+      expect(parsed.userMessage).toBe('An unexpected error occurred. Please try again.');
     });
   });
 
-  describe("withTimeout", () => {
-    it("resolves when promise completes within timeout", async () => {
-      const promise = Promise.resolve("success");
+  describe('withTimeout', () => {
+    it('resolves when promise completes within timeout', async () => {
+      const promise = Promise.resolve('success');
       const result = await withTimeout(promise, 1000);
 
-      expect(result).toBe("success");
+      expect(result).toBe('success');
     });
 
-    it("rejects when promise exceeds timeout", async () => {
+    it('rejects when promise exceeds timeout', async () => {
       const promise = new Promise<string>((resolve) => {
-        setTimeout(() => resolve("too late"), 2000);
+        setTimeout(() => resolve('too late'), 2000);
       });
 
-      await expect(withTimeout(promise, 100)).rejects.toThrow("took too long");
+      await expect(withTimeout(promise, 100)).rejects.toThrow('took too long');
     });
 
-    it("accepts custom timeout message", async () => {
+    it('accepts custom timeout message', async () => {
       const promise = new Promise<string>((resolve) => {
-        setTimeout(() => resolve("too late"), 2000);
+        setTimeout(() => resolve('too late'), 2000);
       });
 
-      await expect(withTimeout(promise, 100, "Custom timeout")).rejects.toThrow(
-        "Custom timeout"
-      );
+      await expect(withTimeout(promise, 100, 'Custom timeout')).rejects.toThrow('Custom timeout');
     });
   });
 
-  describe("withRetry", () => {
-    it("returns value on first success", async () => {
-      const fn = vi.fn().mockResolvedValueOnce("success");
+  describe('withRetry', () => {
+    it('returns value on first success', async () => {
+      const fn = vi.fn().mockResolvedValueOnce('success');
 
       const result = await withRetry(fn);
 
-      expect(result).toBe("success");
+      expect(result).toBe('success');
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
-    it("retries on failure and succeeds", async () => {
+    it('retries on failure and succeeds', async () => {
       const fn = vi
         .fn()
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce("success");
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce('success');
 
       const result = await withRetry(fn, { maxRetries: 2, initialDelayMs: 10 });
 
-      expect(result).toBe("success");
+      expect(result).toBe('success');
       expect(fn).toHaveBeenCalledTimes(2);
     });
 
-    it("gives up after max retries", async () => {
-      const fn = vi.fn().mockRejectedValue(new Error("Persistent error"));
+    it('gives up after max retries', async () => {
+      const fn = vi.fn().mockRejectedValue(new Error('Persistent error'));
 
-      await expect(
-        withRetry(fn, { maxRetries: 2, initialDelayMs: 10 })
-      ).rejects.toThrow("Persistent error");
+      await expect(withRetry(fn, { maxRetries: 2, initialDelayMs: 10 })).rejects.toThrow(
+        'Persistent error'
+      );
 
       expect(fn).toHaveBeenCalledTimes(3); // initial + 2 retries
     });
 
-    it("does not retry non-retryable errors", async () => {
-      const error = new Error("Invalid file format");
+    it('does not retry non-retryable errors', async () => {
+      const error = new Error('Invalid file format');
       const fn = vi.fn().mockRejectedValueOnce(error);
 
-      await expect(withRetry(fn)).rejects.toThrow("Invalid file format");
+      await expect(withRetry(fn)).rejects.toThrow('Invalid file format');
 
       expect(fn).toHaveBeenCalledTimes(1); // only initial attempt
     });
 
-    it("implements exponential backoff", async () => {
+    it('implements exponential backoff', async () => {
       const fn = vi
         .fn()
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce("success");
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce('success');
 
       const startTime = Date.now();
       await withRetry(fn, {
@@ -148,10 +141,8 @@ describe("Error Handling Utilities", () => {
       expect(fn).toHaveBeenCalledTimes(3);
     });
 
-    it("caps backoff at maxDelayMs", async () => {
-      const fn = vi
-        .fn()
-        .mockRejectedValue(new Error("Network error"));
+    it('caps backoff at maxDelayMs', async () => {
+      const fn = vi.fn().mockRejectedValue(new Error('Network error'));
 
       try {
         await withRetry(fn, {
@@ -176,31 +167,31 @@ describe("Error Handling Utilities", () => {
     });
   });
 
-  describe("isNetworkError", () => {
-    it("detects network errors", () => {
-      const error = new Error("Network request failed");
+  describe('isNetworkError', () => {
+    it('detects network errors', () => {
+      const error = new Error('Network request failed');
       expect(isNetworkError(error)).toBe(true);
     });
 
-    it("detects timeout errors", () => {
-      const error = new Error("Request timeout");
+    it('detects timeout errors', () => {
+      const error = new Error('Request timeout');
       expect(isNetworkError(error)).toBe(true);
     });
 
-    it("returns false for non-network errors", () => {
-      const error = new Error("Invalid file");
+    it('returns false for non-network errors', () => {
+      const error = new Error('Invalid file');
       expect(isNetworkError(error)).toBe(false);
     });
   });
 
-  describe("isRetryable", () => {
-    it("returns true for retryable errors", () => {
-      const error = new Error("Network request failed");
+  describe('isRetryable', () => {
+    it('returns true for retryable errors', () => {
+      const error = new Error('Network request failed');
       expect(isRetryable(error)).toBe(true);
     });
 
-    it("returns false for non-retryable errors", () => {
-      const error = new Error("Invalid file format");
+    it('returns false for non-retryable errors', () => {
+      const error = new Error('Invalid file format');
       expect(isRetryable(error)).toBe(false);
     });
   });

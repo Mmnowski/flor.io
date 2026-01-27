@@ -1,15 +1,17 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
-import { Droplet, Leaf } from "lucide-react";
-import { cn } from "~/lib/utils";
+} from '~/components/ui/dialog';
+import { cn } from '~/lib/utils';
+
+import { useState } from 'react';
+import { Link } from 'react-router';
+
+import { Droplet, Leaf } from 'lucide-react';
 
 export interface PlantNeedingWater {
   plant_id: string;
@@ -35,31 +37,27 @@ export function NotificationsModal({
   onWatered,
   isLoading = false,
 }: NotificationsModalProps) {
-  const [wateredPlantIds, setWateredPlantIds] = useState<Set<string>>(
-    new Set()
-  );
+  const [wateredPlantIds, setWateredPlantIds] = useState<Set<string>>(new Set());
 
   const handleWatered = (plantId: string) => {
     setWateredPlantIds((prev) => new Set(prev).add(plantId));
     onWatered(plantId);
   };
 
-  const displayNotifications = notifications.filter(
-    (n) => !wateredPlantIds.has(n.plant_id)
-  );
+  const displayNotifications = notifications.filter((n) => !wateredPlantIds.has(n.plant_id));
 
   const getStatusText = (daysOverdue: number) => {
     if (daysOverdue > 0) {
-      return `Overdue by ${daysOverdue} day${daysOverdue === 1 ? "" : "s"}`;
+      return `Overdue by ${daysOverdue} day${daysOverdue === 1 ? '' : 's'}`;
     }
-    return "Due today";
+    return 'Due today';
   };
 
   const getStatusColor = (daysOverdue: number) => {
     if (daysOverdue > 0) {
-      return "text-red-600 dark:text-red-400";
+      return 'text-red-600 dark:text-red-400';
     }
-    return "text-amber-600 dark:text-amber-400";
+    return 'text-amber-600 dark:text-amber-400';
   };
 
   return (
@@ -72,8 +70,8 @@ export function NotificationsModal({
           </DialogTitle>
           <DialogDescription>
             {displayNotifications.length === 0
-              ? "All caught up! 🌱"
-              : `${displayNotifications.length} plant${displayNotifications.length === 1 ? "" : "s"} need${displayNotifications.length === 1 ? "s" : ""} watering`}
+              ? 'All caught up! 🌱'
+              : `${displayNotifications.length} plant${displayNotifications.length === 1 ? '' : 's'} need${displayNotifications.length === 1 ? 's' : ''} watering`}
           </DialogDescription>
         </DialogHeader>
 
@@ -120,10 +118,7 @@ export function NotificationsModal({
                     {notification.plant_name}
                   </Link>
                   <p
-                    className={cn(
-                      "text-sm font-medium",
-                      getStatusColor(notification.days_overdue)
-                    )}
+                    className={cn('text-sm font-medium', getStatusColor(notification.days_overdue))}
                   >
                     {getStatusText(notification.days_overdue)}
                   </p>

@@ -1,10 +1,16 @@
+import type { PlantWithDetails, PlantWithWatering, Room } from '~/types/plant.types';
+
 import React from 'react';
+
+// Note: Import vi from vitest to use mock functions in factories
+// This should be imported at the top when using these factories
+import { vi } from 'vitest';
+
 import {
-  createMockPlantWithWatering,
   createMockPlantWithDetails,
+  createMockPlantWithWatering,
   createMockRooms,
 } from '../../__tests__/factories';
-import type { PlantWithWatering, PlantWithDetails, Room } from '~/types/plant.types';
 
 /**
  * PlantCard Props Factory
@@ -189,7 +195,7 @@ export function createMockEmptyStateProps(
   return {
     icon: MockIcon,
     title: 'No items',
-    description: 'You haven\'t created anything yet',
+    description: "You haven't created anything yet",
     actionLabel: 'Create',
     onAction: vi.fn(),
     ...overrides,
@@ -229,7 +235,3 @@ export function createMockFormErrorProps(
     ...overrides,
   };
 }
-
-// Note: Import vi from vitest to use mock functions in factories
-// This should be imported at the top when using these factories
-import { vi } from 'vitest';

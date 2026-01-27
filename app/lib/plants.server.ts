@@ -1,13 +1,14 @@
-import { supabaseServer } from './supabase.server';
-import { deletePlantPhoto } from './storage.server';
 import type {
   Plant,
-  PlantWithWatering,
-  PlantWithDetails,
   PlantInsertData,
   PlantUpdateData,
+  PlantWithDetails,
+  PlantWithWatering,
   WateringHistory,
 } from '~/types/plant.types';
+
+import { deletePlantPhoto } from './storage.server';
+import { supabaseServer } from './supabase.server';
 
 /**
  * Get all plants for a user, optionally filtered by room
@@ -57,10 +58,7 @@ export async function getUserPlants(
         }
 
         const daysUntilWatering = nextWateringDate
-          ? Math.ceil(
-              (nextWateringDate.getTime() - new Date().getTime()) /
-                (1000 * 60 * 60 * 24)
-            )
+          ? Math.ceil((nextWateringDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
           : null;
 
         return {
@@ -78,9 +76,7 @@ export async function getUserPlants(
     return plantsWithWatering.sort((a, b) => {
       if (!a.next_watering_date) return 1;
       if (!b.next_watering_date) return -1;
-      return (
-        a.next_watering_date.getTime() - b.next_watering_date.getTime()
-      );
+      return a.next_watering_date.getTime() - b.next_watering_date.getTime();
     });
   } catch (error) {
     console.error('Error fetching plants:', error);
@@ -116,7 +112,7 @@ export async function getPlantById(
       return null;
     }
 
-    const plantData = data as any;
+    const plantData = data;
 
     // Fetch room name if room_id exists
     let roomName: string | null = null;
@@ -135,10 +131,7 @@ export async function getPlantById(
     const wateringHistory = await getWateringHistory(plantId, userId, 10);
 
     const daysUntilWatering = nextWateringDate
-      ? Math.ceil(
-          (nextWateringDate.getTime() - new Date().getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
+      ? Math.ceil((nextWateringDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
     return {
@@ -162,10 +155,7 @@ export async function getPlantById(
  * @param data - Plant data
  * @returns Created plant
  */
-export async function createPlant(
-  userId: string,
-  data: PlantInsertData
-): Promise<Plant> {
+export async function createPlant(userId: string, data: PlantInsertData): Promise<Plant> {
   try {
     // Validate required fields
     if (!data.name || typeof data.name !== 'string' || !data.name.trim()) {
@@ -177,9 +167,7 @@ export async function createPlant(
       data.watering_frequency_days < 1 ||
       data.watering_frequency_days > 365
     ) {
-      throw new Error(
-        'Watering frequency must be between 1 and 365 days'
-      );
+      throw new Error('Watering frequency must be between 1 and 365 days');
     }
 
     const { data: plant, error } = await (supabaseServer
@@ -231,7 +219,7 @@ export async function updatePlant(
       .eq('id', plantId)
       .single() as any);
 
-    if (existing.error || (existing.data as any)?.user_id !== userId) {
+    if (existing.error || existing.data?.user_id !== userId) {
       throw new Error('Plant not found or unauthorized');
     }
 
@@ -244,12 +232,9 @@ export async function updatePlant(
     // Validate watering frequency if provided
     if (
       updateData.watering_frequency_days &&
-      (updateData.watering_frequency_days < 1 ||
-        updateData.watering_frequency_days > 365)
+      (updateData.watering_frequency_days < 1 || updateData.watering_frequency_days > 365)
     ) {
-      throw new Error(
-        'Watering frequency must be between 1 and 365 days'
-      );
+      throw new Error('Watering frequency must be between 1 and 365 days');
     }
 
     const updateQuery = (supabaseServer as any)
@@ -278,10 +263,7 @@ export async function updatePlant(
  * @param plantId - Plant ID
  * @param userId - User ID (for ownership verification)
  */
-export async function deletePlant(
-  plantId: string,
-  userId: string
-): Promise<void> {
+export async function deletePlant(plantId: string, userId: string): Promise<void> {
   try {
     // Get plant to verify ownership and get photo URL
     const { data, error: fetchError } = await (supabaseServer
@@ -290,13 +272,13 @@ export async function deletePlant(
       .eq('id', plantId)
       .single() as any);
 
-    if (fetchError || (data as any)?.user_id !== userId) {
+    if (fetchError || data?.user_id !== userId) {
       throw new Error('Plant not found or unauthorized');
     }
 
     // Delete photo from storage if exists
-    if ((data as any)?.photo_url) {
-      await deletePlantPhoto((data as any).photo_url);
+    if (data?.photo_url) {
+      await deletePlantPhoto(data.photo_url);
     }
 
     // Delete plant (cascades to watering_history)
@@ -320,14 +302,11 @@ export async function deletePlant(
  * @param plantId - Plant ID
  * @returns Next watering date or null
  */
-export async function getNextWateringDate(
-  plantId: string
-): Promise<Date | null> {
+export async function getNextWateringDate(plantId: string): Promise<Date | null> {
   try {
-    const { data, error } = await (supabaseServer as any).rpc(
-      'get_next_watering_date',
-      { p_plant_id: plantId }
-    );
+    const { data, error } = await (supabaseServer as any).rpc('get_next_watering_date', {
+      p_plant_id: plantId,
+    });
 
     if (error) {
       console.error('Failed to get next watering date:', error);
@@ -350,9 +329,7 @@ export async function getNextWateringDate(
  * @param plantId - Plant ID
  * @returns Last watered date or null
  */
-export async function getLastWateredDate(
-  plantId: string
-): Promise<Date | null> {
+export async function getLastWateredDate(plantId: string): Promise<Date | null> {
   try {
     const { data, error } = await (supabaseServer
       .from('watering_history')
@@ -366,7 +343,7 @@ export async function getLastWateredDate(
       return null;
     }
 
-    return new Date((data as any).watered_at);
+    return new Date(data.watered_at);
   } catch (error) {
     console.error('Error getting last watered date:', error);
     return null;
@@ -393,7 +370,7 @@ export async function getWateringHistory(
       .eq('id', plantId)
       .single() as any);
 
-    if (plantError || !plant || (plant as any).user_id !== userId) {
+    if (plantError || !plant || plant.user_id !== userId) {
       return [];
     }
 
@@ -439,9 +416,7 @@ export async function createAIPlant(
       data.watering_frequency_days < 1 ||
       data.watering_frequency_days > 365
     ) {
-      throw new Error(
-        'Watering frequency must be between 1 and 365 days'
-      );
+      throw new Error('Watering frequency must be between 1 and 365 days');
     }
 
     const { data: plant, error } = await (supabaseServer
@@ -456,7 +431,7 @@ export async function createAIPlant(
         fertilizing_tips: data.fertilizing_tips || null,
         pruning_tips: data.pruning_tips || null,
         troubleshooting: data.troubleshooting || null,
-        created_with_ai: true,  // Mark as AI-created
+        created_with_ai: true, // Mark as AI-created
       } as any)
       .select()
       .single() as any);
@@ -497,7 +472,7 @@ export async function recordAIFeedback(
       .eq('id', plantId)
       .single() as any);
 
-    if (plantError || !plant || (plant as any).user_id !== userId) {
+    if (plantError || !plant || plant.user_id !== userId) {
       throw new Error('Plant not found or access denied');
     }
 

@@ -11,6 +11,7 @@
 ## Overview
 
 Phase 5 focuses on:
+
 1. **Room Management** - Allow users to organize plants by rooms
 2. **Accessibility Audit** - Ensure WCAG 2.1 AA compliance
 3. **Error Handling & Validation** - Robust form validation and error display
@@ -23,6 +24,7 @@ Phase 5 focuses on:
 ### 5.1 Rooms Management
 
 #### Task 5.1.1: Create Room API Endpoint
+
 - **File:** `app/routes/api.rooms.tsx`
 - **Actions:**
   - POST: Create new room (returns new room object)
@@ -35,6 +37,7 @@ Phase 5 focuses on:
   - Handle duplicate name error gracefully
 
 #### Task 5.1.2: Update Dashboard for Room Filtering
+
 - **File:** `app/routes/dashboard._index.tsx`
 - **Changes:**
   - Loader: Fetch all rooms for user
@@ -46,6 +49,7 @@ Phase 5 focuses on:
   - Preserve active room during page navigation
 
 #### Task 5.1.3: Inline Room Creation
+
 - **File:** `app/components/room-filter-chips.tsx` (new)
 - **Feature:**
   - "+" button at end of chip list
@@ -57,6 +61,7 @@ Phase 5 focuses on:
   - Loading state while creating
 
 #### Task 5.1.4: Room Assignment in Forms
+
 - **Files:**
   - `app/routes/dashboard.plants.new.tsx`
   - `app/routes/dashboard.plants.$plantId.edit.tsx`
@@ -67,6 +72,7 @@ Phase 5 focuses on:
   - Validation: Show all user's rooms, allow creation if no room exists
 
 #### Task 5.1.5: Delete Room Handling
+
 - **Scenario:** User deletes a room with plants assigned
 - **Options:**
   - Database cascade SET NULL (plants lose room reference)
@@ -78,6 +84,7 @@ Phase 5 focuses on:
 ### 5.2 Accessibility Audit
 
 #### Task 5.2.1: Color Contrast Audit
+
 - **Tools:** WebAIM Contrast Checker, axe DevTools
 - **Check:** All text meets 4.5:1 ratio for normal text, 3:1 for large text
 - **Action Items:**
@@ -92,6 +99,7 @@ Phase 5 focuses on:
 - **Result:** Document approved color palette
 
 #### Task 5.2.2: Touch Target Sizes
+
 - **Standard:** All interactive elements 44x44px minimum
 - **Audit:**
   - Buttons - ensure 44px height + padding
@@ -103,6 +111,7 @@ Phase 5 focuses on:
 - **Test:** Mobile view (375px) to verify spacing
 
 #### Task 5.2.3: Keyboard Navigation
+
 - **Test:** Use keyboard only, no mouse
 - **Flows to test:**
   - Tab through dashboard - order logical (top-to-bottom, left-to-right)
@@ -119,6 +128,7 @@ Phase 5 focuses on:
   - Modal dismiss on Escape (Dialog component handles this)
 
 #### Task 5.2.4: Screen Reader Testing
+
 - **Tools:** NVDA (free, Windows) or macOS VoiceOver
 - **Test:**
   - Login page - form labels associated correctly
@@ -134,6 +144,7 @@ Phase 5 focuses on:
   - Describe icons with `aria-label` or title
 
 #### Task 5.2.5: Language & Labels Review
+
 - **Audit all text:**
   - Button labels - action-oriented ("Save Plant", not "OK")
   - Error messages - specific ("Email already registered" not "Error")
@@ -149,6 +160,7 @@ Phase 5 focuses on:
 ### 5.3 Error Handling & Validation
 
 #### Task 5.3.1: Create Form Error Component
+
 - **File:** `app/components/form-error.tsx`
 - **Props:**
   - `message: string` - Error message
@@ -161,6 +173,7 @@ Phase 5 focuses on:
 - **Usage:** Display action data errors in forms
 
 #### Task 5.3.2: Validation Utilities
+
 - **File:** `app/lib/validation.ts`
 - **Functions:**
   ```typescript
@@ -178,27 +191,31 @@ Phase 5 focuses on:
   - Room name: 1-50 chars, unique per user (checked server-side)
 
 #### Task 5.3.3: Client-Side Validation
+
 - **Implementation:**
   - Use `form onChange` listener
   - Show inline errors below fields (state-driven)
   - Disable submit button if form invalid
   - Red border on invalid inputs
 - **Example:**
+
   ```tsx
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const validation = validateField(name, value);
-    setErrors(prev => ({...prev, [name]: validation.error || ''}));
+    setErrors((prev) => ({ ...prev, [name]: validation.error || '' }));
   };
   ```
 
 #### Task 5.3.4: Server-Side Validation
+
 - **In route actions:**
   - Re-validate all inputs (never trust client)
   - Return `actionData` with errors
   - Example:
+
     ```typescript
     export async function action({ request }: Route.ActionArgs) {
       const formData = await request.formData();
@@ -211,9 +228,11 @@ Phase 5 focuses on:
       // proceed...
     }
     ```
+
   - Display errors in form using `actionData?.errors`
 
 #### Task 5.3.5: Error Boundaries
+
 - **Update:** `app/root.tsx` error boundary
   - Show friendly error message
   - In dev: show stack trace
@@ -222,6 +241,7 @@ Phase 5 focuses on:
   - Example: Plant details page error if plant not found
 
 #### Task 5.3.6: User-Friendly Error Messages
+
 - **File:** `app/lib/error-messages.ts` (new)
 - **Constants:**
   ```typescript
@@ -242,6 +262,7 @@ Phase 5 focuses on:
 ### 5.4 Loading States & Optimistic UI
 
 #### Task 5.4.1: Loading Indicators
+
 - **Implementation:** Use `useNavigation()` hook from React Router
 - **Loading spinner component:**
   - File: `app/components/loading-spinner.tsx`
@@ -249,6 +270,7 @@ Phase 5 focuses on:
   - Accessible: `aria-busy="true"` and `aria-label="Loading..."`
 
 #### Task 5.4.2: Skeleton Loaders
+
 - **Use cases:**
   - Plant list loading
   - Plant details loading
@@ -259,8 +281,8 @@ Phase 5 focuses on:
   - Smooth transition to real content
 
 #### Task 5.4.3: Optimistic UI Updates
-- **Key flows:**
 
+- **Key flows:**
   1. **"Watered Today" button:**
      - Show immediate success feedback
      - Remove from notification list instantly
@@ -282,12 +304,14 @@ Phase 5 focuses on:
   - Offer retry button
 
 #### Task 5.4.4: Navigation Loading Bar
+
 - **Tool:** `nprogress` or similar
 - **Trigger:** When navigation starts
 - **Progress bar:** Top of page, subtle animation
 - **Usage:** Show during route transitions
 
 #### Task 5.4.5: AI Operation Loading States
+
 - **AI plant creation:**
   - Step 2 (Identify): "Identifying plant..." spinner
   - Step 4 (Care instructions): "Generating care instructions..." spinner
@@ -336,6 +360,7 @@ Phase 5 focuses on:
 ## Files to Create/Modify
 
 ### New Files
+
 - `app/routes/api.rooms.tsx` - Room CRUD API
 - `app/components/room-filter-chips.tsx` - Room filter UI
 - `app/components/form-error.tsx` - Error display component
@@ -345,6 +370,7 @@ Phase 5 focuses on:
 - `app/lib/nprogress.client.ts` - Navigation progress bar (optional)
 
 ### Modified Files
+
 - `app/routes/dashboard._index.tsx` - Add room filtering
 - `app/routes/dashboard.plants.new.tsx` - Add room selector
 - `app/routes/dashboard.plants.$plantId.edit.tsx` - Add room selector
@@ -358,11 +384,13 @@ Phase 5 focuses on:
 ## Testing Strategy
 
 ### Unit Tests
+
 - Validation utilities (`app/lib/validation.test.ts`)
 - Error message library
 - Room filtering logic
 
 ### Manual Testing
+
 - Test all keyboard navigation flows
 - Test screen reader with one plant
 - Test error states (duplicate room, invalid input)
@@ -370,6 +398,7 @@ Phase 5 focuses on:
 - Test on mobile (375px width)
 
 ### Accessibility Audit Checklist
+
 - [ ] Color contrast checked (WebAIM)
 - [ ] Touch targets tested (44px minimum)
 - [ ] Keyboard navigation complete
@@ -400,4 +429,3 @@ Phase 5 focuses on:
 - Consider using React Router's `<fetcher>` for optimistic updates
 - Keep error messages out of database - use message library for consistency
 - Test accessibility on real devices/browsers, not just emulation
-

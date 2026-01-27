@@ -3,6 +3,7 @@
 ## What a Screen Reader Does
 
 A screen reader is software that:
+
 1. **Reads page content aloud** to users who are blind or low vision
 2. **Announces interactive elements** ("button", "link", "form input")
 3. **Reads form labels** so user knows what field is for
@@ -10,6 +11,7 @@ A screen reader is software that:
 5. **Provides navigation shortcuts** (jump to next heading, button, etc.)
 
 **Popular screen readers:**
+
 - NVDA (Windows, free, open source) - https://www.nvaccess.org/
 - JAWS (Windows, expensive, most popular professionally)
 - VoiceOver (Mac/iOS, built-in)
@@ -27,18 +29,18 @@ A screen reader is software that:
 
 ### Basic Commands
 
-| Command | What it does |
-|---------|------------|
-| Insert+Home | Start reading from top |
-| Insert+Down | Read next line |
-| Insert+Up | Read previous line |
-| H | Jump to next heading |
-| N | Jump to next navigation |
-| B | Jump to next button |
-| F | Jump to next form field |
-| L | Jump to next list |
-| T | Jump to next table |
-| Escape | Stop reading |
+| Command     | What it does            |
+| ----------- | ----------------------- |
+| Insert+Home | Start reading from top  |
+| Insert+Down | Read next line          |
+| Insert+Up   | Read previous line      |
+| H           | Jump to next heading    |
+| N           | Jump to next navigation |
+| B           | Jump to next button     |
+| F           | Jump to next form field |
+| L           | Jump to next list       |
+| T           | Jump to next table      |
+| Escape      | Stop reading            |
 
 ### Test Procedure
 
@@ -51,6 +53,7 @@ A screen reader is software that:
 ### What Should Be Announced
 
 **Good example (login page):**
+
 ```
 "Flor link"
 "Login, heading level 1"
@@ -62,6 +65,7 @@ A screen reader is software that:
 ```
 
 **Bad example:**
+
 ```
 "Image"                    (no alt text - what is it?)
 "Create Account"           (no heading level)
@@ -193,10 +197,7 @@ A screen reader is software that:
 **Good - descriptive alt text:**
 
 ```tsx
-<img
-  src="monstera.jpg"
-  alt="Monstera deliciosa plant in white pot with 6 leaves"
-/>
+<img src="monstera.jpg" alt="Monstera deliciosa plant in white pot with 6 leaves" />
 
 // Screen reader announces: "Monstera deliciosa plant in white pot with 6 leaves"
 ```
@@ -285,9 +286,7 @@ For notifications/toasts that appear dynamically:
 **Bad - no announcement:**
 
 ```tsx
-<div>
-  {notification && <p>{notification.message}</p>}
-</div>
+<div>{notification && <p>{notification.message}</p>}</div>
 
 // User doesn't know message appeared
 ```
@@ -321,13 +320,15 @@ For notifications/toasts that appear dynamically:
   id="email"
   type="email"
   aria-invalid={hasError}
-  aria-describedby={hasError ? "email-error" : undefined}
-/>
-{hasError && (
-  <div id="email-error" role="alert">
-    Invalid email format
-  </div>
-)}
+  aria-describedby={hasError ? 'email-error' : undefined}
+/>;
+{
+  hasError && (
+    <div id="email-error" role="alert">
+      Invalid email format
+    </div>
+  );
+}
 
 // Screen reader announces: "Invalid email format" when error appears
 ```
@@ -368,6 +369,7 @@ For notifications/toasts that appear dynamically:
 Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough:
 
 ### aria-label
+
 ```tsx
 // When element has no visible text
 <button aria-label="Delete plant">
@@ -376,6 +378,7 @@ Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough
 ```
 
 ### aria-describedby
+
 ```tsx
 // Link element to explanation
 <input
@@ -386,15 +389,13 @@ Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough
 ```
 
 ### aria-invalid & aria-required
+
 ```tsx
-<input
-  required
-  aria-required="true"
-  aria-invalid={hasError}
-/>
+<input required aria-required="true" aria-invalid={hasError} />
 ```
 
 ### aria-live
+
 ```tsx
 // Announce dynamic content
 <div aria-live="polite" aria-atomic="true">
@@ -403,14 +404,14 @@ Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough
 ```
 
 ### role="alert"
+
 ```tsx
 // Important announcements
-<div role="alert">
-  Error: Email is already registered
-</div>
+<div role="alert">Error: Email is already registered</div>
 ```
 
 ### role="dialog"
+
 ```tsx
 // For custom modals
 <div role="dialog" aria-labelledby="dialog-title">
@@ -438,24 +439,29 @@ Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough
 ## Files to Update
 
 ### Root Layout (`app/root.tsx`)
+
 - [ ] Wrap main content in `<main>` tag
 - [ ] Ensure `<nav>` wraps navigation
 
 ### Navigation (`app/components/nav.tsx`)
+
 - [ ] Verify all aria-labels present
 - [ ] Check link text is clear
 
 ### Forms (All form components)
+
 - [ ] Verify all inputs have `<label htmlFor>`
 - [ ] Ensure labels are connected (htmlFor matches input id)
 - [ ] Add aria-describedby for help text
 
 ### Cards/Components
+
 - [ ] Add alt text to all images
 - [ ] Ensure icon buttons have aria-label
 - [ ] Use semantic HTML
 
 ### Pages
+
 - [ ] Use proper heading hierarchy
 - [ ] Use semantic section/article tags
 - [ ] Add aria-live for notifications
@@ -474,4 +480,3 @@ Use ARIA (Accessible Rich Internet Applications) when semantic HTML isn't enough
 ✅ Dynamic notifications use aria-live
 ✅ NVDA can navigate page and understand content
 ✅ Page structure makes sense when read top-to-bottom
-

@@ -5,23 +5,21 @@
  * Entry point: /dashboard/plants/new-ai
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
-
-import { redirect, type Route } from "react-router";
-import { requireAuth } from "~/lib/require-auth.server";
+import { AIWizardPage } from '~/components/AIWizardPage';
+import { processPlantImage } from '~/lib/image.server';
+import { createAIPlant, recordAIFeedback } from '~/lib/plants.server';
+import { requireAuth } from '~/lib/require-auth.server';
+import { getUserRooms } from '~/lib/rooms.server';
+import { uploadPlantPhoto } from '~/lib/storage.server';
 import {
   checkAIGenerationLimit,
   checkPlantLimit,
   incrementAIUsage,
-} from "~/lib/usage-limits.server";
-import { AIWizardPage } from "~/components/AIWizardPage";
-import { getUserRooms } from "~/lib/rooms.server";
-import { createAIPlant, recordAIFeedback } from "~/lib/plants.server";
-import { uploadPlantPhoto } from "~/lib/storage.server";
-import { processPlantImage } from "~/lib/image.server";
+} from '~/lib/usage-limits.server';
 
-export const meta: Route.MetaFunction = () => [
-  { title: "Create Plant with AI - Flor" },
-];
+import { type Route, redirect } from 'react-router';
+
+export const meta: Route.MetaFunction = () => [{ title: 'Create Plant with AI - Flor' }];
 
 /**
  * Loader validates authentication and limits before entering wizard
@@ -32,17 +30,13 @@ export const loader: Route.LoaderFunction = async ({ request }) => {
   // Check if user can create plants
   const plantLimitStatus = await checkPlantLimit(userId);
   if (!plantLimitStatus.allowed) {
-    throw new Error(
-      `Plant limit reached: ${plantLimitStatus.limit} max plants`
-    );
+    throw new Error(`Plant limit reached: ${plantLimitStatus.limit} max plants`);
   }
 
   // Check if user can use AI
   const aiLimitStatus = await checkAIGenerationLimit(userId);
   if (!aiLimitStatus.allowed) {
-    throw new Error(
-      `AI generation limit reached: ${aiLimitStatus.limit} per month`
-    );
+    throw new Error(`AI generation limit reached: ${aiLimitStatus.limit} per month`);
   }
 
   // Get user's rooms for dropdown
@@ -62,39 +56,30 @@ export const loader: Route.LoaderFunction = async ({ request }) => {
 export const action: Route.ActionFunction = async ({ request }) => {
   const userId = await requireAuth(request);
   const formData = await request.formData();
-  const action = formData.get("_action") as string;
+  const action = formData.get('_action') as string;
 
   // Validate action parameter
   if (!action) {
-    return { error: "Invalid action" };
+    return { error: 'Invalid action' };
   }
 
   try {
     switch (action) {
-      case "save-plant": {
+      case 'save-plant': {
         // Parse plant data from form
-        const name = formData.get("name") as string;
-        const wateringFrequencyDays = parseInt(
-          formData.get("wateringFrequencyDays") as string,
-          10
-        );
-        const lightRequirements = formData.get("lightRequirements") as string;
-        const roomId = formData.get("roomId") as string | null;
+        const name = formData.get('name') as string;
+        const wateringFrequencyDays = parseInt(formData.get('wateringFrequencyDays') as string, 10);
+        const lightRequirements = formData.get('lightRequirements') as string;
+        const roomId = formData.get('roomId') as string | null;
 
         // Parse array fields (fertilizingTips, pruningTips, troubleshooting)
-        const fertilizingTips = JSON.parse(
-          formData.get("fertilizingTips") as string
-        );
-        const pruningTips = JSON.parse(
-          formData.get("pruningTips") as string
-        );
-        const troubleshooting = JSON.parse(
-          formData.get("troubleshooting") as string
-        );
+        const fertilizingTips = JSON.parse(formData.get('fertilizingTips') as string);
+        const pruningTips = JSON.parse(formData.get('pruningTips') as string);
+        const troubleshooting = JSON.parse(formData.get('troubleshooting') as string);
 
         // Handle photo if provided
         let photoUrl: string | null = null;
-        const photoFile = formData.get("photoFile") as File | null;
+        const photoFile = formData.get('photoFile') as File | null;
 
         if (photoFile && photoFile.size > 0) {
           // Read file as buffer
@@ -104,7 +89,7 @@ export const action: Route.ActionFunction = async ({ request }) => {
           const processedBuffer = await processPlantImage(buffer);
 
           // Upload to storage
-          const filename = `${userId}/${Date.now()}-${name.replace(/\s+/g, "-")}.jpg`;
+          const filename = `${userId}/${Date.now()}-${name.replace(/\s+/g, '-')}.jpg`;
           photoUrl = await uploadPlantPhoto(filename, processedBuffer);
         }
 
@@ -129,37 +114,27 @@ export const action: Route.ActionFunction = async ({ request }) => {
         };
       }
 
-      case "save-feedback": {
+      case 'save-feedback': {
         // Parse feedback data
-        const plantId = formData.get("plantId") as string;
-        const feedbackType = formData.get("feedbackType") as
-          | "thumbs_up"
-          | "thumbs_down";
-        const comment = formData.get("comment") as string | null;
-        const aiResponseSnapshot = JSON.parse(
-          formData.get("aiResponseSnapshot") as string
-        );
+        const plantId = formData.get('plantId') as string;
+        const feedbackType = formData.get('feedbackType') as 'thumbs_up' | 'thumbs_down';
+        const comment = formData.get('comment') as string | null;
+        const aiResponseSnapshot = JSON.parse(formData.get('aiResponseSnapshot') as string);
 
         // Record feedback
-        await recordAIFeedback(
-          userId,
-          plantId,
-          feedbackType,
-          comment || "",
-          aiResponseSnapshot
-        );
+        await recordAIFeedback(userId, plantId, feedbackType, comment || '', aiResponseSnapshot);
 
         // Redirect to plant details
         return redirect(`/dashboard/plants/${plantId}`);
       }
 
       default:
-        return { error: "Unknown action" };
+        return { error: 'Unknown action' };
     }
   } catch (error) {
-    console.error("Wizard action error:", error);
+    console.error('Wizard action error:', error);
     return {
-      error: error instanceof Error ? error.message : "An error occurred",
+      error: error instanceof Error ? error.message : 'An error occurred',
     };
   }
 };
@@ -167,9 +142,7 @@ export const action: Route.ActionFunction = async ({ request }) => {
 /**
  * Component renders the AI wizard UI
  */
-export default function AIWizardRoute({
-  loaderData,
-}: Route.ComponentProps) {
+export default function AIWizardRoute({ loaderData }: Route.ComponentProps) {
   const handleComplete = (plantId: string) => {
     // Navigate to plant details page
     window.location.href = `/dashboard/plants/${plantId}`;

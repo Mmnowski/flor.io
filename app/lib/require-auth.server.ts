@@ -1,5 +1,6 @@
-import { redirect } from "react-router";
-import { getUserId } from "~/lib/session.server";
+import { getUserId } from '~/lib/session.server';
+
+import { redirect } from 'react-router';
 
 /**
  * Loader utility that requires user authentication
@@ -9,7 +10,7 @@ export async function requireAuth(request: Request) {
   const userId = await getUserId(request);
 
   if (!userId) {
-    throw redirect("/auth/login?redirectTo=" + new URL(request.url).pathname);
+    throw redirect('/auth/login?redirectTo=' + new URL(request.url).pathname);
   }
 
   return userId;

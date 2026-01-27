@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Form } from 'react-router';
-import { AlertCircle } from 'lucide-react';
+import { FormError } from '~/components/form-error';
+import { ImageUpload } from '~/components/image-upload';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { Textarea } from '~/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -14,10 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { FormError } from '~/components/form-error';
-import { ImageUpload } from '~/components/image-upload';
-import { plantNameSchema, wateringFrequencySchema, getFieldError } from '~/lib/validation';
+import { Textarea } from '~/components/ui/textarea';
+import { getFieldError, plantNameSchema, wateringFrequencySchema } from '~/lib/validation';
 import type { PlantWithDetails, Room } from '~/types/plant.types';
+
+import { useCallback, useState } from 'react';
+import { Form } from 'react-router';
+
+import { AlertCircle } from 'lucide-react';
 
 interface FieldErrors {
   [key: string]: string[] | undefined;
@@ -33,9 +35,17 @@ interface PlantFormProps {
   mode: 'create' | 'edit';
 }
 
-export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors, mode }: PlantFormProps) {
+export function PlantForm({
+  plant,
+  rooms,
+  error,
+  fieldErrors: serverFieldErrors,
+  mode,
+}: PlantFormProps) {
   const isEdit = mode === 'edit';
-  const [selectedRoom, setSelectedRoom] = useState<string>(isEdit && plant?.room_id ? plant.room_id : '');
+  const [selectedRoom, setSelectedRoom] = useState<string>(
+    isEdit && plant?.room_id ? plant.room_id : ''
+  );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(serverFieldErrors || {});
 
   const handleRoomChange = (value: string) => {
@@ -74,10 +84,8 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
   };
 
   const isFormValid =
-    Object.keys(fieldErrors).length === 0 &&
-    plant?.name ||
-    (document.querySelector('input[name="name"]') as HTMLInputElement)?.value
-      ?.trim() !== '';
+    (Object.keys(fieldErrors).length === 0 && plant?.name) ||
+    (document.querySelector('input[name="name"]') as HTMLInputElement)?.value?.trim() !== '';
 
   return (
     <Form method="post" encType="multipart/form-data" className="space-y-6 max-w-2xl">
@@ -86,9 +94,7 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
       {/* Photo Upload */}
       <div>
         <Label className="text-base font-semibold mb-3 block">Plant Photo</Label>
-        <ImageUpload
-          currentPhotoUrl={isEdit ? plant?.photo_url : undefined}
-        />
+        <ImageUpload currentPhotoUrl={isEdit ? plant?.photo_url : undefined} />
       </div>
 
       {/* Plant Name */}
@@ -104,11 +110,7 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
           defaultValue={isEdit ? plant?.name : ''}
           required
           maxLength={100}
-          className={`mt-2 ${
-            fieldErrors.name
-              ? 'border-red-500 focus:ring-red-300'
-              : ''
-          }`}
+          className={`mt-2 ${fieldErrors.name ? 'border-red-500 focus:ring-red-300' : ''}`}
           onChange={handleFieldChange}
           aria-invalid={!!fieldErrors.name}
           aria-describedby={fieldErrors.name ? 'name-error' : undefined}
@@ -123,9 +125,7 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
             {Array.isArray(fieldErrors.name) ? fieldErrors.name[0] : fieldErrors.name}
           </div>
         )}
-        {!fieldErrors.name && (
-          <p className="text-sm text-slate-500 mt-1">Maximum 100 characters</p>
-        )}
+        {!fieldErrors.name && <p className="text-sm text-slate-500 mt-1">Maximum 100 characters</p>}
       </div>
 
       {/* Watering Frequency */}
@@ -143,16 +143,12 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
           min="1"
           max="365"
           className={`mt-2 ${
-            fieldErrors.watering_frequency_days
-              ? 'border-red-500 focus:ring-red-300'
-              : ''
+            fieldErrors.watering_frequency_days ? 'border-red-500 focus:ring-red-300' : ''
           }`}
           onChange={handleFieldChange}
           aria-invalid={!!fieldErrors.watering_frequency_days}
           aria-describedby={
-            fieldErrors.watering_frequency_days
-              ? 'watering-frequency-error'
-              : undefined
+            fieldErrors.watering_frequency_days ? 'watering-frequency-error' : undefined
           }
         />
         {fieldErrors.watering_frequency_days && (
@@ -162,13 +158,13 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
             role="alert"
           >
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {Array.isArray(fieldErrors.watering_frequency_days) ? fieldErrors.watering_frequency_days[0] : fieldErrors.watering_frequency_days}
+            {Array.isArray(fieldErrors.watering_frequency_days)
+              ? fieldErrors.watering_frequency_days[0]
+              : fieldErrors.watering_frequency_days}
           </div>
         )}
         {!fieldErrors.watering_frequency_days && (
-          <p className="text-sm text-slate-500 mt-1">
-            How often to water in days (1-365)
-          </p>
+          <p className="text-sm text-slate-500 mt-1">How often to water in days (1-365)</p>
         )}
       </div>
 
@@ -254,18 +250,10 @@ export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors,
 
       {/* Form Actions */}
       <div className="flex gap-3 pt-4">
-        <Button
-          type="submit"
-          className="flex-1"
-          disabled={Object.keys(fieldErrors).length > 0}
-        >
+        <Button type="submit" className="flex-1" disabled={Object.keys(fieldErrors).length > 0}>
           {isEdit ? 'Save Changes' : 'Create Plant'}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => window.history.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => window.history.back()}>
           Cancel
         </Button>
       </div>

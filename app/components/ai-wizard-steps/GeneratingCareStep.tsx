@@ -3,12 +3,13 @@
  * Loading state while AI generates care instructions for the identified plant
  * Includes timeout and retry support
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
+import { parseError, withTimeout } from '~/lib/error-handling';
 
-import { useEffect, useState } from "react";
-import { useAIWizard } from "../ai-wizard";
-import { withTimeout, parseError } from "~/lib/error-handling";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Button } from "~/components/ui/button";
+import { useEffect, useState } from 'react';
+
+import { useAIWizard } from '../ai-wizard';
 
 interface GeneratingCareStepProps {
   onComplete?: () => void;
@@ -17,21 +18,17 @@ interface GeneratingCareStepProps {
 
 const GENERATE_TIMEOUT_MS = 45000; // 45 second timeout for care generation
 
-export function GeneratingCareStep({
-  onComplete,
-  onError,
-}: GeneratingCareStepProps) {
+export function GeneratingCareStep({ onComplete, onError }: GeneratingCareStepProps) {
   const { state, updateState, incrementRetry } = useAIWizard();
   const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     // Generate care instructions
     const generateCare = async () => {
-      const plantName =
-        state.manualPlantName || state.identification?.commonNames[0];
+      const plantName = state.manualPlantName || state.identification?.commonNames[0];
 
       if (!plantName) {
-        onError?.("No plant name provided");
+        onError?.('No plant name provided');
         return;
       }
 
@@ -52,28 +49,27 @@ export function GeneratingCareStep({
         await withTimeout(
           apiCall,
           GENERATE_TIMEOUT_MS,
-          "Care instruction generation took too long"
+          'Care instruction generation took too long'
         );
 
         // Mock: return care instructions based on plant name
         const mockCareData = {
           wateringFrequencyDays: 7,
-          lightRequirements:
-            "Bright indirect light, 6-8 hours daily. Avoid direct sun.",
+          lightRequirements: 'Bright indirect light, 6-8 hours daily. Avoid direct sun.',
           fertilizingTips: [
-            "Fertilize every 4-6 weeks during growing season",
-            "Use balanced liquid fertilizer diluted to half strength",
-            "Reduce fertilizing in fall and winter",
+            'Fertilize every 4-6 weeks during growing season',
+            'Use balanced liquid fertilizer diluted to half strength',
+            'Reduce fertilizing in fall and winter',
           ],
           pruningTips: [
-            "Prune yellow or damaged leaves at the base",
-            "Trim aerial roots if they become unruly",
-            "Best time to prune is spring or early summer",
+            'Prune yellow or damaged leaves at the base',
+            'Trim aerial roots if they become unruly',
+            'Best time to prune is spring or early summer',
           ],
           troubleshooting: [
-            "Yellow leaves: Usually overwatering or too much direct sun",
-            "Brown leaf tips: Low humidity or underwatering",
-            "Slow growth: Insufficient light or nutrients",
+            'Yellow leaves: Usually overwatering or too much direct sun',
+            'Brown leaf tips: Low humidity or underwatering',
+            'Slow growth: Insufficient light or nutrients',
           ],
         };
 
@@ -100,8 +96,7 @@ export function GeneratingCareStep({
     }
   }, [state.manualPlantName, state.identification, updateState, onComplete, onError, isRetrying]);
 
-  const plantName =
-    state.manualPlantName || state.identification?.commonNames[0] || "plant";
+  const plantName = state.manualPlantName || state.identification?.commonNames[0] || 'plant';
 
   const handleRetry = () => {
     setIsRetrying(true);
@@ -114,7 +109,7 @@ export function GeneratingCareStep({
       <div>
         <h2 className="text-2xl font-bold">Generating Care Instructions</h2>
         <p className="mt-2 text-gray-600">
-          Please wait while AI generates personalized care instructions for your{" "}
+          Please wait while AI generates personalized care instructions for your{' '}
           <strong>{plantName}</strong>...
         </p>
       </div>
@@ -125,12 +120,7 @@ export function GeneratingCareStep({
           <AlertDescription className="space-y-3">
             <p>{state.error}</p>
             {state.retryCount < 3 && (
-              <Button
-                onClick={handleRetry}
-                variant="outline"
-                size="sm"
-                className="mt-2"
-              >
+              <Button onClick={handleRetry} variant="outline" size="sm" className="mt-2">
                 Try Again
               </Button>
             )}
@@ -180,16 +170,10 @@ export function GeneratingCareStep({
 
             {/* Status text */}
             <div>
-              <p className="text-lg font-semibold text-gray-900">
-                Creating care instructions...
-              </p>
-              <p className="mt-1 text-sm text-gray-600">
-                This should take about 3 seconds
-              </p>
+              <p className="text-lg font-semibold text-gray-900">Creating care instructions...</p>
+              <p className="mt-1 text-sm text-gray-600">This should take about 3 seconds</p>
               {state.retryCount > 0 && (
-                <p className="mt-2 text-xs text-amber-600">
-                  Attempt {state.retryCount + 1}/3
-                </p>
+                <p className="mt-2 text-xs text-amber-600">Attempt {state.retryCount + 1}/3</p>
               )}
             </div>
 
@@ -224,7 +208,7 @@ export function GeneratingCareStep({
             type="button"
             className="text-sm text-gray-500 hover:text-gray-700 underline"
             onClick={() => {
-              updateState({ error: "Cancelled by user" });
+              updateState({ error: 'Cancelled by user' });
             }}
           >
             Cancel

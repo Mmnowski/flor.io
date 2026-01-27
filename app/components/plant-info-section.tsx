@@ -1,12 +1,10 @@
 'use client';
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '~/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible';
+
 import type { ReactNode } from 'react';
+
+import { ChevronDown } from 'lucide-react';
 
 interface PlantInfoSectionProps {
   title: string;

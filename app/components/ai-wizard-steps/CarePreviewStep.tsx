@@ -2,31 +2,29 @@
  * Step 5: Care Preview & Edit
  * Shows all plant data and allows user to review/edit before saving
  */
-
-import { useState } from "react";
-import { useAIWizard } from "../ai-wizard";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Textarea } from "~/components/ui/textarea";
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+} from '~/components/ui/select';
+import { Textarea } from '~/components/ui/textarea';
+
+import { useState } from 'react';
+
+import { useAIWizard } from '../ai-wizard';
 
 interface CarePreviewStepProps {
   onContinue?: () => void;
   rooms?: Array<{ id: string; name: string }>;
 }
 
-export function CarePreviewStep({
-  onContinue,
-  rooms = [],
-}: CarePreviewStepProps) {
+export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps) {
   const { state, updateState } = useAIWizard();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -35,16 +33,12 @@ export function CarePreviewStep({
   if (!state.careInstructions) {
     return (
       <div className="rounded-lg bg-red-50 p-4">
-        <p className="text-sm text-red-900">
-          Care instructions missing. Please try again.
-        </p>
+        <p className="text-sm text-red-900">Care instructions missing. Please try again.</p>
       </div>
     );
   }
 
-  const handleWateringFrequencyChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleWateringFrequencyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
     if (value > 0 && value <= 365) {
       updateState({
@@ -56,9 +50,7 @@ export function CarePreviewStep({
     }
   };
 
-  const handleLightRequirementsChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleLightRequirementsChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateState({
       careInstructions: {
         ...state.careInstructions,
@@ -68,7 +60,7 @@ export function CarePreviewStep({
   };
 
   const handleTipsChange = (
-    section: "fertilizingTips" | "pruningTips" | "troubleshooting",
+    section: 'fertilizingTips' | 'pruningTips' | 'troubleshooting',
     index: number,
     value: string
   ) => {
@@ -93,8 +85,7 @@ export function CarePreviewStep({
         <div>
           <h2 className="text-2xl font-bold">Review Plant Care</h2>
           <p className="mt-2 text-gray-600">
-            Here's what AI generated for your {plantName}. You can edit any
-            details before saving.
+            Here's what AI generated for your {plantName}. You can edit any details before saving.
           </p>
         </div>
         <Button
@@ -103,18 +94,14 @@ export function CarePreviewStep({
           onClick={() => setIsEditing(!isEditing)}
           className="whitespace-nowrap"
         >
-          {isEditing ? "View" : "Edit"}
+          {isEditing ? 'View' : 'Edit'}
         </Button>
       </div>
 
       {/* Photo preview */}
       {state.photoPreviewUrl && (
         <div className="overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
-          <img
-            src={state.photoPreviewUrl}
-            alt="Plant"
-            className="h-48 w-full object-contain"
-          />
+          <img src={state.photoPreviewUrl} alt="Plant" className="h-48 w-full object-contain" />
         </div>
       )}
 
@@ -132,7 +119,7 @@ export function CarePreviewStep({
           <div>
             <Label htmlFor="room">Room (Optional)</Label>
             <Select
-              value={state.selectedRoomId || ""}
+              value={state.selectedRoomId || ''}
               onValueChange={(value) =>
                 updateState({
                   selectedRoomId: value || null,
@@ -161,9 +148,7 @@ export function CarePreviewStep({
         <div className="mt-4 space-y-2">
           {isEditing ? (
             <>
-              <Label htmlFor="watering-frequency">
-                Watering Frequency (days)
-              </Label>
+              <Label htmlFor="watering-frequency">Watering Frequency (days)</Label>
               <Input
                 id="watering-frequency"
                 type="number"
@@ -175,12 +160,10 @@ export function CarePreviewStep({
             </>
           ) : (
             <>
-              <p className="text-sm font-semibold text-gray-600">
-                Frequency
-              </p>
+              <p className="text-sm font-semibold text-gray-600">Frequency</p>
               <p className="text-lg text-gray-900">
                 Every {state.careInstructions.wateringFrequencyDays} day
-                {state.careInstructions.wateringFrequencyDays !== 1 ? "s" : ""}
+                {state.careInstructions.wateringFrequencyDays !== 1 ? 's' : ''}
               </p>
             </>
           )}
@@ -202,9 +185,7 @@ export function CarePreviewStep({
               />
             </>
           ) : (
-            <p className="text-gray-700">
-              {state.careInstructions.lightRequirements}
-            </p>
+            <p className="text-gray-700">{state.careInstructions.lightRequirements}</p>
           )}
         </div>
       </div>
@@ -218,9 +199,7 @@ export function CarePreviewStep({
               {isEditing ? (
                 <Input
                   value={tip}
-                  onChange={(e) =>
-                    handleTipsChange("fertilizingTips", index, e.target.value)
-                  }
+                  onChange={(e) => handleTipsChange('fertilizingTips', index, e.target.value)}
                   className="mb-2"
                 />
               ) : (
@@ -243,9 +222,7 @@ export function CarePreviewStep({
               {isEditing ? (
                 <Input
                   value={tip}
-                  onChange={(e) =>
-                    handleTipsChange("pruningTips", index, e.target.value)
-                  }
+                  onChange={(e) => handleTipsChange('pruningTips', index, e.target.value)}
                   className="mb-2"
                 />
               ) : (
@@ -268,9 +245,7 @@ export function CarePreviewStep({
               {isEditing ? (
                 <Input
                   value={tip}
-                  onChange={(e) =>
-                    handleTipsChange("troubleshooting", index, e.target.value)
-                  }
+                  onChange={(e) => handleTipsChange('troubleshooting', index, e.target.value)}
                   className="mb-2"
                 />
               ) : (
@@ -287,8 +262,8 @@ export function CarePreviewStep({
       {/* Info */}
       <Alert>
         <AlertDescription>
-          AI-generated content is a starting point. Feel free to customize the
-          care instructions based on your experience with this plant.
+          AI-generated content is a starting point. Feel free to customize the care instructions
+          based on your experience with this plant.
         </AlertDescription>
       </Alert>
 
@@ -302,11 +277,7 @@ export function CarePreviewStep({
         >
           ← Back
         </Button>
-        <Button
-          type="button"
-          onClick={handleContinue}
-          className="flex-1"
-        >
+        <Button type="button" onClick={handleContinue} className="flex-1">
           Save & Continue →
         </Button>
       </div>

@@ -4,8 +4,7 @@
  * Tracks and enforces monthly quotas for AI generation and total plant count.
  * Uses Supabase database for persistence.
  */
-
-import { supabaseServer } from "./supabase.server";
+import { supabaseServer } from './supabase.server';
 
 // Configurable limits (can be moved to environment variables later)
 export const LIMITS = {
@@ -37,7 +36,7 @@ export interface UserUsageLimits {
 function getCurrentMonthYear(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
 }
 
@@ -63,22 +62,20 @@ function getResetDate(): Date {
  *   // Show error: "You've used all 20 AI generations this month"
  * }
  */
-export async function checkAIGenerationLimit(
-  userId: string
-): Promise<AIGenerationLimitStatus> {
+export async function checkAIGenerationLimit(userId: string): Promise<AIGenerationLimitStatus> {
   const supabase = supabaseServer;
   const monthYear = getCurrentMonthYear();
 
   // Get or create usage record for current month
   const { data, error } = await supabase
-    .from("usage_limits")
-    .select("ai_generations_this_month")
-    .eq("user_id", userId)
-    .eq("month_year", monthYear)
+    .from('usage_limits')
+    .select('ai_generations_this_month')
+    .eq('user_id', userId)
+    .eq('month_year', monthYear)
     .single();
 
   // If no record exists, user hasn't hit limit yet
-  if (error && error.code === "PGRST116") {
+  if (error && error.code === 'PGRST116') {
     // PGRST116 = no rows found
     return {
       allowed: true,
@@ -89,7 +86,7 @@ export async function checkAIGenerationLimit(
   }
 
   if (error) {
-    console.error("Error checking AI generation limit:", error);
+    console.error('Error checking AI generation limit:', error);
     // On error, allow the operation (fail open)
     return {
       allowed: true,
@@ -128,30 +125,30 @@ export async function incrementAIUsage(userId: string): Promise<void> {
 
   // Try to increment existing record
   const { data: existing } = await supabase
-    .from("usage_limits")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("month_year", monthYear)
+    .from('usage_limits')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('month_year', monthYear)
     .single();
 
   if (existing) {
     // Record exists, increment it
     const { error } = await supabase
-      .from("usage_limits")
+      .from('usage_limits')
       .update({
         ai_generations_this_month: (existing as any) + 1,
         updated_at: now,
       })
-      .eq("user_id", userId)
-      .eq("month_year", monthYear);
+      .eq('user_id', userId)
+      .eq('month_year', monthYear);
 
     if (error) {
-      console.error("Error incrementing AI usage:", error);
+      console.error('Error incrementing AI usage:', error);
       throw error;
     }
   } else {
     // No record exists, create one
-    const { error } = await supabase.from("usage_limits").insert([
+    const { error } = await supabase.from('usage_limits').insert([
       {
         user_id: userId,
         month_year: monthYear,
@@ -162,7 +159,7 @@ export async function incrementAIUsage(userId: string): Promise<void> {
     ]);
 
     if (error) {
-      console.error("Error creating AI usage record:", error);
+      console.error('Error creating AI usage record:', error);
       throw error;
     }
   }
@@ -181,19 +178,17 @@ export async function incrementAIUsage(userId: string): Promise<void> {
  *   // Show error: "You've reached the limit of 100 plants"
  * }
  */
-export async function checkPlantLimit(
-  userId: string
-): Promise<PlantCountLimitStatus> {
+export async function checkPlantLimit(userId: string): Promise<PlantCountLimitStatus> {
   const supabase = supabaseServer;
 
   // Count user's plants
   const { count, error } = await supabase
-    .from("plants")
-    .select("*", { count: "exact" })
-    .eq("user_id", userId);
+    .from('plants')
+    .select('*', { count: 'exact' })
+    .eq('user_id', userId);
 
   if (error) {
-    console.error("Error checking plant limit:", error);
+    console.error('Error checking plant limit:', error);
     // On error, allow the operation (fail open)
     return {
       allowed: true,
@@ -226,9 +221,7 @@ export async function checkPlantLimit(
  * //   plantCount: { allowed: true, count: 12, limit: 100 }
  * // }
  */
-export async function getUserUsageLimits(
-  userId: string
-): Promise<UserUsageLimits> {
+export async function getUserUsageLimits(userId: string): Promise<UserUsageLimits> {
   const [aiStatus, plantStatus] = await Promise.all([
     checkAIGenerationLimit(userId),
     checkPlantLimit(userId),
@@ -255,8 +248,7 @@ export async function getDetailedUsage(userId: string) {
   const limits = await getUserUsageLimits(userId);
 
   const aiRemaining = limits.aiGenerations.limit - limits.aiGenerations.used;
-  const plantRemaining =
-    limits.plantCount.limit - limits.plantCount.count;
+  const plantRemaining = limits.plantCount.limit - limits.plantCount.count;
 
   return {
     ai: {

@@ -1,21 +1,20 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { PlantCard } from '~/components/plant-card';
+
+import { MemoryRouter } from 'react-router';
+
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
 import {
-  createMockPlantWithWatering,
   createMockOverduePlant,
   createMockPlantDueToday,
+  createMockPlantWithWatering,
 } from '../../__tests__/factories';
 
 describe('PlantCard', () => {
   // Wrapper component to provide Router context
   const renderWithRouter = (component: React.ReactElement) => {
-    return render(
-      <MemoryRouter>
-        {component}
-      </MemoryRouter>
-    );
+    return render(<MemoryRouter>{component}</MemoryRouter>);
   };
 
   describe('rendering', () => {

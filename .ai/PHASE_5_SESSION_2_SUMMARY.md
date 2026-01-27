@@ -7,9 +7,11 @@
 Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 
 #### 1. **Task 5.2.1: Color Contrast Audit** ✅
+
 **File:** `.ai/ACCESSIBILITY_TASK_5.2.1_CONTRAST_AUDIT.md`
 
 **Covers:**
+
 - What contrast ratio means and why it matters
 - Current color scheme analysis (light and dark mode)
 - Each color combination (primary button, text, links, errors, etc.)
@@ -20,6 +22,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 - Success criteria
 
 **Key Points:**
+
 - Standard: 4.5:1 ratio for normal text, 3:1 for large text
 - Current colors mostly good, some need verification
 - Placeholder text might be too light
@@ -28,9 +31,11 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 ---
 
 #### 2. **Task 5.2.2: Touch Target Sizes** ✅
+
 **File:** `.ai/ACCESSIBILITY_TASK_5.2.2_TOUCH_TARGETS.md`
 
 **Covers:**
+
 - Why 44×44px matters (finger size, accessibility)
 - Current state of Flor.io (what's already good)
 - What needs checking (icon buttons)
@@ -40,6 +45,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 - Code examples (before & after)
 
 **Key Points:**
+
 - Standard: 44×44px minimum
 - Icon buttons in nav are 40×40 (too small) ⚠️
 - Need to change from h-10 w-10 to h-11 w-11
@@ -48,9 +54,11 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 ---
 
 #### 3. **Task 5.2.3: Keyboard Navigation** ✅
+
 **File:** `.ai/ACCESSIBILITY_TASK_5.2.3_KEYBOARD_NAVIGATION.md`
 
 **Covers:**
+
 - Keys used for navigation (Tab, Enter, Escape, Arrow keys)
 - How to test keyboard navigation
 - Current state (focus indicators already present ✅)
@@ -60,6 +68,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 - Testing checklist
 
 **Key Points:**
+
 - Standard: Entire app works with keyboard only
 - Flor.io already has good focus indicators ✅
 - Tab order needs verification
@@ -68,9 +77,11 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 ---
 
 #### 4. **Task 5.2.4: Screen Readers** ✅
+
 **File:** `.ai/ACCESSIBILITY_TASK_5.2.4_SCREEN_READERS.md`
 
 **Covers:**
+
 - How screen readers work
 - How to test with NVDA (free)
 - NVDA commands and testing procedure
@@ -84,6 +95,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 - Testing checklist
 
 **Key Points:**
+
 - Standard: Page structure is semantic, images have alt text
 - Flor.io already uses semantic HTML ✅
 - Need to verify form labels are connected
@@ -93,9 +105,11 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 ---
 
 #### 5. **Task 5.2.5: Language & Labels** ✅
+
 **File:** `.ai/ACCESSIBILITY_TASK_5.2.5_LANGUAGE_LABELS.md`
 
 **Covers:**
+
 - 8 core principles for clear language
 - Current language audit (what's already good)
 - Areas to review (auth, dashboard, forms, modals)
@@ -105,6 +119,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 - Testing checklist
 
 **Key Points:**
+
 - Standard: Clear, specific, non-technical language
 - Use action words (verbs) for buttons
 - Error messages must be specific
@@ -119,6 +134,7 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 **File:** `.ai/ACCESSIBILITY_IMPLEMENTATION_ROADMAP.md`
 
 **Contains:**
+
 - Quick summary of all 5 tasks
 - Current state of Flor.io (what's already good vs. needs work)
 - Implementation strategy in 4 phases
@@ -219,16 +235,19 @@ Created five detailed implementation guides for Tasks 5.2.1-5.2.5:
 ## What Each Document Teaches
 
 ### For Understanding
+
 - **Start with:** `.ai/ACCESSIBILITY_GUIDE.md` - Plain language intro
 - **Then read:** Task 5.2.5 (Language/Labels) - Easiest task
 - **Then read:** Task 5.2.2 (Touch Targets) - Straightforward to implement
 
 ### For Implementation
+
 - **Use:** `.ai/ACCESSIBILITY_IMPLEMENTATION_ROADMAP.md` - Overall strategy
 - **Read:** Specific task guide for the task you're implementing
 - **Reference:** Code examples in each task guide
 
 ### For Testing
+
 - **Use:** Checklists in each task guide
 - **Use:** WebAIM Contrast Checker (tool)
 - **Use:** NVDA (tool) for screen reader testing
@@ -306,6 +325,7 @@ After implementing the accessibility fixes:
 **Important:** These guides are comprehensive documentation for understanding accessibility.
 
 We have NOT made code changes yet. The guides provide:
+
 - ✅ What to check
 - ✅ How to test
 - ✅ What the issues are likely to be
@@ -319,11 +339,13 @@ We have NOT made code changes yet. The guides provide:
 ## Using These Documents
 
 ### For Learning
+
 1. Read `.ai/ACCESSIBILITY_GUIDE.md` first (beginner-friendly)
 2. Then read the specific task guide you're interested in
 3. Understand the "why" before making changes
 
 ### For Implementation
+
 1. Read `.ai/ACCESSIBILITY_IMPLEMENTATION_ROADMAP.md`
 2. Follow the step-by-step plan
 3. Read relevant task guide for each step
@@ -331,6 +353,7 @@ We have NOT made code changes yet. The guides provide:
 5. Use checklists to verify
 
 ### For Testing
+
 1. Use tools listed in each guide
 2. Follow testing procedure
 3. Document results
@@ -357,10 +380,10 @@ When all accessibility tasks complete:
 **Accessibility is not a checklist—it's about making your app usable for everyone.**
 
 These guides explain:
+
 - **What** we're checking
 - **Why** it matters
 - **How** to test it
 - **How** to fix it
 
 All in plain language without requiring prior accessibility knowledge!
-

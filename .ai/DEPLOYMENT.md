@@ -30,6 +30,7 @@ PLANTNET_API_KEY=your-plantnet-key
 ```
 
 **Security Notes**:
+
 - Add `.env` to `.gitignore` (already configured)
 - Never commit keys to version control
 - Use strong random values for `SESSION_SECRET`
@@ -83,15 +84,16 @@ supabase db push
 
 The schema includes:
 
-| Component | Purpose |
-|-----------|---------|
-| `plants` | Stores plant data (name, photo, watering frequency, care info) |
-| `rooms` | Organizes plants into rooms for filtering |
-| `watering_history` | Tracks when plants were watered |
-| `ai_feedback` | Stores user feedback on AI recommendations |
-| `usage_limits` | Tracks monthly AI generation usage |
+| Component          | Purpose                                                        |
+| ------------------ | -------------------------------------------------------------- |
+| `plants`           | Stores plant data (name, photo, watering frequency, care info) |
+| `rooms`            | Organizes plants into rooms for filtering                      |
+| `watering_history` | Tracks when plants were watered                                |
+| `ai_feedback`      | Stores user feedback on AI recommendations                     |
+| `usage_limits`     | Tracks monthly AI generation usage                             |
 
 **Key Features**:
+
 - Row Level Security (RLS) - Users can only access their own data
 - Indexes on frequently queried columns
 - Cascade deletes (deleting a plant removes its watering history)
@@ -233,6 +235,7 @@ yarn start
 - **Individual routes**: <100KB each
 
 Monitor with:
+
 ```bash
 # After build
 open dist/stats.html  # See bundle breakdown
@@ -248,6 +251,7 @@ SELECT * FROM pg_indexes WHERE tablename = 'plants';
 ```
 
 **Indexes Ensure Fast Queries**:
+
 - Users → Plants: `idx_plants_user_id`
 - Plants → Rooms: `idx_plants_room_id`
 - Watering History: `idx_watering_history_plant_id`, `idx_watering_history_watered_at`
@@ -255,11 +259,13 @@ SELECT * FROM pg_indexes WHERE tablename = 'plants';
 ### Query Optimization Tips
 
 1. **Limit results**:
+
    ```typescript
    .limit(10)  // For notifications list
    ```
 
 2. **Use `.single()`** for unique lookups:
+
    ```typescript
    .single()  // Returns one row, not array
    ```
@@ -287,6 +293,7 @@ Vercel handles React Router + Node.js servers seamlessly.
    - Add all variables from `.env`
 
 3. **Deploy**:
+
    ```bash
    # Push to main branch triggers automatic deployment
    git push origin main
@@ -376,10 +383,12 @@ psql postgresql://user:password@host:port/database < backup.sql
 ### Application Logs
 
 **Vercel**:
+
 - Real-time logs in dashboard
 - Filter by status code, path, duration
 
 **Fly.io**:
+
 ```bash
 flyctl logs  # Stream live logs
 ```
@@ -390,7 +399,7 @@ Add error tracking for production issues:
 
 ```typescript
 // app/lib/error-tracking.ts
-import * as Sentry from "@sentry/react";
+import * as Sentry from '@sentry/react';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -401,6 +410,7 @@ export const captureException = Sentry.captureException;
 ```
 
 Use in error boundary:
+
 ```typescript
 catch (error) {
   captureException(error);
@@ -422,11 +432,13 @@ curl https://your-app.com/
 ### Monthly Tasks
 
 1. **Update Statistics**:
+
    ```sql
    ANALYZE;  -- Updates query planner statistics
    ```
 
 2. **Vacuum Tables**:
+
    ```sql
    VACUUM ANALYZE;  -- Reclaims space, updates stats
    ```
@@ -453,18 +465,21 @@ As users grow:
 If deployment has critical issues:
 
 **Vercel**:
+
 1. Go to Deployments
 2. Select previous working version
 3. Click "Redeploy"
 4. New deployment starts automatically
 
 **Fly.io**:
+
 ```bash
 flyctl releases  # List deployments
 flyctl releases rollback  # Rollback to previous
 ```
 
 **Database**:
+
 ```bash
 # Restore from backup (see Backups section)
 flyctl postgres attach --backup-id <backup-id>
@@ -492,6 +507,7 @@ Before each deployment:
 **Cause**: Network issue or invalid credentials
 
 **Fix**:
+
 ```bash
 # Verify environment variables
 echo $SUPABASE_URL
@@ -507,6 +523,7 @@ curl -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
 **Cause**: Storage permissions or file too large
 
 **Fix**:
+
 1. Check storage policies are set correctly
 2. Verify file is <10MB (app limits to 500KB after compression)
 3. Check bucket name matches code
@@ -514,6 +531,7 @@ curl -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
 ### "Build fails with TypeScript errors"
 
 **Fix**:
+
 ```bash
 # Check errors
 yarn typecheck
@@ -525,6 +543,7 @@ yarn typecheck
 ### "Database schema not applied"
 
 **Fix**:
+
 ```bash
 # Check Supabase dashboard for tables
 # Manually run SQL in SQL Editor

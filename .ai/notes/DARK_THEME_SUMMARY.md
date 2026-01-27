@@ -6,6 +6,7 @@
 ## ✅ What Was Implemented
 
 ### 1. **Theme Hook** (`app/hooks/useTheme.ts`)
+
 A custom React hook that manages theme state:
 
 ```typescript
@@ -13,6 +14,7 @@ const { theme, toggleTheme, isDark } = useTheme();
 ```
 
 **Features:**
+
 - ✅ Detects system preference (`prefers-color-scheme: dark`)
 - ✅ Reads user preference from localStorage
 - ✅ Persists theme selection across sessions
@@ -20,9 +22,11 @@ const { theme, toggleTheme, isDark } = useTheme();
 - ✅ Handles SSR with mounted state to prevent hydration mismatch
 
 ### 2. **CSS Dark Mode Variables** (`app/app.css`)
+
 Complete color palette for dark mode:
 
 **Colors:**
+
 - Background: `#0f172a` (very dark slate)
 - Card: `#1e293b` (dark slate)
 - Text: `#f1f5f9` (light slate)
@@ -31,9 +35,11 @@ Complete color palette for dark mode:
 - Border: `#1e7e74` (dark emerald)
 
 ### 3. **Theme Toggle Button** (`app/components/nav.tsx`)
+
 Added to navigation bar:
 
 **Design:**
+
 - Moon icon (slate-600) when in light mode
 - Sun icon (amber-500) when in dark mode
 - 44x44px button for accessibility
@@ -41,11 +47,13 @@ Added to navigation bar:
 - Works for both authenticated and unauthenticated users
 
 **Behavior:**
+
 - Click toggles between light and dark
 - Persists to localStorage
 - Smooth transition between modes
 
 ### 4. **Flash Prevention Script** (`app/root.tsx`)
+
 Prevents Flash of Wrong Theme (FOWT):
 
 ```typescript
@@ -66,9 +74,11 @@ Prevents Flash of Wrong Theme (FOWT):
 Runs before React renders, preventing visual flash in dark mode.
 
 ### 5. **Component Updates**
+
 All pages and components updated with `dark:` classes:
 
 **Pages:**
+
 - `home.tsx` - Gradient backgrounds, card colors
 - `auth.login.tsx` - Form inputs, backgrounds
 - `auth.register.tsx` - Form inputs, backgrounds
@@ -76,6 +86,7 @@ All pages and components updated with `dark:` classes:
 - `dashboard._index.tsx` - Plant list header
 
 **Components:**
+
 - `nav.tsx` - Navigation with toggle button
 - `empty-state.tsx` - Placeholder styling
 - `form-error.tsx` - Error messages
@@ -86,6 +97,7 @@ All pages and components updated with `dark:` classes:
 ## 🎨 Color Palette Reference
 
 ### Light Mode (Default)
+
 ```
 Background:     White (#ffffff)
 Foreground:     Gray-900 (#1f2937)
@@ -100,6 +112,7 @@ Error:         Red-500 (#ef4444)
 ```
 
 ### Dark Mode
+
 ```
 Background:     Slate-950 (#0f172a)
 Foreground:     Slate-100 (#f1f5f9)
@@ -118,18 +131,21 @@ Error:         Bright Red (#ff6b6b)
 ## 🧪 Testing Dark Mode
 
 ### Quick Test
+
 1. Click Moon icon in navbar
 2. Theme switches to dark
 3. Refresh page - dark mode persists
 4. Click Sun icon to switch back to light
 
 ### System Preference Test
+
 1. DevTools → Rendering → Emulate CSS media feature
 2. Select "dark"
 3. Refresh page
 4. Should load in dark mode (if no localStorage preference)
 
 ### Across Pages
+
 - Dark mode persists across all pages
 - Theme selection works on home, auth, and dashboard pages
 - Both authenticated and unauthenticated users can toggle
@@ -141,6 +157,7 @@ Error:         Bright Red (#ff6b6b)
 ### Using Dark Mode Classes in Components
 
 **Light and Dark variants:**
+
 ```typescript
 <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
   Content
@@ -148,11 +165,13 @@ Error:         Bright Red (#ff6b6b)
 ```
 
 **For forms:**
+
 ```typescript
 <Input className="dark:bg-slate-800 dark:text-slate-100 dark:border-emerald-900" />
 ```
 
 **For cards:**
+
 ```typescript
 <Card className="dark:bg-slate-900 border dark:border-emerald-900">
   <div className="dark:text-slate-100">Content</div>
@@ -160,6 +179,7 @@ Error:         Bright Red (#ff6b6b)
 ```
 
 **For gradients:**
+
 ```typescript
 <div className="bg-gradient-to-br from-emerald-50 to-white dark:from-slate-950 dark:to-slate-900">
   Hero content
@@ -171,16 +191,19 @@ Error:         Bright Red (#ff6b6b)
 ## ♿ Accessibility
 
 ### Contrast Ratios
+
 - **Light mode:** Dark text on light (4.5:1+) ✅
 - **Dark mode:** Light text on dark (4.5:1+) ✅
 - **Both modes:** Emerald primary maintains 4.5:1 minimum ✅
 
 ### Focus States
+
 - `focus:ring-2 focus:ring-emerald-300` visible in both modes
 - 3px minimum visible outline
 - Works with keyboard navigation
 
 ### Motion
+
 - Smooth `transition-colors` (300ms)
 - No sudden flashes or jarring changes
 - Safe for motion-sensitive users
@@ -190,11 +213,13 @@ Error:         Bright Red (#ff6b6b)
 ## 📊 Performance Impact
 
 ### Bundle Size
+
 - `useTheme.ts`: ~500 bytes (gzipped)
 - CSS variables: Already in `app.css` (0 added bytes)
 - **Total addition: < 1KB**
 
 ### Runtime Performance
+
 - ✅ No JavaScript blocking page load
 - ✅ Theme script runs before React hydration
 - ✅ localStorage is instant access
@@ -205,11 +230,13 @@ Error:         Bright Red (#ff6b6b)
 ## 🔮 Files Modified/Created
 
 **Created:**
+
 - `app/hooks/useTheme.ts` - Theme hook
 - `.ai/DARK_THEME_GUIDE.md` - Comprehensive documentation
 - `.ai/DARK_THEME_SUMMARY.md` - This file
 
 **Modified:**
+
 - `app/app.css` - Dark mode CSS variables
 - `app/root.tsx` - Theme prevention script
 - `app/components/nav.tsx` - Theme toggle button
@@ -226,6 +253,7 @@ Error:         Bright Red (#ff6b6b)
 ## 🚀 What's Ready for Phase 2
 
 The dark theme system is production-ready and:
+
 - ✅ Works in all modern browsers
 - ✅ Respects system preferences
 - ✅ Persists user choice
@@ -240,6 +268,7 @@ The dark theme system is production-ready and:
 ## 📚 Documentation
 
 See `.ai/DARK_THEME_GUIDE.md` for:
+
 - Detailed implementation explanation
 - How to use dark mode in new components
 - Troubleshooting guide
@@ -251,11 +280,13 @@ See `.ai/DARK_THEME_GUIDE.md` for:
 ## ✨ User Experience
 
 ### Before (No Dark Mode)
+
 - Users with dark mode preference see bright light theme
 - Can cause eye strain in low-light environments
 - No option to override system preference
 
 ### After (With Dark Mode) ✅
+
 - Respects system dark mode preference
 - Can manually toggle with navbar button
 - Smooth transition between themes
@@ -267,6 +298,7 @@ See `.ai/DARK_THEME_GUIDE.md` for:
 ## Summary
 
 A complete, production-ready dark theme has been implemented with:
+
 1. System preference detection
 2. User preference persistence
 3. Easy toggle in navbar

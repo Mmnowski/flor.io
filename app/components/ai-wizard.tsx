@@ -12,18 +12,17 @@
  * 5. CarePreview - Review/edit all plant data before saving
  * 6. FeedbackModal - Collect feedback on AI quality
  */
-
-import React, { useState } from "react";
-import type { ReactNode } from "react";
+import React, { useState } from 'react';
+import type { ReactNode } from 'react';
 
 export type WizardStep =
-  | "photo-upload"
-  | "identifying"
-  | "identification-result"
-  | "manual-name"
-  | "generating-care"
-  | "care-preview"
-  | "feedback";
+  | 'photo-upload'
+  | 'identifying'
+  | 'identification-result'
+  | 'manual-name'
+  | 'generating-care'
+  | 'care-preview'
+  | 'feedback';
 
 export interface PlantIdentification {
   scientificName: string;
@@ -62,7 +61,7 @@ export interface WizardState {
   selectedRoomId: string | null;
 
   // Feedback
-  feedbackType: "thumbs_up" | "thumbs_down" | null;
+  feedbackType: 'thumbs_up' | 'thumbs_down' | null;
   feedbackComment: string;
 
   // UI state
@@ -84,17 +83,17 @@ interface AIWizardProps {
  * Default wizard state
  */
 const defaultState: WizardState = {
-  currentStep: "photo-upload",
+  currentStep: 'photo-upload',
   completedSteps: new Set(),
   photoFile: null,
   photoPreviewUrl: null,
   identification: null,
   userConfirmedIdentification: false,
-  manualPlantName: "",
+  manualPlantName: '',
   careInstructions: null,
   selectedRoomId: null,
   feedbackType: null,
-  feedbackComment: "",
+  feedbackComment: '',
   isLoading: false,
   error: null,
   lastAttemptedStep: undefined,
@@ -117,13 +116,9 @@ export const AIWizardContext = React.createContext<{
  * Main wizard component
  * Manages state and provides context to child step components
  */
-export function AIWizard({
-  children,
-  userId,
-  aiRemaining,
-}: AIWizardProps) {
+export function AIWizard({ children, userId, aiRemaining }: AIWizardProps) {
   const [state, setState] = useState<WizardState>(defaultState);
-  const [stepHistory, setStepHistory] = useState<WizardStep[]>(["photo-upload"]);
+  const [stepHistory, setStepHistory] = useState<WizardStep[]>(['photo-upload']);
 
   const goToStep = (step: WizardStep) => {
     setState((prev) => ({
@@ -213,12 +208,12 @@ export function AIWizard({
  */
 function WizardProgressBar({ currentStep }: { currentStep: WizardStep }) {
   const steps: { id: WizardStep; label: string }[] = [
-    { id: "photo-upload", label: "Photo" },
-    { id: "identifying", label: "Identifying" },
-    { id: "identification-result", label: "Confirm" },
-    { id: "generating-care", label: "Generating" },
-    { id: "care-preview", label: "Review" },
-    { id: "feedback", label: "Feedback" },
+    { id: 'photo-upload', label: 'Photo' },
+    { id: 'identifying', label: 'Identifying' },
+    { id: 'identification-result', label: 'Confirm' },
+    { id: 'generating-care', label: 'Generating' },
+    { id: 'care-preview', label: 'Review' },
+    { id: 'feedback', label: 'Feedback' },
   ];
 
   const currentIndex = steps.findIndex((s) => s.id === currentStep);
@@ -230,19 +225,19 @@ function WizardProgressBar({ currentStep }: { currentStep: WizardStep }) {
           <div
             key={step.id}
             className={`flex flex-col items-center ${
-              index <= currentIndex ? "text-blue-600" : "text-gray-400"
+              index <= currentIndex ? 'text-blue-600' : 'text-gray-400'
             }`}
           >
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
                 index < currentIndex
-                  ? "border-blue-600 bg-blue-600 text-white"
+                  ? 'border-blue-600 bg-blue-600 text-white'
                   : index === currentIndex
-                    ? "border-blue-600 bg-white text-blue-600"
-                    : "border-gray-300 bg-white text-gray-300"
+                    ? 'border-blue-600 bg-white text-blue-600'
+                    : 'border-gray-300 bg-white text-gray-300'
               }`}
             >
-              {index < currentIndex ? "✓" : index + 1}
+              {index < currentIndex ? '✓' : index + 1}
             </div>
             <span className="mt-1 text-xs font-medium">{step.label}</span>
           </div>
@@ -268,7 +263,7 @@ function WizardProgressBar({ currentStep }: { currentStep: WizardStep }) {
 export function useAIWizard() {
   const context = React.useContext(AIWizardContext);
   if (!context) {
-    throw new Error("useAIWizard must be used inside AIWizard component");
+    throw new Error('useAIWizard must be used inside AIWizard component');
   }
   return context;
 }

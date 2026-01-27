@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+
 import { supabaseServer } from './supabase.server';
 
 const BUCKET_NAME = 'plant-photos';
@@ -19,12 +20,10 @@ export async function uploadPlantPhoto(
     const filename = `${uuidv4()}.jpg`;
     const path = `${userId}/${filename}`;
 
-    const { error } = await supabaseServer.storage
-      .from(BUCKET_NAME)
-      .upload(path, buffer, {
-        contentType: mimeType,
-        upsert: false,
-      });
+    const { error } = await supabaseServer.storage.from(BUCKET_NAME).upload(path, buffer, {
+      contentType: mimeType,
+      upsert: false,
+    });
 
     if (error) {
       console.error('Failed to upload photo:', error);
@@ -58,9 +57,7 @@ export async function deletePlantPhoto(photoUrl: string): Promise<void> {
 
     const path = urlParts.slice(bucketIndex + 1).join('/');
 
-    const { error } = await supabaseServer.storage
-      .from(BUCKET_NAME)
-      .remove([path]);
+    const { error } = await supabaseServer.storage.from(BUCKET_NAME).remove([path]);
 
     if (error) {
       console.error('Failed to delete photo:', error);

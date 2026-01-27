@@ -5,6 +5,7 @@
 We need to verify that **all text has a contrast ratio of at least 4.5:1** against its background (or 3:1 for large text 18px+/14px+ bold).
 
 The contrast ratio compares light and dark values:
+
 - **21:1** = Black on white (excellent)
 - **7:1** = Good
 - **4.5:1** = Minimum for AA (readable for most people with vision issues)
@@ -15,6 +16,7 @@ The contrast ratio compares light and dark values:
 ## Current Color Scheme Analysis
 
 ### Light Mode (:root)
+
 ```
 Primary: #10b981 (emerald green, medium brightness)
 Primary text: #ffffff (white)
@@ -28,6 +30,7 @@ Foreground: #000000 (black)
 ```
 
 ### Dark Mode (.dark)
+
 ```
 Background: #0f172a (very dark navy)
 Foreground: #f1f5f9 (light gray/white)
@@ -47,6 +50,7 @@ Muted foreground: #cbd5e1 (medium light gray)
 ### 1. **Primary Button: White text on Emerald (#10b981)**
 
 **Light Mode:**
+
 ```
 Text: #ffffff (white)
 Background: #10b981 (emerald)
@@ -54,6 +58,7 @@ Contrast Ratio: GOOD ✅
 ```
 
 **Dark Mode:**
+
 ```
 Text: #0f172a (dark navy)
 Background: #10b981 (same emerald)
@@ -63,6 +68,7 @@ Contrast Ratio: GOOD ✅
 ### 2. **Secondary Text: Black on White**
 
 **Light Mode:**
+
 ```
 Text: #000000 (black)
 Background: #ffffff (white)
@@ -72,6 +78,7 @@ Contrast Ratio: 21:1 EXCELLENT ✅
 ### 3. **Muted Text: Gray on White**
 
 **Light Mode:**
+
 ```
 Text: #556b2f (gray)
 Background: #ffffff (white)
@@ -79,6 +86,7 @@ Needs checking - if too light, fails
 ```
 
 **Dark Mode:**
+
 ```
 Text: #cbd5e1 (light gray)
 Background: #0f172a (very dark)
@@ -90,12 +98,14 @@ Contrast Ratio: GOOD ✅
 **Current:** `--destructive: #ef4444` (light/medium red)
 
 **Light Mode:**
+
 ```
 Text: #ef4444 on #ffffff
 Needs checking - RED IS PROBLEMATIC
 ```
 
 **Dark Mode:**
+
 ```
 Text: #ff6b6b on #0f172a (very dark)
 Better, but needs verification
@@ -104,6 +114,7 @@ Better, but needs verification
 ### 5. **Links: Emerald on White**
 
 **Light Mode:**
+
 ```
 Text: #10b981 (emerald link)
 Background: #ffffff (white)
@@ -113,6 +124,7 @@ Contrast Ratio: Acceptable ✅
 ### 6. **Form Inputs: Black text on light gray**
 
 **Light Mode:**
+
 ```
 Text: #000000 (black)
 Background: #f3f4f6 (light gray)
@@ -122,6 +134,7 @@ Contrast Ratio: GOOD ✅
 ### 7. **Placeholder Text: Gray text on light gray**
 
 **Light Mode:**
+
 ```
 Text: #999999 (medium gray) - LIKELY TOO LIGHT
 Background: #ffffff (white) or #f3f4f6 (light gray)
@@ -146,6 +159,7 @@ Contrast Ratio: Likely FAILS ❌
 ### Specific Areas to Test
 
 #### 1. Auth Pages (Login/Register)
+
 - [ ] Email input text (black on light gray input)
 - [ ] Password input text (black on light gray input)
 - [ ] Form labels (small text vs input text)
@@ -154,6 +168,7 @@ Contrast Ratio: Likely FAILS ❌
 - [ ] Buttons (white text on emerald)
 
 #### 2. Dashboard
+
 - [ ] Plant card text (dark text on white cards)
 - [ ] Plant name (heading level)
 - [ ] Status text (days since watered)
@@ -161,6 +176,7 @@ Contrast Ratio: Likely FAILS ❌
 - [ ] Plant grid empty state text
 
 #### 3. Plant Details Page
+
 - [ ] Plant name (heading)
 - [ ] "Last watered" text (status information)
 - [ ] Button text ("Watered Today" button)
@@ -168,11 +184,13 @@ Contrast Ratio: Likely FAILS ❌
 - [ ] Watering history dates (might be muted/gray)
 
 #### 4. Modals/Dialogs
+
 - [ ] Notifications modal text
 - [ ] Confirmation dialog text
 - [ ] Modal buttons
 
 #### 5. Dark Mode (All of the above + additional checks)
+
 - [ ] Light text on dark background
 - [ ] Form inputs in dark mode
 - [ ] All color combinations
@@ -247,24 +265,31 @@ Contrast Ratio: Likely FAILS ❌
 ## Implementation Plan
 
 ### Step 1: Document Current Colors
+
 Create a complete reference of all color combinations used in Flor.io
 
 ### Step 2: Test Each Combination
+
 Use WebAIM Contrast Checker for each unique combination
 
 ### Step 3: Mark Pass/Fail
+
 Record which combinations pass WCAG AA (4.5:1)
 
 ### Step 4: Fix Issues
+
 For failing combinations:
+
 - Darken text (harder to read but more accessible)
 - Lighten background (affects design)
 - Use different color entirely
 
 ### Step 5: Test Dark Mode
+
 Run same tests in dark mode
 
 ### Step 6: Verify Implementation
+
 - Check fixed colors render correctly
 - Test on real mobile device
 - Rerun axe DevTools audit
@@ -276,6 +301,7 @@ Run same tests in dark mode
 If we need to fix colors, here are accessible alternatives:
 
 ### For Error/Destructive Red
+
 ```
 Current: #ef4444 (light red)
 Better option: #dc2626 (darker red)
@@ -284,6 +310,7 @@ Ensures contrast on white and light backgrounds
 ```
 
 ### For Muted/Help Text
+
 ```
 Current: #999999 (medium gray) - possibly too light
 Better: #666666 (darker gray)
@@ -291,6 +318,7 @@ OR #4b5563 (darker) for better contrast
 ```
 
 ### For Success/Green Status
+
 ```
 Current: #10b981 (medium emerald)
 Light mode text: #047857 (darker emerald) for contrast
@@ -298,6 +326,7 @@ OR #065f46 (very dark) for maximum contrast
 ```
 
 ### For Warning/Orange Status
+
 ```
 Current: #f97316 (orange)
 Light mode text: #92400e (dark brown)
@@ -335,4 +364,3 @@ Dark mode: Keep #f59e0b (bright orange)
 ✅ Text readable in bright sunlight
 ✅ Color-coded status (green/orange/red) also has icons or text
 ✅ Both light and dark modes pass
-

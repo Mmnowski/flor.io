@@ -2,12 +2,13 @@
  * Step 2: Identifying
  * Loading state while AI identifies the plant with timeout and retry support
  */
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
+import { parseError, withTimeout } from '~/lib/error-handling';
 
-import { useEffect, useState } from "react";
-import { useAIWizard } from "../ai-wizard";
-import { withTimeout, parseError } from "~/lib/error-handling";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Button } from "~/components/ui/button";
+import { useEffect, useState } from 'react';
+
+import { useAIWizard } from '../ai-wizard';
 
 interface IdentifyingStepProps {
   onComplete?: () => void;
@@ -16,10 +17,7 @@ interface IdentifyingStepProps {
 
 const IDENTIFY_TIMEOUT_MS = 30000; // 30 second timeout for identification
 
-export function IdentifyingStep({
-  onComplete,
-  onError,
-}: IdentifyingStepProps) {
+export function IdentifyingStep({ onComplete, onError }: IdentifyingStepProps) {
   const { state, updateState, incrementRetry } = useAIWizard();
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -27,7 +25,7 @@ export function IdentifyingStep({
     // Simulate API call to identify plant
     const identifyPlant = async () => {
       if (!state.photoFile) {
-        onError?.("No photo provided");
+        onError?.('No photo provided');
         return;
       }
 
@@ -36,7 +34,7 @@ export function IdentifyingStep({
 
         // Create FormData to send to server
         const formData = new FormData();
-        formData.append("photoFile", state.photoFile);
+        formData.append('photoFile', state.photoFile);
 
         // In a real scenario, this would call the server action
         // const response = await fetch("/api/identify-plant", {
@@ -49,29 +47,28 @@ export function IdentifyingStep({
           setTimeout(resolve, 2000);
         });
 
-        await withTimeout(apiCall, IDENTIFY_TIMEOUT_MS, "Plant identification took too long");
+        await withTimeout(apiCall, IDENTIFY_TIMEOUT_MS, 'Plant identification took too long');
 
         // Mock: randomly select a plant (in real app, this comes from API)
         const mockPlants = [
           {
-            scientificName: "Monstera deliciosa",
-            commonNames: ["Monstera", "Swiss Cheese Plant"],
+            scientificName: 'Monstera deliciosa',
+            commonNames: ['Monstera', 'Swiss Cheese Plant'],
             confidence: 0.92,
           },
           {
-            scientificName: "Epipremnum aureum",
-            commonNames: ["Pothos", "Devil's Ivy"],
+            scientificName: 'Epipremnum aureum',
+            commonNames: ['Pothos', "Devil's Ivy"],
             confidence: 0.88,
           },
           {
-            scientificName: "Sansevieria trifasciata",
-            commonNames: ["Snake Plant", "Mother-in-law's Tongue"],
+            scientificName: 'Sansevieria trifasciata',
+            commonNames: ['Snake Plant', "Mother-in-law's Tongue"],
             confidence: 0.95,
           },
         ];
 
-        const randomPlant =
-          mockPlants[Math.floor(Math.random() * mockPlants.length)];
+        const randomPlant = mockPlants[Math.floor(Math.random() * mockPlants.length)];
 
         updateState({
           identification: randomPlant,
@@ -106,9 +103,7 @@ export function IdentifyingStep({
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Identifying Your Plant</h2>
-        <p className="mt-2 text-gray-600">
-          Please wait while AI analyzes your plant photo...
-        </p>
+        <p className="mt-2 text-gray-600">Please wait while AI analyzes your plant photo...</p>
       </div>
 
       {/* Error state */}
@@ -117,12 +112,7 @@ export function IdentifyingStep({
           <AlertDescription className="space-y-3">
             <p>{state.error}</p>
             {state.retryCount < 3 && (
-              <Button
-                onClick={handleRetry}
-                variant="outline"
-                size="sm"
-                className="mt-2"
-              >
+              <Button onClick={handleRetry} variant="outline" size="sm" className="mt-2">
                 Try Again
               </Button>
             )}
@@ -146,16 +136,10 @@ export function IdentifyingStep({
 
             {/* Status text */}
             <div>
-              <p className="text-lg font-semibold text-gray-900">
-                Analyzing your plant...
-              </p>
-              <p className="mt-1 text-sm text-gray-600">
-                This should take about 2 seconds
-              </p>
+              <p className="text-lg font-semibold text-gray-900">Analyzing your plant...</p>
+              <p className="mt-1 text-sm text-gray-600">This should take about 2 seconds</p>
               {state.retryCount > 0 && (
-                <p className="mt-2 text-xs text-amber-600">
-                  Attempt {state.retryCount + 1}/3
-                </p>
+                <p className="mt-2 text-xs text-amber-600">Attempt {state.retryCount + 1}/3</p>
               )}
             </div>
 
@@ -174,7 +158,7 @@ export function IdentifyingStep({
             type="button"
             className="text-sm text-gray-500 hover:text-gray-700 underline"
             onClick={() => {
-              updateState({ error: "Cancelled by user" });
+              updateState({ error: 'Cancelled by user' });
             }}
           >
             Cancel

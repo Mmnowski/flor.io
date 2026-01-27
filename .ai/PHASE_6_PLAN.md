@@ -9,6 +9,7 @@
 ## Executive Summary
 
 Phase 6 foundation work has been **substantially completed** in previous phases:
+
 - ✅ Vitest fully configured with jsdom and Testing Library
 - ✅ 28 comprehensive test files written (438 total tests)
 - ✅ Extensive mock factories for Supabase, authentication, image processing
@@ -18,6 +19,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 - ❌ Documentation files (TESTING.md, DEPLOYMENT.md) not created
 
 **Phase 6 Tasks**:
+
 1. Fix failing tests and achieve 100% pass rate
 2. Generate and verify test coverage reports
 3. Set up performance monitoring (Lighthouse, Web Vitals)
@@ -30,6 +32,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ## Current Test Status Analysis
 
 ### Test Inventory
+
 - **Total Test Files**: 28
 - **Passing Files**: 16
 - **Failing Files**: 12
@@ -41,6 +44,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ### Test File Breakdown
 
 #### Component Tests (10 files)
+
 - `PlantCard.test.tsx` - 60+ test cases (rendering, watering status, accessibility) ✅
 - `WateringButton.test.tsx` - Form submission tests ⚠️
 - `ImageUpload.test.tsx` - File upload and preview ✅
@@ -49,6 +53,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 - Plus 5 more component test files
 
 #### Server/Library Tests (9 files)
+
 - `plants.server.test.ts` - Input validation ✅
 - `watering.server.test.ts` - Watering calculations ✅
 - `rooms.server.test.ts` - Room management ✅
@@ -60,12 +65,14 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 - `error-handling.test.ts` - Error utilities (65+ tests) ✅
 
 #### Integration Tests (5 files)
+
 - `api.water.$plantId.test.ts` - Watering endpoint ⚠️
 - `api.notifications.test.ts` - Notification API ✅
 - `dashboard.plants.new-ai.integration.test.ts` - AI wizard flow ⚠️
 - Plus 2 more integration test variants
 
 #### Utility Tests (2 files)
+
 - `smoke.test.ts` - Basic Vitest verification ✅
 - `factories.test.ts` - Factory function tests ✅
 
@@ -103,6 +110,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ### Section 1: Fix Failing Tests (Priority 1)
 
 #### Task 1.1: Fix AI Wizard Integration Tests
+
 **Files**: `app/routes/__tests__/dashboard.plants.new-ai.integration.test.ts`
 
 **Status**: ⚠️ Failing (15 tests)
@@ -110,14 +118,15 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Root Cause**: Mock setup for server-only modules happens after imports
 
 **Action Items**:
+
 1. Move all `vi.mock()` calls to the top of test file (before imports)
 2. Ensure `requireAuth` is properly mocked:
    ```typescript
    vi.mock('~/lib/require-auth.server', () => ({
      requireAuth: vi.fn(async () => ({
        userId: 'test-user-id',
-       email: 'test@example.com'
-     }))
+       email: 'test@example.com',
+     })),
    }));
    ```
 3. Mock AI service calls with proper response structure
@@ -126,11 +135,13 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 6. Run tests and verify all 15 pass
 
 **Success Criteria**:
+
 - ✅ All 15 tests pass
 - ✅ No console errors during test execution
 - ✅ Mocks verify that correct APIs are called with expected args
 
 #### Task 1.2: Fix NotificationsModal Tests
+
 **Files**: `app/components/__tests__/NotificationsModal.test.tsx`
 
 **Status**: ⚠️ Failing (12 tests)
@@ -138,6 +149,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Root Cause**: Duplicate keys in plant list rendering
 
 **Action Items**:
+
 1. Examine test plant data fixture - verify each plant has unique ID
 2. Check plant list rendering in component:
    ```typescript
@@ -146,21 +158,20 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    ```
 3. In tests, use factory functions to ensure unique plant IDs:
    ```typescript
-   const plants = [
-     createMockPlant({ id: 'plant-1' }),
-     createMockPlant({ id: 'plant-2' }),
-   ];
+   const plants = [createMockPlant({ id: 'plant-1' }), createMockPlant({ id: 'plant-2' })];
    ```
 4. Test modal opens/closes properly
 5. Test watering button in notification item triggers action
 6. Verify notification dismissed after watering
 
 **Success Criteria**:
+
 - ✅ All 12 tests pass
 - ✅ No React key warnings
 - ✅ No console errors
 
 #### Task 1.3: Fix WateringButton Form Tests
+
 **Files**: `app/components/__tests__/WateringButton.test.tsx`
 
 **Status**: ⚠️ Failing (8 tests)
@@ -168,6 +179,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Root Cause**: Button rendered outside form context in test
 
 **Action Items**:
+
 1. Ensure test renders button within `<form>` element:
    ```typescript
    render(
@@ -182,11 +194,13 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 5. Verify proper action attribute on form
 
 **Success Criteria**:
+
 - ✅ All 8 tests pass
 - ✅ Form submission triggers properly
 - ✅ Loading state appears during submission
 
 #### Task 1.4: Fix Navigation Notifications Tests
+
 **Files**: `app/components/__tests__/Navigation.notifications.test.tsx`
 
 **Status**: ⚠️ Failing (10 tests)
@@ -194,6 +208,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Root Cause**: Notification count state not updating from loader data
 
 **Action Items**:
+
 1. Verify Navigation component uses proper loader data hook
 2. Mock loader data to include notification count
 3. Test bell icon renders with correct badge count
@@ -202,12 +217,15 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 6. Test keyboard navigation on bell button (enter/space)
 
 **Success Criteria**:
+
 - ✅ All 10 tests pass
 - ✅ Badge count displays correctly
 - ✅ Modal opens on click
 
 #### Task 1.5: Fix Route Integration Tests
+
 **Files**:
+
 - `app/routes/__tests__/api.water.$plantId.test.ts`
 - `app/routes/__tests__/api.notifications.test.ts`
 
@@ -216,6 +234,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Root Cause**: Incomplete mock Supabase query chains
 
 **Action Items**:
+
 1. Review factory function `setupMockSupabaseForPlants()` - ensure all query methods are implemented:
    - `.select()`
    - `.eq()`
@@ -240,6 +259,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    - Database errors (should return 500)
 
 **Success Criteria**:
+
 - ✅ All 42 tests pass
 - ✅ Proper HTTP status codes
 - ✅ Error handling verified
@@ -251,6 +271,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 **Files**: Run coverage with Vitest
 
 **Action Items**:
+
 1. Run: `yarn test:coverage`
 2. Review coverage report in HTML:
    - Open `coverage/index.html` in browser
@@ -266,6 +287,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 4. Document coverage baseline in TESTING.md
 
 **Success Criteria**:
+
 - ✅ Overall coverage >80%
 - ✅ All core utilities >85% coverage
 - ✅ All components >80% coverage
@@ -276,9 +298,11 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ### Section 3: Set Up Performance Testing (Task 3)
 
 #### Task 3.1: Lighthouse Configuration
+
 **Files**: Create `.lighthouserc.json`
 
 **Action Items**:
+
 1. Install Lighthouse CI: `yarn add -D @lhci/cli@latest`
 2. Create `.lighthouserc.json`:
    ```json
@@ -308,18 +332,22 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 5. Document performance targets in TESTING.md
 
 **Success Criteria**:
+
 - ✅ Lighthouse can run against localhost
 - ✅ Performance score >80
 - ✅ Accessibility score >90
 
 #### Task 3.2: Web Vitals Monitoring
+
 **Files**: `app/lib/web-vitals.ts`, `app/root.tsx`
 
 **Action Items**:
+
 1. Install Web Vitals: `yarn add web-vitals`
 2. Create `app/lib/web-vitals.ts`:
+
    ```typescript
-   import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
+   import { onCLS, onFCP, onFID, onLCP, onTTFB } from 'web-vitals';
 
    export function captureWebVitals() {
      onCLS(console.log);
@@ -329,21 +357,26 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
      onTTFB(console.log);
    }
    ```
+
 3. Call in root.tsx useEffect for client-side only
 4. Log to console in development, send to analytics in production
 5. Create performance baseline documentation
 
 **Success Criteria**:
+
 - ✅ Web Vitals are captured
 - ✅ Metrics logged in console during dev
 - ✅ No impact on app performance
 
 #### Task 3.3: Bundle Size Analysis
+
 **Files**: `vite.config.ts`
 
 **Action Items**:
+
 1. Install rollup-plugin-visualizer: `yarn add -D rollup-plugin-visualizer`
 2. Add to vite.config.ts:
+
    ```typescript
    import { visualizer } from 'rollup-plugin-visualizer';
 
@@ -352,17 +385,19 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
        // ... other plugins
        visualizer({
          filename: 'dist/stats.html',
-         open: true
-       })
-     ]
+         open: true,
+       }),
+     ],
    });
    ```
+
 3. Build: `yarn build`
 4. Review bundle breakdown in `dist/stats.html`
 5. Identify large dependencies
 6. Document in TESTING.md
 
 **Success Criteria**:
+
 - ✅ Bundle analysis runs on build
 - ✅ Main bundle <200KB (gzipped)
 - ✅ Can identify code optimization opportunities
@@ -372,9 +407,11 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ### Section 4: Documentation (Task 4)
 
 #### Task 4.1: Create TESTING.md
+
 **File**: `.ai/TESTING.md` (or root `TESTING.md`)
 
 **Content to Include**:
+
 1. **Testing Philosophy**
    - Unit tests for utilities and pure functions
    - Component tests for UI logic
@@ -382,6 +419,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    - E2E tests for critical user flows (future)
 
 2. **Running Tests**
+
    ```bash
    yarn test              # Run tests once
    yarn test:watch       # Run in watch mode
@@ -419,9 +457,11 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    - Minimum coverage enforcement
 
 #### Task 4.2: Create DEPLOYMENT.md
+
 **File**: `.ai/DEPLOYMENT.md`
 
 **Content to Include**:
+
 1. **Prerequisites**
    - Node.js 18+
    - Yarn package manager
@@ -441,6 +481,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    - Create storage bucket for plant photos
 
 4. **Local Development**
+
    ```bash
    yarn install
    yarn dev          # Runs on localhost:5173
@@ -449,6 +490,7 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    ```
 
 5. **Production Build**
+
    ```bash
    yarn build        # Creates build/client and build/server
    yarn start        # Serves production build
@@ -471,12 +513,16 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    - Disaster recovery plan
 
 #### Task 4.3: Update CLAUDE.md
+
 **File**: `CLAUDE.md`
 
 **Changes**:
+
 1. Update testing section (currently says "No test commands"):
+
    ```markdown
    ### Testing
+
    - **Run tests**: `yarn test`
    - **Watch mode**: `yarn test:watch`
    - **Coverage**: `yarn test:coverage`
@@ -486,8 +532,10 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
    ```
 
 2. Add performance section:
+
    ```markdown
    ### Performance
+
    - **Lighthouse**: See TESTING.md for setup
    - **Bundle analysis**: `yarn build` creates stats.html
    - **Performance targets**: >80 Lighthouse score, <200KB main bundle (gzipped)
@@ -500,9 +548,11 @@ Phase 6 foundation work has been **substantially completed** in previous phases:
 ### Section 5: CI/CD Integration (Task 5)
 
 #### Task 5.1: GitHub Actions Configuration
+
 **File**: `.github/workflows/test.yml` (create if not exists)
 
 **Content**:
+
 ```yaml
 name: Tests & Coverage
 
@@ -533,9 +583,11 @@ jobs:
 ```
 
 #### Task 5.2: Pre-commit Hooks (Optional)
+
 **Files**: Update `.husky/pre-commit` (if using Husky)
 
 **Action Items**:
+
 1. Run type checking before commit
 2. Run tests for changed files
 3. Ensure coverage meets minimum
@@ -546,9 +598,11 @@ jobs:
 ### Section 6: Performance Optimization (Task 6)
 
 #### Task 6.1: Image Optimization
+
 **Current**: Using Sharp for server-side compression
 
 **Action Items**:
+
 1. Verify all images are <500KB (already implemented)
 2. Add WebP format support in Sharp:
    ```typescript
@@ -564,17 +618,21 @@ jobs:
 4. Use `<picture>` tags for browser support
 
 #### Task 6.2: Code Splitting
+
 **Status**: ✅ Automatic via React Router
 
 **Action Items**:
+
 1. Verify route-based code splitting is working: `yarn build`
 2. Check build output for separate chunks per route
 3. Document in DEPLOYMENT.md
 
 #### Task 6.3: Database Query Optimization
+
 **Current**: Indexes already defined in schema
 
 **Action Items**:
+
 1. Run `ANALYZE` on all tables in production:
    ```sql
    ANALYZE;
@@ -584,9 +642,11 @@ jobs:
 4. Optimize N+1 queries in loaders
 
 #### Task 6.4: Caching Strategy
+
 **Files**: `app/root.tsx` (update response headers)
 
 **Action Items**:
+
 1. Set Cache-Control headers for static assets:
    ```typescript
    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
@@ -605,6 +665,7 @@ jobs:
 ## Implementation Sequence
 
 ### Week 1: Test Fixes & Coverage
+
 1. **Day 1-2**: Fix AI wizard integration tests (Task 1.1)
 2. **Day 2-3**: Fix NotificationsModal and WateringButton tests (Tasks 1.2-1.3)
 3. **Day 3-4**: Fix Navigation and route integration tests (Tasks 1.4-1.5)
@@ -612,6 +673,7 @@ jobs:
 5. **Day 5**: Document test status and coverage baselines
 
 ### Week 2: Performance & Documentation
+
 1. **Day 1-2**: Set up Lighthouse and Web Vitals (Task 3.1-3.2)
 2. **Day 2-3**: Bundle analysis and optimization (Task 3.3)
 3. **Day 3-4**: Create TESTING.md and DEPLOYMENT.md (Task 4)
@@ -619,6 +681,7 @@ jobs:
 5. **Day 5**: Performance optimization pass (Task 6)
 
 ### Week 3: Polish & Final Testing
+
 1. **Day 1-2**: Complete all remaining tasks
 2. **Day 2-3**: Run E2E verification against acceptance criteria
 3. **Day 3-5**: Bug fixes and final optimization
@@ -628,6 +691,7 @@ jobs:
 ## Success Criteria - Phase 6 Complete
 
 ### Testing
+
 - ✅ All 438 tests passing (0 failures)
 - ✅ Overall code coverage >80%
 - ✅ Core utilities >85% coverage
@@ -635,6 +699,7 @@ jobs:
 - ✅ Test execution <45 seconds
 
 ### Performance
+
 - ✅ Lighthouse Performance: >80
 - ✅ Lighthouse Accessibility: >90
 - ✅ Lighthouse Best Practices: >85
@@ -643,6 +708,7 @@ jobs:
 - ✅ Core Web Vitals: All green
 
 ### Documentation
+
 - ✅ TESTING.md created and comprehensive
 - ✅ DEPLOYMENT.md created with complete instructions
 - ✅ CLAUDE.md updated with test commands
@@ -650,12 +716,14 @@ jobs:
 - ✅ Performance targets documented
 
 ### CI/CD
+
 - ✅ GitHub Actions test workflow configured
 - ✅ Tests run on every PR
 - ✅ Coverage reports uploaded to Codecov (optional)
 - ✅ Build passes on CI environment
 
 ### Code Quality
+
 - ✅ No console errors or warnings
 - ✅ No TypeScript errors
 - ✅ No accessibility violations (WCAG 2.1 AA)
@@ -676,6 +744,7 @@ jobs:
 ## Rollback Plan
 
 If issues arise:
+
 1. **Failed Tests**: Reset to previous commit, debug in isolation
 2. **Performance Regression**: Revert vite/dependency changes, profile with DevTools
 3. **Coverage Drop**: Identify and test missing paths before merging

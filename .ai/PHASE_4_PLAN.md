@@ -19,6 +19,7 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 #### Files to Create/Modify
 
 **`app/lib/plantnet.server.ts`** (NEW)
+
 - PlantNet API wrapper for plant identification
 - Initially mocked with realistic delay and responses
 - Function signature ready for real API integration
@@ -34,6 +35,7 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 ```
 
 **Key Features:**
+
 - Async function with 2-second mock delay (simulates API call)
 - Realistic confidence score (0.5-0.95 range)
 - Database of ~20 common houseplants with variants
@@ -41,6 +43,7 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 - Extensible for real PlantNet API credentials
 
 **`app/lib/openai.server.ts`** (NEW)
+
 - OpenAI GPT-5 API wrapper for care instruction generation
 - Initially mocked with realistic plant-specific responses
 - Function signature ready for real API integration
@@ -61,6 +64,7 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 ```
 
 **Key Features:**
+
 - Async function with 3-second mock delay (simulates generation)
 - Plant-specific care data for common houseplants
 - Variation in responses based on plant characteristics
@@ -68,6 +72,7 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 - Ready to swap real OpenAI SDK
 
 #### Testing Strategy
+
 - Unit tests for mock data consistency
 - Integration tests to verify response shapes
 - No external API calls in development
@@ -82,17 +87,20 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 #### Files to Create/Modify
 
 **`app/routes/dashboard.plants.new-ai.tsx`** (NEW)
+
 - Main wizard route handler
 - Server-side action handler for multi-step form
 - Type-safe loader with current step validation
 - Handles image upload, compression, storage, API calls
 
 **Route Flow:**
+
 - Entry: `/dashboard/plants/new-ai` (via "Add with AI" button)
 - Session/state management for wizard progress
 - Exit: Redirect to feedback modal → plant details
 
 **`app/components/ai-wizard.tsx`** (NEW)
+
 - Master wizard component managing step state
 - Coordinates between step components
 - Handles progress indicators and navigation
@@ -101,18 +109,21 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 **`app/components/ai-wizard-steps/`** (NEW DIRECTORY)
 
 **`Step1-PhotoUpload.tsx`**
+
 - File input with drag-and-drop support
 - Image preview with dimensions
 - File validation (JPG/PNG/WEBP, max 10MB)
 - [Continue] button to Step 2
 
 **`Step2-Identifying.tsx`**
+
 - Loading state with spinner
 - Status message: "Identifying your plant..."
 - 2-second mock delay visible to user
 - Auto-advance to Step 3 on completion
 
 **`Step3-IdentificationResult.tsx`**
+
 - Display identified plant name and confidence
 - Show plant photo again
 - Prompt: "Is this [Plant Name]?"
@@ -120,17 +131,20 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 - [No, I'll enter the name manually] → Step 3b
 
 **`Step3b-ManualName.tsx` (fallback)**
+
 - Text input for plant name
 - Validation: 1-100 characters, no special chars
 - [Continue] button to Step 4
 
 **`Step4-GeneratingCare.tsx`**
+
 - Loading state with spinner
 - Status message: "Generating care instructions..."
 - 3-second mock delay visible to user
 - Auto-advance to Step 5 on completion
 
 **`Step5-CarePreview.tsx`**
+
 - Display all generated data in read-only cards:
   - Plant photo
   - Common & scientific name
@@ -144,12 +158,14 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 - [Edit] button → Step 5b (inline editing)
 
 **`Step5b-EditCare.tsx` (optional)**
+
 - Inline editable fields for all care data
 - Input validation as user types
 - [Save Changes] → back to Step 5
 - [Cancel] → back to Step 5
 
 **`Step6-FeedbackModal.tsx` (integrated)**
+
 - Show after successful save
 - Prompt: "How helpful were these recommendations?"
 - [👍 Thumbs Up] [👎 Thumbs Down] buttons
@@ -160,11 +176,13 @@ Phase 4 adds AI-powered plant identification and care recommendations. This phas
 #### Route Updates
 
 **`app/routes.ts`** modifications:
+
 ```typescript
 route("dashboard/plants/new-ai", "routes/dashboard.plants.new-ai.tsx"),
 ```
 
 **`app/routes/dashboard._index.tsx`** modifications:
+
 - Update "Add Plant" dialog to offer:
   - [Add Manually] → `/dashboard/plants/new`
   - [Use AI to Identify] → `/dashboard/plants/new-ai`
@@ -240,6 +258,7 @@ export async function getUserUsageLimits(userId: string): Promise<{
 ```
 
 **Current Limits (configurable in code):**
+
 - Monthly AI generations: 20 per user per month
 - Total plants: 100 per user (growth phase)
 - Can be adjusted via environment variables or admin panel later
@@ -273,6 +292,7 @@ export async function getUserUsageLimits(userId: string): Promise<{
 #### Database Integration
 
 **Uses existing table:**
+
 ```sql
 -- From IMPLEMENTATION_PLAN schema
 CREATE TABLE usage_limits (
@@ -291,60 +311,70 @@ CREATE TABLE usage_limits (
 ## Implementation Sequence
 
 ### Step 1: AI Service Wrappers (Day 1)
+
 - [ ] Create `app/lib/plantnet.server.ts` with mock identification
 - [ ] Create `app/lib/openai.server.ts` with mock care generation
 - [ ] Write unit tests for both services
 - [ ] Verify response shapes and consistency
 
 ### Step 2: Usage Limits System (Day 1-2)
+
 - [ ] Create `app/lib/usage-limits.server.ts`
 - [ ] Implement limit checking logic
 - [ ] Add usage tracking functions
 - [ ] Write server tests for limit edge cases
 
 ### Step 3: Wizard Foundation (Day 2-3)
+
 - [ ] Create wizard route: `app/routes/dashboard.plants.new-ai.tsx`
 - [ ] Create `app/components/ai-wizard.tsx` (state management)
 - [ ] Create base step components structure
 - [ ] Implement step navigation and progress tracking
 
 ### Step 4: Wizard Steps 1-3 (Day 3-4)
+
 - [ ] Implement Step 1: Photo upload
 - [ ] Implement Step 2-3: Identification with loading state
 - [ ] Add error handling and validation
 - [ ] Test image upload flow
 
 ### Step 5: Wizard Steps 4-5 (Day 4-5)
+
 - [ ] Implement Step 4: Care generation loading
 - [ ] Implement Step 5: Preview with inline editing
 - [ ] Add room selector
 - [ ] Integrate AI service calls
 
 ### Step 6: Plant Creation & Storage (Day 5)
+
 - [ ] Hook up plant creation action
 - [ ] Verify `created_with_ai` flag set
 - [ ] Store AI response snapshot in `ai_feedback` table
 - [ ] Test full wizard save flow
 
 ### Step 7: Feedback Modal (Day 6)
+
 - [ ] Implement Step 6: Feedback collection
 - [ ] Add thumbs up/down buttons
 - [ ] Optional comment textarea
 - [ ] Save feedback to database
 
 ### Step 8: UI Integration (Day 6-7)
+
 - [ ] Update "Add Plant" dialog in dashboard
 - [ ] Add "Use AI" vs "Add Manually" options
 - [ ] Show usage limits in UI
 - [ ] Add loading spinner component if needed
 
 ### Step 9: Error Handling & Edge Cases (Day 7)
+
 - [ ] Network error recovery
 - [ ] Invalid input handling
 - [ ] Usage limit exceeded messaging
 - [ ] File validation edge cases
 
 ### Step 10: Testing & Polish (Day 8-9)
+
 - [ ] Integration tests for complete wizard flow
 - [ ] Mock API behavior testing
 - [ ] Accessibility audit (keyboard nav, screen reader)
@@ -360,12 +390,14 @@ CREATE TABLE usage_limits (
 **Challenge:** Multi-step wizard must persist data across HTTP requests.
 
 **Solution:** Use React Router's session/request pattern:
+
 1. Store wizard state in hidden form fields
 2. Pass FormData through each step
 3. Accumulate state server-side, then save to DB
 4. Alternative: Store in-progress data in database temp table
 
 **Chosen Approach:** Session-based FormData accumulation
+
 - Simpler implementation
 - Survives page reloads naturally
 - No database pollution
@@ -373,6 +405,7 @@ CREATE TABLE usage_limits (
 ### Image Handling
 
 **Reuse existing infrastructure:**
+
 - `app/lib/image.server.ts` for compression (already built)
 - `app/lib/storage.server.ts` for upload (already built)
 - Photo preview before sending to AI APIs
@@ -380,12 +413,14 @@ CREATE TABLE usage_limits (
 ### Error States
 
 **Critical errors:**
+
 - Image upload failure → Show retry
 - Identification timeout → Show manual entry option
 - Care generation timeout → Show retry
 - Storage upload failure → Show error, prevent save
 
 **User-friendly messages:**
+
 - Technical errors hidden from users
 - Suggest actions (retry, manual entry, skip AI)
 - Log errors server-side for debugging
@@ -410,22 +445,26 @@ CREATE TABLE usage_limits (
 ## UI/UX Patterns
 
 ### Progress Indicator
+
 ```
 Photo → Identifying → Identified → Generating → Preview → Save → Feedback
   ●         ●            ✓           ●          ○        ○      ○
 ```
 
 ### Loading States
+
 - Spinner icon + status text
 - 2-3 second delays to simulate real API
 - Cancel button or "skip AI" option if needed
 
 ### Error Messages
+
 - Red text with icon
 - Specific, actionable guidance
 - Retry button where applicable
 
 ### Feedback Collection
+
 - Thumbs up/down for quick feedback
 - Optional comment for detailed feedback
 - Encourage but don't require
@@ -435,6 +474,7 @@ Photo → Identifying → Identified → Generating → Preview → Save → Fee
 ## Future Integrations
 
 ### Real PlantNet API
+
 ```typescript
 // Replace mock in plantnet.server.ts
 import axios from 'axios';
@@ -443,40 +483,41 @@ export async function identifyPlant(imageUrl: string) {
   const response = await axios.post('https://api.plantnet.org/v2/identify', {
     images: [imageUrl],
     organs: ['leaf', 'flower'],
-    apiKey: process.env.PLANTNET_API_KEY
+    apiKey: process.env.PLANTNET_API_KEY,
   });
   return parseResponse(response.data);
 }
 ```
 
 ### Real OpenAI API
+
 ```typescript
 // Replace mock in openai.server.ts
 import { OpenAI } from 'openai';
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function generateCareInstructions(plantName: string) {
   const message = await client.messages.create({
     model: 'gpt-5',
     max_tokens: 1024,
-    messages: [
-      { role: 'user', content: `Generate care instructions for ${plantName}...` }
-    ]
+    messages: [{ role: 'user', content: `Generate care instructions for ${plantName}...` }],
   });
   return parseResponse(message.content);
 }
 ```
 
 ### Admin Dashboard
+
 - View aggregate AI usage stats
 - Monitor identification accuracy
 - Most identified plants
 - User feedback trends
 
 ### Settings Page
+
 - Display monthly AI quota
 - Show usage history
 - Option to upgrade quota (future billing)
@@ -488,16 +529,19 @@ export async function generateCareInstructions(plantName: string) {
 ### Unit Tests
 
 **`app/lib/plantnet.server.test.ts`**
+
 - Mock returns consistent data
 - Confidence scores in valid range
 - Delay timing acceptable
 
 **`app/lib/openai.server.test.ts`**
+
 - Care data completeness
 - Variation in responses
 - Delay timing acceptable
 
 **`app/lib/usage-limits.server.test.ts`**
+
 - Limit checking logic
 - Month rollover logic
 - Concurrent user handling
@@ -505,12 +549,14 @@ export async function generateCareInstructions(plantName: string) {
 ### Integration Tests
 
 **`app/routes/dashboard.plants.new-ai.test.tsx`**
+
 - Complete wizard flow
 - Session state persistence
 - Plant creation with AI flag
 - Feedback recording
 
 **`app/components/ai-wizard.test.tsx`**
+
 - Step navigation
 - Progress tracking
 - Error recovery
@@ -529,6 +575,7 @@ export async function generateCareInstructions(plantName: string) {
 ## File Summary
 
 ### New Files Created
+
 ```
 app/
   lib/
@@ -560,6 +607,7 @@ app/
 ```
 
 ### Modified Files
+
 ```
 app/
   routes.ts                              # Add new-ai route
@@ -572,6 +620,7 @@ app/
 ## Success Criteria
 
 ### ✅ Core Functionality Complete
+
 - ✅ User can upload plant photo (drag-and-drop + file browser)
 - ✅ Plant is identified with confidence score visualization
 - ✅ AI generates relevant care instructions (mocked)
@@ -585,6 +634,7 @@ app/
 - ✅ Photo upload/processing/storage integrated
 
 ### ⚠️ Not Yet Implemented (Optional Polish)
+
 - ⚠️ Error cases with retry logic (framework ready, needs edge case handling)
 - ⚠️ Full mobile responsive testing (CSS designed responsively)
 - ⚠️ Keyboard navigation audit (React patterns support this)
@@ -596,14 +646,14 @@ app/
 
 ## Risks & Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Session state loss between steps | Medium | High | Implement form accumulation with hidden fields |
-| Image upload timeout | Medium | Medium | Add timeout handling and user feedback |
-| Mock delay adds too much UX friction | Low | Medium | Make delays configurable for testing |
-| Feedback modal not visible/completed | Medium | Low | Make feedback skip-able but encourage |
-| Usage limit logic miscalculation | Low | High | Extensive unit tests, time-based testing |
-| Mobile layout issues in wizard | Medium | Medium | Test on real devices, responsive components |
+| Risk                                 | Probability | Impact | Mitigation                                     |
+| ------------------------------------ | ----------- | ------ | ---------------------------------------------- |
+| Session state loss between steps     | Medium      | High   | Implement form accumulation with hidden fields |
+| Image upload timeout                 | Medium      | Medium | Add timeout handling and user feedback         |
+| Mock delay adds too much UX friction | Low         | Medium | Make delays configurable for testing           |
+| Feedback modal not visible/completed | Medium      | Low    | Make feedback skip-able but encourage          |
+| Usage limit logic miscalculation     | Low         | High   | Extensive unit tests, time-based testing       |
+| Mobile layout issues in wizard       | Medium      | Medium | Test on real devices, responsive components    |
 
 ---
 
@@ -633,6 +683,7 @@ app/
 9. **AI Plant Tests** (f03d62f) - Test coverage for creation and feedback
 
 ### 📊 Metrics
+
 - **9 commits** completed
 - **47+ unit tests** passing (services + limits)
 - **9 integration tests** for AI functions
@@ -644,9 +695,9 @@ app/
 **Current Branch:** `phase-4/ai-integration`
 
 **Commits Made:**
+
 - Each major component: separate commit with detailed message
 - Test commits accompany implementation
 - Clear commit history for PR review
 
 **PR Status:** Ready for review - all core functionality implemented
-

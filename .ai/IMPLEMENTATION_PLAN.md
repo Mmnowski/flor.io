@@ -5,6 +5,7 @@
 Building Flor.io - a plant care web application with AI-powered plant identification and care instructions. This is an MVP focused on helping users track watering schedules and manage their plant collection.
 
 **Tech Stack:**
+
 - React Router v7 (SSR enabled)
 - Supabase (PostgreSQL + Auth + Storage)
 - TailwindCSS v4 + shadcn/ui components
@@ -13,6 +14,7 @@ Building Flor.io - a plant care web application with AI-powered plant identifica
 - Vitest for unit tests
 
 **Implementation Strategy:**
+
 - Priority: Technical dependency order
 - Start from fresh create-react-router template
 - Build foundational layers first, then features
@@ -24,21 +26,27 @@ Building Flor.io - a plant care web application with AI-powered plant identifica
 ## High-Level Implementation Phases
 
 ### Phase 1: Foundation & Infrastructure (Week 1-2)
+
 Set up database schema, authentication, environment configuration, and core UI components.
 
 ### Phase 2: Core Plant Management (Week 3-4)
+
 Implement manual plant card CRUD operations, image upload/storage, and basic dashboard.
 
 ### Phase 3: Watering System (Week 5-6)
+
 Build watering tracking, notifications modal, and watering history.
 
 ### Phase 4: AI Integration (Week 7-9)
+
 Implement AI-powered plant identification and care instruction generation (with mocks).
 
 ### Phase 5: Organization & Polish (Week 10-11)
+
 Add rooms/filtering, usage limits, accessibility audit, and refinements.
 
 ### Phase 6: Testing & Optimization (Week 12-14)
+
 Unit tests, performance optimization, bug fixes, and documentation.
 
 ---
@@ -309,13 +317,16 @@ CREATE POLICY "Users can delete their own plant photos"
 ### 1.1 Environment Setup
 
 **Files to create/modify:**
+
 - `.env.example`
 - `.env` (gitignored)
 - `app/lib/supabase.server.ts`
 - `app/lib/supabase.client.ts`
 
 **Tasks:**
+
 1. Create environment variables structure:
+
    ```
    SUPABASE_URL=
    SUPABASE_ANON_KEY=
@@ -335,6 +346,7 @@ CREATE POLICY "Users can delete their own plant photos"
 ### 1.2 Authentication System
 
 **Files to create:**
+
 - `app/routes/auth.login.tsx` - Login page
 - `app/routes/auth.register.tsx` - Registration page
 - `app/routes/auth.callback.tsx` - OAuth callback handler
@@ -343,6 +355,7 @@ CREATE POLICY "Users can delete their own plant photos"
 - `app/lib/session.server.ts` - Session management
 
 **Route definitions in `app/routes.ts`:**
+
 ```typescript
 route("auth/login", "routes/auth.login.tsx"),
 route("auth/register", "routes/auth.register.tsx"),
@@ -351,6 +364,7 @@ route("auth/logout", "routes/auth.logout.tsx"),
 ```
 
 **Key features:**
+
 1. **Login page** (`auth.login.tsx`):
    - Email/password form
    - Google OAuth button
@@ -378,11 +392,13 @@ route("auth/logout", "routes/auth.logout.tsx"),
 ### 1.3 UI Components Setup (shadcn/ui)
 
 **Install shadcn/ui:**
+
 ```bash
 npx shadcn@latest init
 ```
 
 **Components to install:**
+
 ```bash
 npx shadcn@latest add button
 npx shadcn@latest add input
@@ -401,11 +417,13 @@ npx shadcn@latest add alert
 ```
 
 **Files created by shadcn:**
+
 - `components/ui/*` - shadcn components
 - `lib/utils.ts` - cn() utility for className merging
 - `components.json` - shadcn config
 
 **Custom components to create:**
+
 - `app/components/nav.tsx` - Navigation header
 - `app/components/empty-state.tsx` - Empty state component
 - `app/components/loading-spinner.tsx` - Loading indicator
@@ -413,10 +431,12 @@ npx shadcn@latest add alert
 ### 1.4 Root Layout & Navigation
 
 **Files to modify:**
+
 - `app/root.tsx` - Add navigation, toast provider
 - `app/app.css` - Customize Tailwind theme for accessibility
 
 **Tasks:**
+
 1. Update `root.tsx`:
    - Add navigation component (conditional based on auth)
    - Add Toaster component for notifications
@@ -430,9 +450,11 @@ npx shadcn@latest add alert
 ### 1.5 Protected Route Middleware
 
 **Files to create:**
+
 - `app/lib/require-auth.server.ts`
 
 **Functionality:**
+
 - Loader utility that checks authentication
 - Redirects to `/auth/login` if not authenticated
 - Returns user session if authenticated
@@ -445,12 +467,14 @@ npx shadcn@latest add alert
 ### 2.1 Dashboard Route
 
 **Files to create:**
+
 - `app/routes/dashboard.tsx` - Main dashboard layout
 - `app/routes/dashboard._index.tsx` - Dashboard home (plant list)
 - `app/components/plant-card.tsx` - Plant card component
 - `app/components/add-plant-dialog.tsx` - Modal for choosing manual/AI
 
 **Route definitions:**
+
 ```typescript
 route("dashboard", "routes/dashboard.tsx", [
   index("routes/dashboard._index.tsx"),
@@ -461,6 +485,7 @@ route("dashboard", "routes/dashboard.tsx", [
 ```
 
 **Dashboard home (`dashboard._index.tsx`):**
+
 - **Loader**: Fetch all plants for user, include last watering data
 - **Component**:
   - Empty state if no plants
@@ -469,6 +494,7 @@ route("dashboard", "routes/dashboard.tsx", [
   - Room filter chips (horizontal scroll)
 
 **Plant card component:**
+
 - Display: photo, name, room tag
 - Status: "Last watered: X days ago | Next: in Y days"
 - Click → navigate to plant details
@@ -477,11 +503,13 @@ route("dashboard", "routes/dashboard.tsx", [
 ### 2.2 Manual Plant Creation
 
 **Files to create:**
+
 - `app/routes/dashboard.plants.new.tsx` - Create plant form
 - `app/lib/image.server.ts` - Image upload/compression utilities
 - `app/lib/plants.server.ts` - Plant CRUD utilities
 
 **Form flow:**
+
 1. File input for photo upload (optional)
 2. Text input for plant name (required)
 3. Number input for watering frequency (required)
@@ -489,6 +517,7 @@ route("dashboard", "routes/dashboard.tsx", [
 5. Submit button
 
 **Action handler:**
+
 1. Parse `FormData`
 2. Validate inputs
 3. If photo provided:
@@ -501,6 +530,7 @@ route("dashboard", "routes/dashboard.tsx", [
 6. Redirect to plant details page
 
 **Server-side image processing (Sharp):**
+
 ```typescript
 // app/lib/image.server.ts
 import sharp from 'sharp';
@@ -520,9 +550,11 @@ export async function compressImage(
 ### 2.3 Plant Details View
 
 **Files to create:**
+
 - `app/routes/dashboard.plants.$plantId.tsx` - Plant details page
 
 **Loader:**
+
 - Fetch plant by ID
 - Ensure user owns the plant (RLS handles this)
 - Fetch watering history (last 10 entries)
@@ -530,6 +562,7 @@ export async function compressImage(
 - Return 404 if not found
 
 **Component:**
+
 - Large photo display
 - Plant name (heading)
 - Room tag (badge)
@@ -544,6 +577,7 @@ export async function compressImage(
 - [Edit] and [Delete] buttons at bottom
 
 **Action handler (for "Watered Today" button):**
+
 1. Insert into `watering_history` table
 2. Return success
 3. Trigger toast notification
@@ -552,18 +586,22 @@ export async function compressImage(
 ### 2.4 Edit Plant
 
 **Files to create:**
+
 - `app/routes/dashboard.plants.$plantId.edit.tsx` - Edit form
 
 **Loader:**
+
 - Fetch plant data (same as details)
 - Fetch all rooms for dropdown
 
 **Component:**
+
 - Pre-filled form with current values
 - All fields editable (name, photo, frequency, room, care instructions)
 - [Save Changes] and [Cancel] buttons
 
 **Action handler:**
+
 - Parse FormData
 - If new photo uploaded, compress and replace old one
 - Update plant record in database
@@ -572,6 +610,7 @@ export async function compressImage(
 ### 2.5 Delete Plant
 
 **Implement in plant details route:**
+
 - Add delete action handler
 - Show confirmation dialog (client-side)
 - On confirm, submit form with intent="delete"
@@ -587,6 +626,7 @@ export async function compressImage(
 **Already implemented in Phase 2.3**, but enhance:
 
 **Create utility function:**
+
 ```typescript
 // app/lib/watering.server.ts
 export async function markAsWatered(plantId: string, userId: string) {
@@ -607,15 +647,18 @@ export async function calculateNextWateringDate(plantId: string) {
 ### 3.2 Notifications Modal
 
 **Files to create:**
+
 - `app/routes/api.notifications.tsx` - API route for notifications data
 - `app/components/notifications-modal.tsx` - Modal component
 
 **API route loader:**
+
 - Fetch all plants where `next_watering_date <= NOW()`
 - Calculate days overdue for each
 - Return sorted by urgency (most overdue first)
 
 **Modal component:**
+
 - Trigger: Bell icon in navigation (show badge with count)
 - Display list of plants needing water
 - Each item:
@@ -625,9 +668,10 @@ export async function calculateNextWateringDate(plantId: string) {
   - Color coding (orange/red/dark red)
   - [Watered] button
 - Click plant item → navigate to details
-- [X] button → close modal
+- [x] button → close modal
 
 **Watered button action:**
+
 - Call API to mark as watered
 - Remove from notification list (optimistic UI)
 - Show success feedback
@@ -635,9 +679,11 @@ export async function calculateNextWateringDate(plantId: string) {
 ### 3.3 Notification Badge
 
 **Files to modify:**
+
 - `app/components/nav.tsx` - Add bell icon with badge
 
 **Implementation:**
+
 - Loader in dashboard layout fetches notification count
 - Display count badge on bell icon if > 0
 - Click → open notifications modal
@@ -649,10 +695,12 @@ export async function calculateNextWateringDate(plantId: string) {
 ### 4.1 Mocked API Services
 
 **Files to create:**
+
 - `app/lib/plantnet.server.ts` - PlantNet API wrapper (mocked)
 - `app/lib/openai.server.ts` - GPT-5 API wrapper (mocked)
 
 **PlantNet mock:**
+
 ```typescript
 export async function identifyPlant(imageUrl: string): Promise<{
   scientificName: string;
@@ -660,18 +708,19 @@ export async function identifyPlant(imageUrl: string): Promise<{
   confidence: number;
 }> {
   // Mock delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Return mock data
   return {
-    scientificName: "Monstera deliciosa",
-    commonNames: ["Monstera", "Swiss Cheese Plant"],
+    scientificName: 'Monstera deliciosa',
+    commonNames: ['Monstera', 'Swiss Cheese Plant'],
     confidence: 0.92,
   };
 }
 ```
 
 **OpenAI mock:**
+
 ```typescript
 export async function generateCareInstructions(plantName: string): Promise<{
   wateringFrequencyDays: number;
@@ -681,26 +730,26 @@ export async function generateCareInstructions(plantName: string): Promise<{
   troubleshooting: string[];
 }> {
   // Mock delay
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   // Return mock data based on plant name
   return {
     wateringFrequencyDays: 7,
-    lightRequirements: "Bright indirect light, 6-8 hours daily",
+    lightRequirements: 'Bright indirect light, 6-8 hours daily',
     fertilizingTips: [
-      "Fertilize every 4-6 weeks during growing season",
-      "Use balanced liquid fertilizer diluted to half strength",
-      "Reduce fertilizing in fall and winter"
+      'Fertilize every 4-6 weeks during growing season',
+      'Use balanced liquid fertilizer diluted to half strength',
+      'Reduce fertilizing in fall and winter',
     ],
     pruningTips: [
-      "Prune yellow or damaged leaves at the base",
-      "Trim aerial roots if they become unruly",
-      "Best time to prune is in spring or early summer"
+      'Prune yellow or damaged leaves at the base',
+      'Trim aerial roots if they become unruly',
+      'Best time to prune is in spring or early summer',
     ],
     troubleshooting: [
-      "Yellow leaves: Overwatering or too much direct sun",
-      "Brown leaf tips: Low humidity or underwatering",
-      "Pests: Check for spider mites and mealybugs"
+      'Yellow leaves: Overwatering or too much direct sun',
+      'Brown leaf tips: Low humidity or underwatering',
+      'Pests: Check for spider mites and mealybugs',
     ],
   };
 }
@@ -709,6 +758,7 @@ export async function generateCareInstructions(plantName: string): Promise<{
 ### 4.2 AI Plant Creation Flow
 
 **Files to create:**
+
 - `app/routes/dashboard.plants.new-ai.tsx` - AI creation wizard
 - `app/components/ai-creation-steps.tsx` - Multi-step wizard component
 - `app/components/ai-feedback-dialog.tsx` - Feedback modal
@@ -716,32 +766,38 @@ export async function generateCareInstructions(plantName: string): Promise<{
 **Flow steps:**
 
 **Step 1: Upload Photo**
+
 - File input
 - Preview uploaded image
 - [Continue] button
 
 **Step 2: Identify Plant**
+
 - Show loading state: "Identifying plant..." (spinner)
 - Call PlantNet API (mocked)
 - Display result: Photo + "Is this [Plant Name]?"
 - [Yes] or [No, enter name manually] buttons
 
 **Step 3: Manual Name Fallback (if No clicked)**
+
 - Text input for plant name
 - [Continue] button (disabled if empty)
 
 **Step 4: Generate Care Instructions**
+
 - Show loading state: "Generating care instructions..." (spinner)
 - Call GPT-5 API (mocked) with plant name
 - Display preview of all generated data
 
 **Step 5: Preview & Edit**
+
 - Show all fields (name, photo, frequency, room, care sections)
 - All fields editable
 - [Accept] button (saves as-is) or [Edit] (make inline edits)
 - [Save] button after editing
 
 **Step 6: AI Feedback Modal**
+
 - After saving, show feedback dialog
 - Thumbs up / Thumbs down buttons
 - Optional textarea for comments (max 500 chars)
@@ -749,6 +805,7 @@ export async function generateCareInstructions(plantName: string): Promise<{
 - Save feedback to `ai_feedback` table with AI response snapshot
 
 **Action handler:**
+
 1. Handle each step's form submission
 2. Store progress in session or URL params
 3. On final save:
@@ -761,9 +818,11 @@ export async function generateCareInstructions(plantName: string): Promise<{
 ### 4.3 Usage Limits Tracking
 
 **Files to create:**
+
 - `app/lib/usage-limits.server.ts` - Usage tracking utilities
 
 **Functions:**
+
 ```typescript
 export async function checkAIGenerationLimit(userId: string): Promise<{
   allowed: boolean;
@@ -791,6 +850,7 @@ export async function checkPlantLimit(userId: string): Promise<{
 ```
 
 **Integration:**
+
 - Check limits before allowing AI creation
 - Check plant limit before any creation (manual or AI)
 - Display friendly error messages if limit reached
@@ -803,21 +863,25 @@ export async function checkPlantLimit(userId: string): Promise<{
 ### 5.1 Rooms Management
 
 **Files to create:**
+
 - `app/routes/api.rooms.tsx` - CRUD API for rooms
 
 **Features:**
 
 **Create room:**
+
 - Inline input in dashboard filter chips
 - API endpoint to create room
 - Return new room, update UI
 
 **Assign room to plant:**
+
 - Dropdown in create/edit forms
 - Option to create new room inline
 - Update plant record
 
 **Filter by room:**
+
 - Horizontal scrolling chip filter
 - Single-select (only one active)
 - Update URL params: `?room={roomId}`
@@ -827,6 +891,7 @@ export async function checkPlantLimit(userId: string): Promise<{
 ### 5.2 Accessibility Audit
 
 **Tasks:**
+
 1. **Color contrast audit**:
    - Use tools like WebAIM Contrast Checker
    - Ensure 4.5:1 ratio for all text
@@ -855,10 +920,12 @@ export async function checkPlantLimit(userId: string): Promise<{
 ### 5.3 Error Handling & Validation
 
 **Files to create:**
+
 - `app/components/form-error.tsx` - Form error display component
 - `app/lib/validation.ts` - Validation utilities
 
 **Implement:**
+
 1. Client-side validation:
    - Required fields
    - Email format
@@ -881,6 +948,7 @@ export async function checkPlantLimit(userId: string): Promise<{
 ### 5.4 Loading States & Optimistic UI
 
 **Implement:**
+
 1. **Loading indicators**:
    - Use `useNavigation()` hook to show loading states
    - Skeleton loaders for data fetching
@@ -902,20 +970,23 @@ export async function checkPlantLimit(userId: string): Promise<{
 ### 6.1 Unit Tests Setup
 
 **Install dependencies:**
+
 ```bash
 yarn add -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event
 ```
 
 **Files to create:**
+
 - `vitest.config.ts` - Vitest configuration
 - `app/test/setup.ts` - Test setup file
 - `app/test/mocks/supabase.ts` - Supabase client mocks
 
 **Configure Vitest:**
+
 ```typescript
-import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
@@ -946,9 +1017,11 @@ export default defineConfig({
    - Test error cases
 
 **Example test:**
+
 ```typescript
 // app/lib/watering.server.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import { calculateNextWateringDate } from './watering.server';
 
 describe('calculateNextWateringDate', () => {
@@ -966,6 +1039,7 @@ describe('calculateNextWateringDate', () => {
 ### 6.3 Performance Optimization
 
 **Tasks:**
+
 1. **Image optimization**:
    - Ensure all images are compressed
    - Use WebP format where supported
@@ -992,11 +1066,13 @@ describe('calculateNextWateringDate', () => {
 ### 6.4 Documentation
 
 **Files to create:**
+
 - Update `CLAUDE.md` with implementation details
 - Create `DEPLOYMENT.md` - Deployment instructions
 - Create `TESTING.md` - Testing guide
 
 **CLAUDE.md additions:**
+
 - Database schema overview
 - Key architectural decisions
 - How to run tests
@@ -1007,6 +1083,7 @@ describe('calculateNextWateringDate', () => {
 ## Critical Files Summary
 
 ### Configuration Files
+
 - `.env` - Environment variables (Supabase, API keys)
 - `vite.config.ts` - Vite + React Router config
 - `react-router.config.ts` - SSR settings
@@ -1015,11 +1092,13 @@ describe('calculateNextWateringDate', () => {
 - `components.json` - shadcn/ui config
 
 ### Core Application Files
+
 - `app/root.tsx` - Root layout, navigation, providers
 - `app/routes.ts` - Route definitions
 - `app/app.css` - Global styles, Tailwind customizations
 
 ### Authentication & Session
+
 - `app/lib/supabase.server.ts` - Server Supabase client
 - `app/lib/supabase.client.ts` - Browser Supabase client
 - `app/lib/auth.server.ts` - Auth utilities
@@ -1030,6 +1109,7 @@ describe('calculateNextWateringDate', () => {
 - `app/routes/auth.logout.tsx` - Logout action
 
 ### Plant Management
+
 - `app/routes/dashboard.tsx` - Dashboard layout
 - `app/routes/dashboard._index.tsx` - Plant list/dashboard home
 - `app/routes/dashboard.plants.new.tsx` - Manual plant creation
@@ -1040,21 +1120,25 @@ describe('calculateNextWateringDate', () => {
 - `app/lib/image.server.ts` - Image processing (Sharp)
 
 ### Watering System
+
 - `app/lib/watering.server.ts` - Watering utilities
 - `app/routes/api.notifications.tsx` - Notifications API
 - `app/components/notifications-modal.tsx` - Notifications UI
 
 ### AI Integration
+
 - `app/lib/plantnet.server.ts` - PlantNet API wrapper (mocked)
 - `app/lib/openai.server.ts` - GPT-5 API wrapper (mocked)
 - `app/components/ai-creation-steps.tsx` - AI wizard
 - `app/components/ai-feedback-dialog.tsx` - Feedback modal
 
 ### Organization & Limits
+
 - `app/routes/api.rooms.tsx` - Rooms CRUD API
 - `app/lib/usage-limits.server.ts` - Usage tracking
 
 ### Components (UI)
+
 - `app/components/ui/*` - shadcn/ui components
 - `app/components/nav.tsx` - Navigation
 - `app/components/plant-card.tsx` - Plant card
@@ -1064,6 +1148,7 @@ describe('calculateNextWateringDate', () => {
 - `app/components/form-error.tsx` - Form errors
 
 ### Types & Utilities
+
 - `app/types/database.types.ts` - Supabase generated types
 - `app/lib/utils.ts` - General utilities (cn, etc.)
 - `app/lib/validation.ts` - Form validation
@@ -1075,6 +1160,7 @@ describe('calculateNextWateringDate', () => {
 ### End-to-End Verification Workflow
 
 **1. Authentication Flow**
+
 - [ ] Visit app → redirected to login
 - [ ] Register new account (email/password)
 - [ ] Logout and login again
@@ -1082,6 +1168,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Verify session persists across page reloads
 
 **2. Manual Plant Creation**
+
 - [ ] Create plant without photo (name + frequency)
 - [ ] Create plant with photo upload
 - [ ] Verify photo is compressed and displayed
@@ -1089,6 +1176,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Delete plant with confirmation
 
 **3. Watering System**
+
 - [ ] Create plant with 1-day frequency
 - [ ] Wait for next day (or manually set date in DB)
 - [ ] Verify notification badge shows count
@@ -1099,6 +1187,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Check watering history on plant details
 
 **4. AI Plant Creation** (with mocks)
+
 - [ ] Click "Add Plant" → "Use AI"
 - [ ] Upload photo
 - [ ] Verify identification loading state (2s)
@@ -1112,6 +1201,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Verify feedback saved to database
 
 **5. Rooms/Organization**
+
 - [ ] Create new room via chip filter
 - [ ] Assign plants to rooms
 - [ ] Filter dashboard by room
@@ -1119,6 +1209,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Bookmark URL and verify filter persists
 
 **6. Usage Limits**
+
 - [ ] Create 50 plants (or set limit in code to 3 for testing)
 - [ ] Verify "Add Plant" disabled when limit reached
 - [ ] Use AI 20 times (or set limit to 3)
@@ -1126,6 +1217,7 @@ describe('calculateNextWateringDate', () => {
 - [ ] Verify limit resets next month
 
 **7. Accessibility**
+
 - [ ] Navigate entire app with keyboard only
 - [ ] Verify focus indicators visible
 - [ ] Test with screen reader (basic)
@@ -1134,17 +1226,20 @@ describe('calculateNextWateringDate', () => {
 - [ ] Test on mobile (375px width)
 
 **8. Performance**
+
 - [ ] Run Lighthouse audit on dashboard
 - [ ] Verify score >80 on all metrics
 - [ ] Test with 50 plants on dashboard
 - [ ] Verify smooth scrolling and rendering
 
 **9. Unit Tests**
+
 - [ ] Run `yarn test` and verify all pass
 - [ ] Check test coverage report
 - [ ] Ensure critical utilities have >80% coverage
 
 **10. Error Handling**
+
 - [ ] Test form validation (empty fields, invalid email)
 - [ ] Test upload with invalid file type
 - [ ] Test upload with >10MB file

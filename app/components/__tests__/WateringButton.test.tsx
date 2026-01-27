@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { WateringButton } from '~/components/watering-button';
+
+import { RouterProvider, createMemoryRouter } from 'react-router';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
-import { WateringButton } from '~/components/watering-button';
+import { describe, expect, it } from 'vitest';
 
 // Wrapper component to provide data router context required by Form component
 const renderWithRouter = (component: React.ReactElement) => {
@@ -23,11 +25,7 @@ describe('WateringButton', () => {
   describe('rendering', () => {
     it('should render record watering button', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -36,11 +34,7 @@ describe('WateringButton', () => {
 
     it('should render button with water droplet icon', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -51,11 +45,7 @@ describe('WateringButton', () => {
 
     it('should render within a form with POST method', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const form = screen.getByRole('button', { name: /record watering/i }).closest('form');
@@ -64,11 +54,7 @@ describe('WateringButton', () => {
 
     it('should include hidden action input', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const actionInput = document.querySelector('input[name="_action"]');
@@ -93,11 +79,7 @@ describe('WateringButton', () => {
 
     it('should not display last watered date when null', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const dateText = screen.queryByText(/last watered:/i);
@@ -107,11 +89,7 @@ describe('WateringButton', () => {
     it('should format date correctly (short month, day, year)', () => {
       const testDate = new Date('2024-01-15');
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={testDate}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={testDate} />
       );
 
       // The formatted date should be "Jan 15, 2024"
@@ -149,11 +127,7 @@ describe('WateringButton', () => {
 
     it('should not display next watering date when null', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const dateText = screen.queryByText(/next watering:/i);
@@ -163,11 +137,7 @@ describe('WateringButton', () => {
     it('should format next watering date correctly', () => {
       const testDate = new Date('2024-02-10');
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={testDate}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={testDate} lastWateredDate={null} />
       );
 
       expect(screen.getByText(/Feb 10, 2024|next watering:/)).toBeInTheDocument();
@@ -216,11 +186,7 @@ describe('WateringButton', () => {
   describe('button styling', () => {
     it('should have emerald color scheme', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -231,11 +197,7 @@ describe('WateringButton', () => {
 
     it('should have hover state with darker emerald', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -244,11 +206,7 @@ describe('WateringButton', () => {
 
     it('should span full width', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -257,11 +215,7 @@ describe('WateringButton', () => {
 
     it('should have large size', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -273,11 +227,7 @@ describe('WateringButton', () => {
   describe('form submission', () => {
     it('should include action hidden input in form', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const form = screen.getByRole('button', { name: /record watering/i }).closest('form');
@@ -289,11 +239,7 @@ describe('WateringButton', () => {
     it('should be clickable', async () => {
       const user = userEvent.setup();
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -309,11 +255,7 @@ describe('WateringButton', () => {
   describe('accessibility', () => {
     it('should have descriptive button text', () => {
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={null}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
       const button = screen.getByRole('button', { name: /record watering/i });
@@ -368,11 +310,7 @@ describe('WateringButton', () => {
     it('should handle old dates', () => {
       const oldDate = new Date('2020-01-01');
       renderWithRouter(
-        <WateringButton
-          plantId={mockPlantId}
-          nextWateringDate={null}
-          lastWateredDate={oldDate}
-        />
+        <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={oldDate} />
       );
 
       expect(screen.getByText(/last watered:/i)).toBeInTheDocument();

@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { createMemoryRouter, RouterProvider } from "react-router";
-import { Navigation } from "../nav";
+import { RouterProvider, createMemoryRouter } from 'react-router';
+
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { Navigation } from '../nav';
 
 /**
  * Navigation Notifications Integration Tests
@@ -20,63 +22,61 @@ import { Navigation } from "../nav";
 const mockFetcher = {
   load: vi.fn(),
   submit: vi.fn(),
-  state: "idle" as const,
+  state: 'idle' as const,
   data: null,
 };
 
-vi.mock("react-router", async () => {
-  const actual = await vi.importActual("react-router");
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual('react-router');
   return {
     ...actual,
     useFetcher: vi.fn(() => ({ ...mockFetcher })),
   };
 });
 
-describe("Navigation Notifications Integration", () => {
+describe('Navigation Notifications Integration', () => {
   const mockNotifications = {
     notifications: [
       {
-        plant_id: "plant-1",
-        plant_name: "Monstera",
+        plant_id: 'plant-1',
+        plant_name: 'Monstera',
         photo_url: null,
-        last_watered: "2024-01-20T10:00:00Z",
-        next_watering: "2024-01-27T10:00:00Z",
+        last_watered: '2024-01-20T10:00:00Z',
+        next_watering: '2024-01-27T10:00:00Z',
         days_overdue: 2,
       },
       {
-        plant_id: "plant-2",
-        plant_name: "Snake Plant",
+        plant_id: 'plant-2',
+        plant_name: 'Snake Plant',
         photo_url: null,
-        last_watered: "2024-01-19T10:00:00Z",
-        next_watering: "2024-01-26T10:00:00Z",
+        last_watered: '2024-01-19T10:00:00Z',
+        next_watering: '2024-01-26T10:00:00Z',
         days_overdue: 1,
       },
     ],
     count: 2,
   };
 
-  const renderNavigation = (
-    props?: Partial<React.ComponentProps<typeof Navigation>>
-  ) => {
+  const renderNavigation = (props?: Partial<React.ComponentProps<typeof Navigation>>) => {
     const defaultProps = {
       isAuthenticated: true,
-      userEmail: "test@example.com",
+      userEmail: 'test@example.com',
       ...props,
     };
 
     const routes = [
       {
-        path: "/",
+        path: '/',
         element: <Navigation {...defaultProps} />,
       },
       {
-        path: "/dashboard",
+        path: '/dashboard',
         element: <div>Dashboard</div>,
       },
     ];
 
     const router = createMemoryRouter(routes, {
-      initialEntries: ["/"],
+      initialEntries: ['/'],
       initialIndex: 0,
     });
 
@@ -89,42 +89,42 @@ describe("Navigation Notifications Integration", () => {
     mockFetcher.submit.mockClear();
   });
 
-  describe("Notification badge display and updates", () => {
-    it("should render bell icon button when authenticated", () => {
+  describe('Notification badge display and updates', () => {
+    it('should render bell icon button when authenticated', () => {
       renderNavigation({ isAuthenticated: true });
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should not render bell icon when not authenticated", () => {
+    it('should not render bell icon when not authenticated', () => {
       renderNavigation({ isAuthenticated: false });
-      const bellButton = screen.queryByRole("button", { name: /notifications/i });
+      const bellButton = screen.queryByRole('button', { name: /notifications/i });
       expect(bellButton).not.toBeInTheDocument();
     });
 
-    it("should display badge count when notifications exist", () => {
+    it('should display badge count when notifications exist', () => {
       mockFetcher.data = mockNotifications;
       renderNavigation();
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const badge = within(bellButton).getByText("2");
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const badge = within(bellButton).getByText('2');
       expect(badge).toBeInTheDocument();
     });
 
-    it("should not display badge when no notifications", () => {
+    it('should not display badge when no notifications', () => {
       mockFetcher.data = { notifications: [], count: 0 };
       renderNavigation();
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       const badge = within(bellButton).queryByText(/\d+/);
       expect(badge).not.toBeInTheDocument();
     });
 
-    it("should update badge count when fetcher data changes", async () => {
+    it('should update badge count when fetcher data changes', async () => {
       const { rerender } = renderNavigation();
 
       // Initially no data
-      let bellButton = screen.getByRole("button", { name: /notifications/i });
+      let bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(within(bellButton).queryByText(/\d+/)).not.toBeInTheDocument();
 
       // Update mock data
@@ -133,45 +133,45 @@ describe("Navigation Notifications Integration", () => {
       // Need to trigger re-render - in real scenario this happens via fetcher data change
       rerender(<Navigation isAuthenticated={true} userEmail="test@example.com" />);
 
-      bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(within(bellButton).getByText("2")).toBeInTheDocument();
+      bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(within(bellButton).getByText('2')).toBeInTheDocument();
     });
   });
 
-  describe("Initial data fetching on mount", () => {
-    it("should fetch notifications when component mounts (authenticated)", () => {
+  describe('Initial data fetching on mount', () => {
+    it('should fetch notifications when component mounts (authenticated)', () => {
       renderNavigation({ isAuthenticated: true });
 
       // Should have called load on mount
-      expect(mockFetcher.load).toHaveBeenCalledWith("/api/notifications");
+      expect(mockFetcher.load).toHaveBeenCalledWith('/api/notifications');
     });
 
-    it("should not fetch notifications when not authenticated", () => {
+    it('should not fetch notifications when not authenticated', () => {
       mockFetcher.load.mockClear();
       renderNavigation({ isAuthenticated: false });
 
-      expect(mockFetcher.load).not.toHaveBeenCalledWith("/api/notifications");
+      expect(mockFetcher.load).not.toHaveBeenCalledWith('/api/notifications');
     });
 
-    it("should only fetch notifications once on initial mount", () => {
+    it('should only fetch notifications once on initial mount', () => {
       mockFetcher.load.mockClear();
       renderNavigation({ isAuthenticated: true });
 
       // Should have been called exactly once
       const callsToNotifications = mockFetcher.load.mock.calls.filter((c) =>
-        c[0].includes("notifications")
+        c[0].includes('notifications')
       );
       expect(callsToNotifications.length).toBe(1);
     });
   });
 
-  describe("Modal opening and data refetch", () => {
-    it("should open modal when bell button is clicked", async () => {
+  describe('Modal opening and data refetch', () => {
+    it('should open modal when bell button is clicked', async () => {
       const user = userEvent.setup();
       mockFetcher.data = mockNotifications;
 
       renderNavigation();
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
       await user.click(bellButton);
 
@@ -179,13 +179,13 @@ describe("Navigation Notifications Integration", () => {
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should refetch notifications when modal opens", async () => {
+    it('should refetch notifications when modal opens', async () => {
       const user = userEvent.setup();
       mockFetcher.load.mockClear();
       mockFetcher.data = mockNotifications;
 
       renderNavigation();
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
       // First load on mount
       await waitFor(() => {
@@ -198,28 +198,28 @@ describe("Navigation Notifications Integration", () => {
       await user.click(bellButton);
 
       // May or may not refetch depending on debouncing
-      expect(mockFetcher.load).toHaveBeenCalledWith("/api/notifications");
+      expect(mockFetcher.load).toHaveBeenCalledWith('/api/notifications');
     });
   });
 
-  describe("Watering action integration", () => {
-    it("should submit watering action when plant watered from modal", async () => {
+  describe('Watering action integration', () => {
+    it('should submit watering action when plant watered from modal', async () => {
       mockFetcher.data = mockNotifications;
       renderNavigation();
 
       // In real scenario, this would be triggered by modal's onWatered callback
       // For now we're just testing that the navigation component has the capability
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should update notification count after successful watering", () => {
+    it('should update notification count after successful watering', () => {
       // Start with 2 plants
       mockFetcher.data = mockNotifications;
       const { rerender } = renderNavigation();
 
-      let bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(within(bellButton).getByText("2")).toBeInTheDocument();
+      let bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(within(bellButton).getByText('2')).toBeInTheDocument();
 
       // Simulate data update after watering
       mockFetcher.data = {
@@ -229,67 +229,67 @@ describe("Navigation Notifications Integration", () => {
 
       rerender(<Navigation isAuthenticated={true} userEmail="test@example.com" />);
 
-      bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(within(bellButton).getByText("1")).toBeInTheDocument();
+      bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(within(bellButton).getByText('1')).toBeInTheDocument();
     });
 
-    it("should hide badge after all plants watered", () => {
+    it('should hide badge after all plants watered', () => {
       mockFetcher.data = mockNotifications;
       const { rerender } = renderNavigation();
 
-      let bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(within(bellButton).getByText("2")).toBeInTheDocument();
+      let bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(within(bellButton).getByText('2')).toBeInTheDocument();
 
       // All plants watered
       mockFetcher.data = { notifications: [], count: 0 };
       rerender(<Navigation isAuthenticated={true} userEmail="test@example.com" />);
 
-      bellButton = screen.getByRole("button", { name: /notifications/i });
+      bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(within(bellButton).queryByText(/\d+/)).not.toBeInTheDocument();
     });
   });
 
-  describe("Navigation structure and accessibility", () => {
-    it("should have bell button positioned correctly in nav", () => {
+  describe('Navigation structure and accessibility', () => {
+    it('should have bell button positioned correctly in nav', () => {
       renderNavigation({ isAuthenticated: true });
 
-      const nav = screen.getByRole("navigation");
-      const bellButton = within(nav).getByRole("button", {
+      const nav = screen.getByRole('navigation');
+      const bellButton = within(nav).getByRole('button', {
         name: /notifications/i,
       });
 
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should have proper aria-label on bell button", () => {
+    it('should have proper aria-label on bell button', () => {
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(bellButton).toHaveAttribute("aria-label");
-      expect(bellButton.getAttribute("aria-label")).toMatch(/notifications/i);
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(bellButton).toHaveAttribute('aria-label');
+      expect(bellButton.getAttribute('aria-label')).toMatch(/notifications/i);
     });
 
-    it("should maintain button accessibility with and without badge", () => {
+    it('should maintain button accessibility with and without badge', () => {
       // Without notifications
       mockFetcher.data = { notifications: [], count: 0 };
       const { rerender } = renderNavigation();
 
-      let bellButton = screen.getByRole("button", { name: /notifications/i });
+      let bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeAccessible();
 
       // With notifications
       mockFetcher.data = mockNotifications;
       rerender(<Navigation isAuthenticated={true} userEmail="test@example.com" />);
 
-      bellButton = screen.getByRole("button", { name: /notifications/i });
+      bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeAccessible();
     });
 
-    it("should be keyboard accessible", async () => {
+    it('should be keyboard accessible', async () => {
       const user = userEvent.setup();
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
       // Tab to button
       await user.tab();
@@ -299,44 +299,44 @@ describe("Navigation Notifications Integration", () => {
     });
   });
 
-  describe("Styling and visual consistency", () => {
-    it("should apply ghost variant styling", () => {
+  describe('Styling and visual consistency', () => {
+    it('should apply ghost variant styling', () => {
       renderNavigation({ isAuthenticated: true });
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
       // Should have hover styling classes
-      expect(bellButton).toHaveClass("hover:bg-emerald-50", "dark:hover:bg-slate-800");
+      expect(bellButton).toHaveClass('hover:bg-emerald-50', 'dark:hover:bg-slate-800');
     });
 
-    it("should have focus ring for keyboard navigation", () => {
+    it('should have focus ring for keyboard navigation', () => {
       renderNavigation({ isAuthenticated: true });
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
-      expect(bellButton).toHaveClass("focus:ring-2", "focus:ring-emerald-300");
+      expect(bellButton).toHaveClass('focus:ring-2', 'focus:ring-emerald-300');
     });
 
-    it("should display correct icon size", () => {
+    it('should display correct icon size', () => {
       renderNavigation({ isAuthenticated: true });
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
-      expect(bellButton).toHaveClass("h-10", "w-10");
+      expect(bellButton).toHaveClass('h-10', 'w-10');
     });
 
-    it("should support dark mode", () => {
+    it('should support dark mode', () => {
       renderNavigation({ isAuthenticated: true });
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
-      expect(bellButton).toHaveClass("dark:hover:bg-slate-800");
+      expect(bellButton).toHaveClass('dark:hover:bg-slate-800');
     });
   });
 
-  describe("Integration with other nav elements", () => {
-    it("should render bell button after dashboard link", () => {
+  describe('Integration with other nav elements', () => {
+    it('should render bell button after dashboard link', () => {
       renderNavigation({ isAuthenticated: true });
 
-      const nav = screen.getByRole("navigation");
-      const dashboardLink = within(nav).getByRole("link", { name: /dashboard/i });
-      const bellButton = within(nav).getByRole("button", {
+      const nav = screen.getByRole('navigation');
+      const dashboardLink = within(nav).getByRole('link', { name: /dashboard/i });
+      const bellButton = within(nav).getByRole('button', {
         name: /notifications/i,
       });
 
@@ -344,43 +344,43 @@ describe("Navigation Notifications Integration", () => {
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should work alongside theme toggle button", () => {
+    it('should work alongside theme toggle button', () => {
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const themeButtons = screen.getAllByRole("button").filter((btn) =>
-        btn.getAttribute("aria-label")?.includes("mode")
-      );
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const themeButtons = screen
+        .getAllByRole('button')
+        .filter((btn) => btn.getAttribute('aria-label')?.includes('mode'));
 
       expect(bellButton).toBeInTheDocument();
       expect(themeButtons.length).toBeGreaterThan(0);
     });
 
-    it("should work alongside user menu", () => {
+    it('should work alongside user menu', () => {
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const userMenuButton = screen.getByRole("button", { name: /user menu/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const userMenuButton = screen.getByRole('button', { name: /user menu/i });
 
       expect(bellButton).toBeInTheDocument();
       expect(userMenuButton).toBeInTheDocument();
     });
   });
 
-  describe("Edge cases and error states", () => {
-    it("should handle missing userEmail gracefully", () => {
+  describe('Edge cases and error states', () => {
+    it('should handle missing userEmail gracefully', () => {
       renderNavigation({ isAuthenticated: true, userEmail: undefined });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should handle rapid bell button clicks", async () => {
+    it('should handle rapid bell button clicks', async () => {
       const user = userEvent.setup();
       mockFetcher.data = mockNotifications;
       renderNavigation();
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
 
       // Multiple rapid clicks
       await user.click(bellButton);
@@ -391,26 +391,26 @@ describe("Navigation Notifications Integration", () => {
       expect(bellButton).toBeInTheDocument();
     });
 
-    it("should handle null notifications data", () => {
+    it('should handle null notifications data', () => {
       mockFetcher.data = null;
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(bellButton).toBeInTheDocument();
 
       // Should not display badge if data is null
       expect(within(bellButton).queryByText(/\d+/)).not.toBeInTheDocument();
     });
 
-    it("should handle zero notifications count", () => {
+    it('should handle zero notifications count', () => {
       mockFetcher.data = { notifications: [], count: 0 };
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
       expect(within(bellButton).queryByText(/\d+/)).not.toBeInTheDocument();
     });
 
-    it("should handle large notification counts", () => {
+    it('should handle large notification counts', () => {
       mockFetcher.data = {
         notifications: Array(99)
           .fill(null)
@@ -418,8 +418,8 @@ describe("Navigation Notifications Integration", () => {
             plant_id: `plant-${i}`,
             plant_name: `Plant ${i}`,
             photo_url: null,
-            last_watered: "2024-01-20T10:00:00Z",
-            next_watering: "2024-01-27T10:00:00Z",
+            last_watered: '2024-01-20T10:00:00Z',
+            next_watering: '2024-01-27T10:00:00Z',
             days_overdue: i % 5,
           })),
         count: 99,
@@ -427,75 +427,63 @@ describe("Navigation Notifications Integration", () => {
 
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      expect(within(bellButton).getByText("99")).toBeInTheDocument();
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      expect(within(bellButton).getByText('99')).toBeInTheDocument();
     });
   });
 
-  describe("Authentication state changes", () => {
-    it("should show bell button only when authenticated", () => {
+  describe('Authentication state changes', () => {
+    it('should show bell button only when authenticated', () => {
       const { rerender } = renderNavigation({ isAuthenticated: false });
 
-      expect(
-        screen.queryByRole("button", { name: /notifications/i })
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /notifications/i })).not.toBeInTheDocument();
 
-      rerender(
-        <Navigation isAuthenticated={true} userEmail="test@example.com" />
-      );
+      rerender(<Navigation isAuthenticated={true} userEmail="test@example.com" />);
 
-      expect(
-        screen.getByRole("button", { name: /notifications/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
     });
 
-    it("should handle logout by hiding bell button", () => {
+    it('should handle logout by hiding bell button', () => {
       const { rerender } = renderNavigation({ isAuthenticated: true });
 
-      expect(
-        screen.getByRole("button", { name: /notifications/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument();
 
-      rerender(
-        <Navigation isAuthenticated={false} userEmail={undefined} />
-      );
+      rerender(<Navigation isAuthenticated={false} userEmail={undefined} />);
 
-      expect(
-        screen.queryByRole("button", { name: /notifications/i })
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /notifications/i })).not.toBeInTheDocument();
     });
   });
 
-  describe("Badge styling variations", () => {
-    it("should use destructive variant for badge", () => {
+  describe('Badge styling variations', () => {
+    it('should use destructive variant for badge', () => {
       mockFetcher.data = mockNotifications;
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const badge = within(bellButton).getByText("2");
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const badge = within(bellButton).getByText('2');
 
       // Badge should have destructive styling (red)
-      expect(badge).toHaveClass("bg-red-600");
+      expect(badge).toHaveClass('bg-red-600');
     });
 
-    it("should position badge in top-right corner", () => {
+    it('should position badge in top-right corner', () => {
       mockFetcher.data = mockNotifications;
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const badge = within(bellButton).getByText("2");
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const badge = within(bellButton).getByText('2');
 
-      expect(badge).toHaveClass("absolute", "-top-1", "-right-1");
+      expect(badge).toHaveClass('absolute', '-top-1', '-right-1');
     });
 
-    it("should have consistent badge size", () => {
+    it('should have consistent badge size', () => {
       mockFetcher.data = mockNotifications;
       renderNavigation({ isAuthenticated: true });
 
-      const bellButton = screen.getByRole("button", { name: /notifications/i });
-      const badge = within(bellButton).getByText("2");
+      const bellButton = screen.getByRole('button', { name: /notifications/i });
+      const badge = within(bellButton).getByText('2');
 
-      expect(badge).toHaveClass("h-5", "w-5");
+      expect(badge).toHaveClass('h-5', 'w-5');
     });
   });
 });

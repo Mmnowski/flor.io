@@ -7,6 +7,7 @@ This document outlines integration tests for the Phase 3 watering notification s
 ## Testing Strategy
 
 **Integration Tests** test multiple components/systems together:
+
 - API endpoints with server functions
 - Components with route loaders/actions
 - UI interactions with data fetching
@@ -16,6 +17,7 @@ This document outlines integration tests for the Phase 3 watering notification s
 **Test Framework**: Vitest + React Testing Library with `createMemoryRouter`
 
 **Key Tools**:
+
 ```bash
 yarn test                # Run all tests
 yarn test:watch        # Watch mode
@@ -28,6 +30,7 @@ yarn test:coverage    # Coverage report
 ## Integration Test Categories
 
 ### 1. API Endpoint Integration Tests
+
 Tests that verify API routes work with their underlying server functions.
 
 #### Test Suite: `api.notifications.integration.test.ts`
@@ -180,6 +183,7 @@ describe('Water Plant API Integration', () => {
 ---
 
 ### 2. Component-to-Route Integration Tests
+
 Tests that verify components correctly interact with route loaders/actions.
 
 #### Test Suite: `NotificationsModal.integration.test.tsx`
@@ -258,6 +262,7 @@ describe('NotificationsModal with Route Integration', () => {
 ---
 
 ### 3. Navigation-to-Modal Integration Tests
+
 Tests that verify navigation component correctly manages notifications.
 
 #### Test Suite: `Navigation.notifications.integration.test.tsx`
@@ -363,6 +368,7 @@ describe('Navigation to Notifications Modal Integration', () => {
 ---
 
 ### 4. Full Feature Flow Integration Tests
+
 End-to-end tests verifying the complete notification feature workflow.
 
 #### Test Suite: `watering.notifications.e2e.integration.test.tsx`
@@ -574,6 +580,7 @@ describe('Complete Watering Notification Feature Flow', () => {
 ---
 
 ### 5. Error Scenario Integration Tests
+
 Tests for error conditions and edge cases.
 
 #### Test Suite: `watering.notifications.errors.integration.test.ts`
@@ -764,7 +771,9 @@ export function createNotificationTestScenarios() {
       createMockPlant({ days_overdue: 0 }),
       createMockPlant({ days_overdue: -3 }),
     ],
-    manyPlants: Array(50).fill(null).map(() => createMockPlant()),
+    manyPlants: Array(50)
+      .fill(null)
+      .map(() => createMockPlant()),
   };
 }
 
@@ -785,6 +794,7 @@ export async function setupNotificationScenario(scenario: string) {
 ## Coverage Goals
 
 **Integration Test Coverage Targets**:
+
 - API endpoint integration: 90%+
 - Component-route integration: 85%+
 - Full feature flows: 80%+
@@ -797,6 +807,7 @@ export async function setupNotificationScenario(scenario: string) {
 ## CI/CD Integration
 
 **GitHub Actions Workflow** (`.github/workflows/test.yml`):
+
 ```yaml
 - name: Run Integration Tests
   run: yarn test -- integration.test
@@ -813,6 +824,7 @@ export async function setupNotificationScenario(scenario: string) {
 ## Maintenance
 
 **When to Update Integration Tests**:
+
 1. Adding new features to watering system
 2. Changing API response format
 3. Modifying notification modal layout
@@ -820,6 +832,7 @@ export async function setupNotificationScenario(scenario: string) {
 5. Adding new error scenarios
 
 **Test Review Checklist**:
+
 - [ ] Tests cover happy path
 - [ ] Tests cover error cases
 - [ ] Tests cover edge cases

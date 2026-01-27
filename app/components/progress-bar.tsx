@@ -3,7 +3,6 @@
  *
  * Shows progress during page navigation and form submissions
  */
-
 import { useEffect, useState } from 'react';
 import { useNavigation } from 'react-router';
 
@@ -70,9 +69,7 @@ export function LoadingOverlay({ message }: { message?: string }) {
         </div>
 
         {message && (
-          <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
-            {message}
-          </p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 text-center">{message}</p>
         )}
       </div>
     </div>
@@ -82,7 +79,13 @@ export function LoadingOverlay({ message }: { message?: string }) {
 /**
  * Inline loading spinner (small)
  */
-export function LoadingSpinner({ size = 'md', message }: { size?: 'sm' | 'md' | 'lg'; message?: string }) {
+export function LoadingSpinner({
+  size = 'md',
+  message,
+}: {
+  size?: 'sm' | 'md' | 'lg';
+  message?: string;
+}) {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',

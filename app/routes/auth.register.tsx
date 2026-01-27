@@ -1,33 +1,35 @@
-import { Form, Link, redirect, useActionData } from "react-router";
-import type { Route } from "./+types/auth.register";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Card } from "~/components/ui/card";
-import { FormError } from "~/components/form-error";
-import { registerSchema } from "~/lib/validation";
-import { registerUser } from "~/lib/auth.server";
-import { createUserSession, getUserId } from "~/lib/session.server";
+import { FormError } from '~/components/form-error';
+import { Button } from '~/components/ui/button';
+import { Card } from '~/components/ui/card';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
+import { registerUser } from '~/lib/auth.server';
+import { createUserSession, getUserId } from '~/lib/session.server';
+import { registerSchema } from '~/lib/validation';
+
+import { Form, Link, redirect, useActionData } from 'react-router';
+
+import type { Route } from './+types/auth.register';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await getUserId(request);
   if (userId) {
-    return redirect("/dashboard");
+    return redirect('/dashboard');
   }
   return null;
 };
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  if (request.method !== "POST") {
+  if (request.method !== 'POST') {
     return { error: null as string | null };
   }
 
   try {
     const formData = await request.formData();
     const data = {
-      email: String(formData.get("email")),
-      password: String(formData.get("password")),
-      confirmPassword: String(formData.get("confirmPassword")),
+      email: String(formData.get('email')),
+      password: String(formData.get('password')),
+      confirmPassword: String(formData.get('confirmPassword')),
     };
 
     // Validate using Zod schema
@@ -35,27 +37,27 @@ export const action = async ({ request }: Route.ActionArgs) => {
     if (!validation.success) {
       const errors = validation.error.flatten().fieldErrors;
       const firstError = Object.values(errors)[0]?.[0];
-      return { error: firstError || "Validation failed" };
+      return { error: firstError || 'Validation failed' };
     }
 
     const user = await registerUser(validation.data.email, validation.data.password);
 
     if (!user?.id) {
-      return { error: "Failed to create account" };
+      return { error: 'Failed to create account' };
     }
 
     return createUserSession(user.id);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Registration failed";
-    if (message.includes("already registered")) {
-      return { error: "This email is already registered" };
+    const message = error instanceof Error ? error.message : 'Registration failed';
+    if (message.includes('already registered')) {
+      return { error: 'This email is already registered' };
     }
     return { error: message };
   }
 };
 
 export default function RegisterPage() {
-  const actionData = useActionData() as { error: string | null } | undefined;
+  const actionData = useActionData();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-white dark:from-slate-950 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -135,7 +137,7 @@ export default function RegisterPage() {
           </Form>
 
           <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-6 leading-relaxed">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link
               to="/auth/login"
               className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors focus:ring-2 focus:ring-emerald-300 rounded px-1 focus:outline-none"

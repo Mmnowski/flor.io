@@ -1,6 +1,7 @@
 Your task is to prepare a commit message based on the uncommited changes in the working directory.
 
 ## Template
+
 ```
 [TYPE]([TICKET NUMBER or CONTEXT OF THE CHANGE]): [SHORT DESCRIPTION]
 
@@ -8,6 +9,7 @@ Your task is to prepare a commit message based on the uncommited changes in the 
 ```
 
 ## Examples
+
 ```
 feat(DOCKER-DEPLOYMENT): add Docker deployment instructions
 
@@ -20,6 +22,7 @@ fix(DEV-SERVER): correct development server URL
 ```
 
 ## Rules
+
 - Focus on the main purpose of the changes.
 - [SHORT DESCRIPTION] should be concise yet descriptive.
 - Use bullet points to summarize key changes.
@@ -28,4 +31,3 @@ fix(DEV-SERVER): correct development server URL
 - Avoid mentioning unrelated changes.
 - When describing changes related to tests, only specify which tests were added or modified, not the implementation details. Avoid mentioning amount of tests or coverage percentages.
 - Do not include any mention of being co-authored by an AI agent.
-

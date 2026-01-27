@@ -3,6 +3,7 @@
 ## What is Web Accessibility?
 
 Web accessibility means **making sure everyone can use your website**, regardless of their abilities. This includes people who:
+
 - Have **vision impairments** (blind, low vision, color blind)
 - Have **hearing impairments** (deaf, hard of hearing)
 - Have **motor impairments** (can't use a mouse, tremors)
@@ -11,6 +12,7 @@ Web accessibility means **making sure everyone can use your website**, regardles
 - Have **slow internet** or old devices
 
 **Making your site accessible helps EVERYONE:**
+
 - Users with magnified screens see clearer contrast
 - Users on mobile see larger touch targets
 - Users on slow internet benefit from semantic HTML
@@ -22,6 +24,7 @@ Web accessibility means **making sure everyone can use your website**, regardles
 ## Why Accessibility Standards Exist
 
 The **WCAG 2.1 (Web Content Accessibility Guidelines)** is an international standard with three levels:
+
 - **A** (minimum - basic accessibility)
 - **AA** (intermediate - covers 80% of needs) ← **We're targeting this**
 - **AAA** (advanced - comprehensive)
@@ -37,6 +40,7 @@ We're targeting **AA** because it's the legal requirement in most places and cov
 **Contrast** is the difference in brightness between text and its background.
 
 **Why it matters:**
+
 - People with low vision need high contrast to read text
 - People who are color blind can't distinguish certain colors
 - People in bright sunlight (outdoor use) struggle with low contrast
@@ -59,11 +63,13 @@ When you have **light text on light background** or **dark text on dark backgrou
 For regular-sized text (less than 18px), contrast ratio must be at least **4.5 to 1**.
 
 **What does 4.5:1 mean?**
+
 - It's a ratio comparing light and dark values
 - Example: Black (#000000) on white (#FFFFFF) = 21:1 ratio (excellent!)
 - Example: Dark gray (#666666) on medium gray (#999999) = 1.5:1 (bad!)
 
 **Why 4.5:1?**
+
 - Scientific studies show this is the minimum for people with 20/40 vision
 - People with low vision (can't see clearly) can still read it
 - People with color blindness can still distinguish text
@@ -73,6 +79,7 @@ For regular-sized text (less than 18px), contrast ratio must be at least **4.5 t
 For **large text** (18px+ or 14px+ bold), contrast ratio can be **3 to 1**.
 
 **Why lower for large text?**
+
 - Large text is already easier to see
 - The larger size compensates for lower contrast
 - We're testing button labels, headings
@@ -109,17 +116,20 @@ For **large text** (18px+ or 14px+ bold), contrast ratio can be **3 to 1**.
 ## How to Check Contrast
 
 ### Tool 1: WebAIM Contrast Checker
+
 - Visit: https://webaim.org/resources/contrastchecker/
 - Enter foreground color (text): `#000000`
 - Enter background color: `#FFFFFF`
 - It shows: Passes AA? Yes/No
 
 ### Tool 2: Browser DevTools
+
 - Right-click element → Inspect
 - Go to "Styles" panel
 - Look for contrast info in newer browsers
 
 ### Tool 3: Browser Extension
+
 - "axe DevTools" Chrome/Edge extension (free)
 - Automatically finds contrast issues
 - Shows you which elements fail
@@ -127,6 +137,7 @@ For **large text** (18px+ or 14px+ bold), contrast ratio can be **3 to 1**.
 ## Examples for Flor.io
 
 ### Status Colors
+
 ```
 OVERDUE PLANT (currently: orange status)
 - Need to check: Dark text on orange background = 4.5:1? YES/NO
@@ -146,6 +157,7 @@ BLACK text on red: 4.5:1? NO - use white instead
 ```
 
 ### Form Error Messages
+
 ```
 Currently: Red background with red text
 Problem: May not meet 4.5:1 ratio
@@ -173,6 +185,7 @@ Solution:
 **Touch target** = the clickable/tappable area of a button, link, or interactive element.
 
 **Why it matters:**
+
 - Mobile users tap with fingers, not mouse cursors
 - People with tremors miss small buttons
 - Elderly users have less precise motor control
@@ -184,6 +197,7 @@ Solution:
 **WCAG 2.1 AA standard:** Interactive elements must be at least **44×44 pixels** in size.
 
 **What counts as interactive?**
+
 - Buttons
 - Links
 - Form inputs (height of textbox)
@@ -201,11 +215,13 @@ Solution:
 ## Examples from Flor.io
 
 ### ✅ What's Already Good
+
 - "Create Plant" button (likely 44px+ height)
 - Input fields (likely 44px+ height)
 - Most buttons in UI
 
 ### ⚠️ What Might Need Checking
+
 ```
 Small icon buttons:
 - Delete icon on plant cards
@@ -230,12 +246,14 @@ Better:
 ## Special Cases
 
 ### Form Inputs
+
 ```
 GOOD: <input className="h-11 px-4" />  /* 44px height */
 BAD:  <input className="h-6 px-2" />   /* 24px height */
 ```
 
 ### Links
+
 ```
 Text link: "Edit Plant"
 - Click area = link text width
@@ -248,6 +266,7 @@ OR make parent element larger
 ```
 
 ### Checkboxes and Radio Buttons
+
 ```
 shadcn/ui components already handle this well
 BUT native HTML checkboxes are 16x16px = BAD
@@ -284,6 +303,7 @@ Solution: Ensure label is associated and clickable
 **Users should be able to use your entire site with keyboard only** - no mouse needed.
 
 **Why it matters:**
+
 - People with motor disabilities can't use mice
 - Power users prefer keyboard (faster)
 - People with tremors need steady movement (keyboard vs shaky mouse)
@@ -305,16 +325,19 @@ Solution: Ensure label is associated and clickable
 **Focus** = which element your keyboard interaction will affect
 
 **Why visibility matters:**
+
 - Without seeing focus, you don't know what will happen if you press Enter
 - Keyboard users MUST see where they are
 
 ### Good Focus Indicator
+
 ```
 Blue outline or ring around element
 Example: <button className="focus:ring-2 focus:ring-blue-400" />
 ```
 
 ### Bad Focus Indicator
+
 ```
 No outline at all (browser default removed)
 Invisible focus (light gray on gray background)
@@ -326,6 +349,7 @@ Color change only (not visible when focused)
 ### 1. Tab Order Should Be Logical
 
 **Expected order:**
+
 ```
 Login Form:
 1. Email input
@@ -337,6 +361,7 @@ Login Form:
 ```
 
 **Problem:**
+
 ```
 Sometimes tab order is weird:
 1. Something at bottom of page
@@ -347,6 +372,7 @@ Cause: Wrong z-index, wrong HTML order, CSS positioning messes up order
 ```
 
 **How we ensure good order:**
+
 - HTML elements in logical order
 - Avoid heavy CSS positioning that changes visual order
 - Use CSS flexbox/grid for layout (respects HTML order)
@@ -354,6 +380,7 @@ Cause: Wrong z-index, wrong HTML order, CSS positioning messes up order
 ### 2. All Interactive Elements Must Be Keyboard-Accessible
 
 **Must work with Tab + Enter/Space:**
+
 - Buttons → Enter/Space = click
 - Links → Enter = navigate
 - Form inputs → Tab = focus, type text
@@ -364,12 +391,14 @@ Cause: Wrong z-index, wrong HTML order, CSS positioning messes up order
 ### 3. Focus Trap in Modals
 
 When modal opens:
+
 - Focus moves INTO the modal
 - Pressing Tab cycles through modal elements only
 - CANNOT tab to background elements (behind modal)
 - Pressing Escape closes modal
 
 **Example (with focus-trap library):**
+
 ```tsx
 import { FocusTrap } from 'focus-trap-react';
 
@@ -380,7 +409,7 @@ import { FocusTrap } from 'focus-trap-react';
       <Button>Save</Button>
     </DialogContent>
   </Dialog>
-</FocusTrap>
+</FocusTrap>;
 ```
 
 shadcn/ui Dialog already has this built-in!
@@ -388,6 +417,7 @@ shadcn/ui Dialog already has this built-in!
 ### 4. Visible Focus Styles
 
 Every focusable element needs visible outline or ring:
+
 ```css
 /* Default browser outline (good enough) */
 :focus-visible {
@@ -401,8 +431,11 @@ button {
 ```
 
 **NOT acceptable:**
+
 ```css
-:focus { outline: none; }  /* NEVER do this without replacement */
+:focus {
+  outline: none;
+} /* NEVER do this without replacement */
 ```
 
 ## How to Test Keyboard Navigation
@@ -433,11 +466,13 @@ button {
 **Screen readers** are programs that read text aloud and announce interactive elements.
 
 **Users:**
+
 - Blind people
 - Severely visually impaired people
 - Some people with dyslexia (audio helps processing)
 
 **Popular screen readers:**
+
 - JAWS (Windows, expensive)
 - NVDA (Windows, free, open source)
 - VoiceOver (Mac/iOS, built-in)
@@ -455,6 +490,7 @@ button {
 ## What Screen Reader User Hears
 
 ### Good Example:
+
 ```
 (Visits plant details page)
 "Plant details, heading level 1"
@@ -468,6 +504,7 @@ button {
 ```
 
 ### Bad Example:
+
 ```
 (Same page with accessibility problems)
 "Page"
@@ -502,6 +539,7 @@ button {
 ```
 
 **Elements we need:**
+
 - `<main>` - main content area (one per page)
 - `<nav>` - navigation area
 - `<h1>, <h2>, <h3>` - headings (proper hierarchy)
@@ -539,6 +577,7 @@ Screen reader says: "Monstera deliciosa plant in white pot"
 ```
 
 **Good alt text:**
+
 - Describes the image content
 - Should be what you'd say about the image
 - For icons: describe the action, not the picture
@@ -571,11 +610,10 @@ Users should be able to navigate by headings:
 ```html
 <!-- GOOD: Clear structure -->
 <h1>Dashboard</h1>
-  <h2>My Plants</h2>
-    Plant card 1
-    Plant card 2
-  <h2>Rooms</h2>
-    Room list
+<h2>My Plants</h2>
+Plant card 1 Plant card 2
+<h2>Rooms</h2>
+Room list
 ```
 
 ### 6. Use ARIA When Semantic HTML Isn't Enough
@@ -584,9 +622,7 @@ Users should be able to navigate by headings:
 
 ```html
 <!-- Announce live updates (notifications) -->
-<div role="alert" aria-live="polite">
-  Plant watered successfully!
-</div>
+<div role="alert" aria-live="polite">Plant watered successfully!</div>
 
 <!-- Announce dialog modals -->
 <div role="dialog" aria-labelledby="dialog-title">
@@ -595,9 +631,7 @@ Users should be able to navigate by headings:
 </div>
 
 <!-- Describe custom components -->
-<div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-  75%
-</div>
+<div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
 ```
 
 ## How to Test with Screen Reader (NVDA on Windows)
@@ -629,6 +663,7 @@ Users should be able to navigate by headings:
 **Use clear, specific language that all users can understand.**
 
 **Why it matters:**
+
 - People with cognitive disabilities understand simpler language
 - Non-native English speakers understand clearer language
 - People with dyslexia understand concrete language better
@@ -673,6 +708,7 @@ Users should be able to navigate by headings:
 ```
 
 **Error messages should:**
+
 - Say what's wrong (not just "Error")
 - Suggest how to fix it
 - Be written simply
@@ -715,6 +751,7 @@ say "Delete Plant" everywhere (not "Remove Plant")
 ```
 
 **Why:**
+
 - Placeholder disappears when typing
 - Label always visible
 - Help text explains what expected
@@ -743,11 +780,13 @@ say "Delete Plant" everywhere (not "Remove Plant")
 ## Flor.io Language Audit
 
 ### Current Good Examples
+
 - "Plant Name" (clear)
 - "Watering Frequency (days)" (specific)
 - "Light Requirements" (concrete)
 
 ### Areas to Check
+
 - Button labels - all specific and action-oriented?
 - Error messages - all specific?
 - Help text - all concrete and helpful?
@@ -771,6 +810,7 @@ say "Delete Plant" everywhere (not "Remove Plant")
 # Summary: Why All This Matters
 
 These 5 accessibility tasks make Flor.io usable for:
+
 - ✅ Blind and low-vision users (contrast, screen readers)
 - ✅ Deaf and hard-of-hearing users (captions, visual feedback)
 - ✅ Motor disability users (keyboard, large touch targets)
@@ -783,4 +823,3 @@ These 5 accessibility tasks make Flor.io usable for:
 - ✅ Low-bandwidth users (simpler HTML)
 
 **Plus:** Better SEO, better maintainability, fewer bugs, happier users!
-

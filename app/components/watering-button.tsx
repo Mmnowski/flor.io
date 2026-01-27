@@ -1,9 +1,11 @@
 'use client';
 
+import { Button } from '~/components/ui/button';
+
 import { useState } from 'react';
 import { useFetcher } from 'react-router';
-import { Button } from '~/components/ui/button';
-import { Droplet, Check } from 'lucide-react';
+
+import { Check, Droplet } from 'lucide-react';
 
 interface WateringButtonProps {
   plantId: string;

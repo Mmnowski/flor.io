@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useFetcher } from "react-router";
-import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
+import { NotificationsModal, type PlantNeedingWater } from '~/components/notifications-modal';
+import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { Bell, Menu, Moon, Sun } from "lucide-react";
-import { useTheme } from "~/hooks/useTheme";
-import { NotificationsModal, type PlantNeedingWater } from "~/components/notifications-modal";
+} from '~/components/ui/dropdown-menu';
+import { useTheme } from '~/hooks/useTheme';
+
+import { useEffect, useRef, useState } from 'react';
+import { Link, useFetcher, useLocation } from 'react-router';
+
+import { Bell, Menu, Moon, Sun } from 'lucide-react';
 
 export function Navigation({
   isAuthenticated,
@@ -32,16 +34,16 @@ export function Navigation({
 
   // Fetch notifications on mount for authenticated users
   useEffect(() => {
-    if (isAuthenticated && !initialFetchDone.current && notificationsFetcher.state === "idle") {
+    if (isAuthenticated && !initialFetchDone.current && notificationsFetcher.state === 'idle') {
       initialFetchDone.current = true;
-      notificationsFetcher.load("/api/notifications");
+      notificationsFetcher.load('/api/notifications');
     }
   }, [isAuthenticated]);
 
   // Refetch notifications when modal opens
   useEffect(() => {
-    if (isAuthenticated && notificationsOpen && notificationsFetcher.state === "idle") {
-      notificationsFetcher.load("/api/notifications");
+    if (isAuthenticated && notificationsOpen && notificationsFetcher.state === 'idle') {
+      notificationsFetcher.load('/api/notifications');
     }
   }, [isAuthenticated, notificationsOpen]);
 
@@ -54,19 +56,19 @@ export function Navigation({
 
   // Refetch notifications after watering action completes
   useEffect(() => {
-    if (wateringFetcher.state === "idle" && wateringFetcher.data) {
+    if (wateringFetcher.state === 'idle' && wateringFetcher.data) {
       // Refetch notifications after a successful watering
-      notificationsFetcher.load("/api/notifications");
+      notificationsFetcher.load('/api/notifications');
     }
   }, [wateringFetcher.state, wateringFetcher.data]);
 
   // Handle watering action
   const handleWatered = (plantId: string) => {
-    wateringFetcher.submit({}, { method: "post", action: `/api/water/${plantId}` });
+    wateringFetcher.submit({}, { method: 'post', action: `/api/water/${plantId}` });
   };
 
   // Don't show nav on auth pages
-  if (location.pathname.startsWith("/auth")) {
+  if (location.pathname.startsWith('/auth')) {
     return null;
   }
 
@@ -118,7 +120,7 @@ export function Navigation({
                   size="icon"
                   onClick={toggleTheme}
                   className="h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
-                  aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                  aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? (
                     <Sun className="h-5 w-5 text-amber-500" />
@@ -166,7 +168,7 @@ export function Navigation({
                   size="icon"
                   onClick={toggleTheme}
                   className="h-11 w-11 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
-                  aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                  aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? (
                     <Sun className="h-5 w-5 text-amber-500" />
@@ -201,7 +203,7 @@ export function Navigation({
           onOpenChange={setNotificationsOpen}
           notifications={notifications}
           onWatered={handleWatered}
-          isLoading={wateringFetcher.state !== "idle"}
+          isLoading={wateringFetcher.state !== 'idle'}
         />
       )}
     </nav>

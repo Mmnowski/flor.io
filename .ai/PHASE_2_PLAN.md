@@ -19,27 +19,33 @@ This plan implements manual plant creation, dashboard with plant grid, plant det
 These utilities are the foundation. All routes depend on them.
 
 #### Step 1: Storage Utility (`/app/lib/storage.server.ts`)
+
 **Purpose:** Upload/delete plant photos to Supabase Storage.
 
 **Functions:**
+
 - `uploadPlantPhoto(userId, buffer, mimeType)` → Returns public URL
 - `deletePlantPhoto(photoUrl)` → Deletes file from storage
 - `getPlantPhotoUrl(path)` → Gets public URL
 
 **Key Details:**
+
 - Bucket: `plant-photos`
 - Path: `{userId}/{uuid}.jpg`
 - Generate UUID for unique filenames
 - Return null on error (graceful failure)
 
 #### Step 2: Image Processing (`/app/lib/image.server.ts`)
+
 **Purpose:** Server-side image compression using Sharp.
 
 **Functions:**
+
 - `processPlantImage(buffer)` → Returns processed Buffer
 - `extractImageFromFormData(formData, fieldName)` → Extracts File from FormData
 
 **Processing Pipeline:**
+
 1. Accept buffer from FormData
 2. Resize to max 1920px width (maintain aspect ratio)
 3. Convert to JPEG, quality 85%
@@ -47,27 +53,33 @@ These utilities are the foundation. All routes depend on them.
 5. Ensure output < 500KB
 
 **Constraints:**
+
 - Max input: 10MB
 - Max output: 500KB
 - Accepted formats: JPG, PNG, WEBP
 - Output format: JPEG only
 
 #### Step 3: Rooms Utility (`/app/lib/rooms.server.ts`)
+
 **Purpose:** Fetch user's rooms for dropdowns and filters.
 
 **Functions:**
+
 - `getUserRooms(userId)` → Returns Room[]
 - `getRoomById(roomId, userId)` → Returns Room | null
 
 **Implementation:**
+
 - Filter by user_id
 - Order by name ascending
 - RLS handles security
 
 #### Step 4: Plants Utility (`/app/lib/plants.server.ts`)
+
 **Purpose:** Core CRUD for plants.
 
 **Functions:**
+
 - `getUserPlants(userId, roomId?)` → Returns PlantWithWatering[]
 - `getPlantById(plantId, userId)` → Returns PlantWithDetails | null
 - `createPlant(userId, data)` → Returns Plant
@@ -77,6 +89,7 @@ These utilities are the foundation. All routes depend on them.
 **Key Implementation:**
 
 **getUserPlants:**
+
 - Join with rooms table for room names
 - Use `get_next_watering_date(plant_id)` function
 - Calculate days_until_watering (negative = overdue)
@@ -84,6 +97,7 @@ These utilities are the foundation. All routes depend on them.
 - Order by next watering (soonest first)
 
 **getPlantById:**
+
 - Verify ownership (user_id check)
 - Get room name if room_id exists
 - Calculate watering status
@@ -91,25 +105,30 @@ These utilities are the foundation. All routes depend on them.
 - Return null if not found
 
 **createPlant:**
+
 - Validate required fields (name, watering_frequency_days)
 - Insert with user_id and created_with_ai = false
 - Return inserted plant
 
 **updatePlant:**
+
 - Verify ownership before update
 - Update only provided fields
 - Update updated_at timestamp
 - Return updated plant
 
 **deletePlant:**
+
 - Verify ownership
 - Delete plant (cascades to watering_history)
 - Delete photo from storage if exists
 
 #### Step 5: Watering Utility (`/app/lib/watering.server.ts`)
+
 **Purpose:** Manage watering history and calculations.
 
 **Functions:**
+
 - `recordWatering(plantId, userId, wateredAt?)` → Returns void
 - `getWateringHistory(plantId, userId, limit?)` → Returns WateringHistory[]
 - `getNextWateringDate(plantId)` → Returns Date | null
@@ -118,22 +137,27 @@ These utilities are the foundation. All routes depend on them.
 **Implementation:**
 
 **recordWatering:**
+
 - Verify plant ownership
 - Insert into watering_history with timestamp
 - Use current time if none provided
 
 **getNextWateringDate:**
+
 - Call `get_next_watering_date(plant_id)` DB function
 - Return as Date object
 
 **getPlantsNeedingWater:**
+
 - Call `get_plants_needing_water(user_id)` DB function
 - Returns plants where next_watering <= NOW()
 
 #### Step 6: Type Definitions (`/app/types/plant.types.ts`)
+
 **Purpose:** Extended types with computed fields.
 
 **Types:**
+
 ```typescript
 export type Plant = Database['public']['Tables']['plants']['Row'];
 export type PlantInsert = Database['public']['Tables']['plants']['Insert'];
@@ -173,9 +197,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ### Phase 2.1: Dashboard Route (Steps 7-9)
 
 #### Step 7: Room Filter Component (`/app/components/room-filter.tsx`)
+
 **Type:** Client Component
 
 **Props:**
+
 ```typescript
 {
   rooms: Room[];
@@ -185,6 +211,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Features:**
+
 - Horizontal scrolling container
 - "All Plants" chip (always first)
 - Room chips with plant count badges
@@ -192,9 +219,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Click to filter dashboard
 
 #### Step 8: Plant Card Component (`/app/components/plant-card.tsx`)
+
 **Type:** Client Component
 
 **Props:**
+
 ```typescript
 {
   plant: PlantWithWatering;
@@ -202,6 +231,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Structure:**
+
 - Card with clickable link to detail view
 - Photo or leaf icon placeholder
 - Plant name (h3)
@@ -212,6 +242,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
   - Gray: Not due (> 0 days)
 
 **Styling:**
+
 - Aspect ratio 3:4 for photo
 - Object-fit: cover
 - Hover: scale 1.02, shadow-lg
@@ -220,6 +251,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 #### Step 9: Dashboard Route (`/app/routes/dashboard._index.tsx`)
 
 **Loader:**
+
 1. Get userId from requireAuth()
 2. Get roomId from URL searchParams
 3. Fetch plants via getUserPlants(userId, roomId)
@@ -227,6 +259,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 5. Return { plants, rooms, activeRoomId }
 
 **Component:**
+
 - Header with plant count and "Add Plant" button
 - RoomFilter if rooms exist
 - EmptyState if no plants
@@ -234,6 +267,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Cards link to `/dashboard/plants/$plantId`
 
 **URL Pattern:**
+
 - `/dashboard` - All plants
 - `/dashboard?room={roomId}` - Filtered by room
 
@@ -242,9 +276,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ### Phase 2.2: Manual Plant Creation (Steps 10-12)
 
 #### Step 10: Image Upload Component (`/app/components/image-upload.tsx`)
+
 **Type:** Client Component
 
 **Props:**
+
 ```typescript
 {
   currentPhotoUrl?: string | null;
@@ -253,6 +289,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Features:**
+
 - Hidden file input (triggered by button)
 - Image preview using FileReader
 - Show current photo if exists
@@ -260,14 +297,17 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Client-side file type and size validation
 
 **Validation:**
-- Accept: image/*
+
+- Accept: image/\*
 - Max size warning: 10MB
 - Show preview before upload
 
 #### Step 11: Plant Form Component (`/app/components/plant-form.tsx`)
+
 **Type:** Client Component
 
 **Props:**
+
 ```typescript
 {
   plant?: PlantWithDetails; // For edit mode
@@ -278,6 +318,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Fields:**
+
 1. Photo Upload (ImageUpload component) - optional
 2. Name (text input, required, max 100 chars)
 3. Watering Frequency (number input, required, min 1, max 365)
@@ -288,17 +329,20 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 8. Troubleshooting (textarea, optional)
 
 **Validation:**
+
 - Client: HTML5 required, min, max
 - Server: Validate in action
 
 #### Step 12: Create Plant Route (`/app/routes/dashboard.plants.new.tsx`)
 
 **Loader:**
+
 1. Get userId from requireAuth()
 2. Fetch rooms via getUserRooms(userId)
 3. Return { rooms }
 
 **Action:**
+
 1. Verify authentication
 2. Parse FormData
 3. Validate required fields (name, watering_frequency)
@@ -311,12 +355,14 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 6. Redirect to `/dashboard/plants/$plantId`
 
 **Error Handling:**
+
 - Missing fields → return { error: 'message' }
 - Invalid image → return { error: 'Invalid image' }
 - Image too large → return { error: 'Image exceeds 10MB' }
 - Database error → return { error: 'Failed to create plant' }
 
 **Component:**
+
 - PlantForm in create mode
 - Form submits to current route
 - Show error if actionData.error exists
@@ -327,9 +373,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ### Phase 2.3: Plant Details View (Steps 13-15)
 
 #### Step 13: Watering Button Component (`/app/components/watering-button.tsx`)
+
 **Type:** Client Component
 
 **Props:**
+
 ```typescript
 {
   plantId: string;
@@ -339,6 +387,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Features:**
+
 - Form with POST to same route
 - Hidden input: `_action=water`
 - Button shows "Watered Today" with checkmark
@@ -347,9 +396,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Minimum 44px height (accessibility)
 
 #### Step 14: Plant Info Section Component (`/app/components/plant-info-section.tsx`)
+
 **Type:** Client Component (uses Collapsible)
 
 **Props:**
+
 ```typescript
 {
   title: string;
@@ -360,6 +411,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Structure:**
+
 - Collapsible from shadcn/ui
 - CollapsibleTrigger with icon, title, chevron
 - CollapsibleContent with text or "No information provided"
@@ -368,6 +420,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 #### Step 15: Plant Detail Route (`/app/routes/dashboard.plants.$plantId.tsx`)
 
 **Loader:**
+
 1. Get userId from requireAuth()
 2. Get plantId from params
 3. Fetch plant via getPlantById(plantId, userId)
@@ -377,19 +430,22 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 
 **Actions (Multiplexed):**
 
-**Water Action (_action=water):**
+**Water Action (\_action=water):**
+
 1. Verify ownership
 2. Call recordWatering(plantId, userId)
 3. Revalidate loader
 4. Return null (triggers revalidation)
 
-**Delete Action (_action=delete):**
+**Delete Action (\_action=delete):**
+
 1. Verify ownership
 2. Delete photo if exists (deletePlantPhoto)
 3. Delete plant (deletePlant)
 4. Redirect to /dashboard
 
 **Component:**
+
 - Large photo display or placeholder
 - Plant name (h1)
 - Room badge
@@ -411,6 +467,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 #### Step 16: Edit Plant Route (`/app/routes/dashboard.plants.$plantId.edit.tsx`)
 
 **Loader:**
+
 1. Get userId from requireAuth()
 2. Get plantId from params
 3. Fetch plant via getPlantById(plantId, userId)
@@ -419,6 +476,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 6. Return { plant, rooms }
 
 **Action:**
+
 1. Verify authentication
 2. Parse FormData
 3. Validate fields
@@ -431,6 +489,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 6. Redirect to `/dashboard/plants/$plantId`
 
 **Component:**
+
 - PlantForm in edit mode with plant data
 - Pre-filled with current values
 - Shows current photo
@@ -442,9 +501,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ### Phase 2.5: Delete Plant (Steps 17-18)
 
 #### Step 17: Delete Dialog Component (`/app/components/delete-plant-dialog.tsx`)
+
 **Type:** Client Component (uses Dialog)
 
 **Props:**
+
 ```typescript
 {
   open: boolean;
@@ -455,6 +516,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ```
 
 **Structure:**
+
 - Dialog from shadcn/ui
 - Warning message with plant name
 - "Are you sure you want to delete {plantName}?"
@@ -463,9 +525,11 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Form with POST and `_action=delete`
 
 #### Step 18: Add Delete Action to Detail Route
+
 **File:** `/app/routes/dashboard.plants.$plantId.tsx`
 
 **Changes:**
+
 - Import DeletePlantDialog
 - Add state for dialog open/close
 - Add Delete button that opens dialog
@@ -476,6 +540,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ## Critical Files to Modify/Create
 
 ### New Files (18 total)
+
 1. `/app/lib/storage.server.ts`
 2. `/app/lib/image.server.ts`
 3. `/app/lib/rooms.server.ts`
@@ -491,6 +556,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 13. `/app/components/delete-plant-dialog.tsx`
 
 ### Modified Files (4 total)
+
 14. `/app/routes/dashboard._index.tsx` (currently stub)
 15. `/app/routes/dashboard.plants.new.tsx` (currently stub)
 16. `/app/routes/dashboard.plants.$plantId.tsx` (currently stub)
@@ -501,6 +567,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ## Critical Considerations
 
 ### 1. Image Compression (Sharp)
+
 - Must be server-side (Sharp is Node.js only)
 - Max width: 1920px
 - Quality: 85%
@@ -508,22 +575,26 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 - Format: JPEG only
 
 ### 2. Supabase Storage
+
 - Bucket: `plant-photos`
 - Path: `{userId}/{uuid}.jpg`
 - Public bucket (files accessible via URL)
 - RLS policies ensure user can only access own photos
 
 ### 3. Watering Status
+
 - Use database function `get_next_watering_date(plant_id)`
 - Don't calculate in JavaScript
 - Calculate days_until_watering client-side for display
 
 ### 4. Security (RLS)
+
 - Database RLS policies filter by user_id
 - Still include user_id in queries for clarity
 - No manual authorization needed in most cases
 
 ### 5. Form Validation
+
 - Client-side: HTML5 attributes (required, min, max)
 - Server-side: Re-validate all inputs in actions
 - Return actionData with errors for display
@@ -533,6 +604,7 @@ export type PlantUpdateData = Partial<PlantInsertData>;
 ## Validation & Error Handling
 
 ### Required Field Validation
+
 ```typescript
 if (!name || typeof name !== 'string' || name.trim().length === 0) {
   return { error: 'Plant name is required' };
@@ -545,6 +617,7 @@ if (frequency < 1 || frequency > 365) {
 ```
 
 ### File Upload Validation
+
 ```typescript
 // Client-side
 if (file.size > 10 * 1024 * 1024) {
@@ -559,6 +632,7 @@ if (file && file.size > MAX_FILE_SIZE) {
 ```
 
 ### Error Handling Pattern
+
 ```typescript
 try {
   await createPlant(userId, plantData);
@@ -573,6 +647,7 @@ try {
 ## Testing Strategy
 
 ### Manual Testing Checklist
+
 - [ ] Create plant without photo
 - [ ] Create plant with photo (< 1MB)
 - [ ] Create plant with large photo (> 5MB) - expect error
@@ -587,12 +662,14 @@ try {
 - [ ] View dashboard with 20+ plants
 
 ### Integration Tests
+
 - [ ] Full CRUD flow: Create → View → Edit → Delete
 - [ ] Photo flow: Upload → View in card → View in detail → Edit
 - [ ] Watering flow: Record → See status → See in history
 - [ ] Room filter flow: Filter → Create in room → See in filter
 
 ### Edge Cases
+
 - [ ] Plant with deleted room (show null gracefully)
 - [ ] Very long plant name (truncate in card, full in detail)
 - [ ] Concurrent watering from multiple devices
@@ -600,6 +677,7 @@ try {
 - [ ] Invalid watering frequency (show error)
 
 ### Accessibility
+
 - [ ] All forms keyboard navigable
 - [ ] All images have alt text
 - [ ] Error messages announced to screen readers
@@ -613,6 +691,7 @@ try {
 ### Step-by-Step Verification
 
 **After Utilities (Steps 1-6):**
+
 1. Test image upload to storage bucket
 2. Test image compression (verify output < 500KB)
 3. Test plant CRUD operations in DB
@@ -620,6 +699,7 @@ try {
 5. Verify types compile without errors
 
 **After Dashboard (Step 9):**
+
 1. Visit `/dashboard`
 2. See empty state if no plants
 3. Create plant manually in DB
@@ -627,6 +707,7 @@ try {
 5. Click card and navigate to detail (404 expected)
 
 **After Create (Step 12):**
+
 1. Click "Add Plant" button
 2. Fill form and submit
 3. Verify redirect to detail view
@@ -634,12 +715,14 @@ try {
 5. Check plant created in DB
 
 **After Detail (Step 15):**
+
 1. View plant detail page
 2. Click "Watered Today"
 3. Verify watering recorded in history
 4. Verify status updated
 
 **After Edit (Step 16):**
+
 1. Click "Edit" button
 2. Change plant name
 3. Upload new photo
@@ -647,6 +730,7 @@ try {
 5. Check old photo deleted from storage
 
 **After Delete (Steps 17-18):**
+
 1. Click "Delete" button
 2. Confirm in dialog
 3. Verify redirect to dashboard
@@ -658,6 +742,7 @@ try {
 ## Dependencies
 
 ### NPM Packages to Install
+
 ```bash
 yarn add sharp
 yarn add uuid
@@ -665,6 +750,7 @@ yarn add -D @types/uuid
 ```
 
 ### Existing Dependencies (Already Installed)
+
 - @supabase/supabase-js
 - React Router v7
 - TailwindCSS v4
@@ -686,6 +772,7 @@ yarn add -D @types/uuid
 ## Success Criteria
 
 Phase 2 is complete when:
+
 - [ ] Users can create plants manually with optional photo
 - [ ] Dashboard shows grid of plants with watering status
 - [ ] Users can filter plants by room
@@ -703,12 +790,14 @@ Phase 2 is complete when:
 ## Next Steps After Phase 2
 
 Phase 3 will add:
+
 - Watering notifications modal
 - Notification badge in navigation
 - Plants needing water API endpoint
 - Email/push notifications (stretch goal)
 
 Phase 4 will add:
+
 - AI plant identification (PlantNet mock)
 - AI care instructions (GPT-5 mock)
 - AI feedback system

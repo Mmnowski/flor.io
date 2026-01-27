@@ -28,6 +28,7 @@ cp .env.example .env
 ```
 
 Edit `.env` with your Supabase credentials:
+
 ```
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key-here
@@ -47,6 +48,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 6. Wait for execution to complete
 
 The SQL will create:
+
 - `plants` table
 - `watering_history` table
 - `rooms` table
@@ -121,11 +123,13 @@ After testing, you're ready for Phase 2:
 ## Quick Reference
 
 ### Important Files to Update
+
 - Check `.ai/IMPLEMENTATION_TODO.md` for detailed checklist
 - Follow `.ai/IMPLEMENTATION_PLAN.md` for feature details
 - Read `.ai/PROCESS.md` for development workflow
 
 ### Running Commands
+
 ```bash
 yarn dev          # Start dev server
 yarn typecheck    # Check TypeScript
@@ -134,39 +138,42 @@ yarn start        # Run production build
 ```
 
 ### Database Queries (in Phase 2)
+
 All database access goes through Supabase client:
+
 ```typescript
-const { data, error } = await supabaseServer
-  .from('plants')
-  .select('*')
-  .eq('user_id', userId);
+const { data, error } = await supabaseServer.from('plants').select('*').eq('user_id', userId);
 ```
 
 ### File Upload (in Phase 2)
+
 Using Sharp for compression + Supabase Storage:
+
 ```typescript
 const buffer = await file.arrayBuffer();
 const compressed = await compressImage(Buffer.from(buffer));
-await supabaseServer.storage
-  .from('plant-photos')
-  .upload(`${userId}/${plantId}.jpg`, compressed);
+await supabaseServer.storage.from('plant-photos').upload(`${userId}/${plantId}.jpg`, compressed);
 ```
 
 ## Troubleshooting
 
 ### "Cannot connect to Supabase"
+
 - Check your .env file has correct credentials
 - Make sure SUPABASE_URL doesn't have trailing slash
 
 ### "Row Level Security violation"
+
 - Make sure you're logged in (have a valid userId in session)
 - Check RLS policies were created by SQL schema
 
 ### "Type errors in routes"
+
 - Run `yarn typecheck` to regenerate types
 - Types are auto-generated from Supabase schema
 
 ### Images not uploading
+
 - Check storage bucket exists and is public
 - Check bucket policies allow authenticated uploads
 - Check image is < 10MB and is valid image file

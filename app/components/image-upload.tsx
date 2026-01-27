@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
 import { Button } from '~/components/ui/button';
-import { X, Upload } from 'lucide-react';
+
+import { useRef, useState } from 'react';
+
+import { Upload, X } from 'lucide-react';
 
 interface ImageUploadProps {
   currentPhotoUrl?: string | null;
@@ -81,20 +83,11 @@ export function ImageUpload({ currentPhotoUrl, onFileChange }: ImageUploadProps)
           </div>
 
           {/* File name */}
-          {fileName && (
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {fileName}
-            </p>
-          )}
+          {fileName && <p className="text-sm text-slate-600 dark:text-slate-400">{fileName}</p>}
 
           {/* Actions */}
           <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleUploadClick}
-              className="flex-1"
-            >
+            <Button type="button" variant="outline" onClick={handleUploadClick} className="flex-1">
               <Upload className="w-4 h-4 mr-2" />
               Change Photo
             </Button>
@@ -110,12 +103,7 @@ export function ImageUpload({ currentPhotoUrl, onFileChange }: ImageUploadProps)
           </div>
         </div>
       ) : (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleUploadClick}
-          className="w-full"
-        >
+        <Button type="button" variant="outline" onClick={handleUploadClick} className="w-full">
           <Upload className="w-4 h-4 mr-2" />
           Upload Plant Photo
         </Button>

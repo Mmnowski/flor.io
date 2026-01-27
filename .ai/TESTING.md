@@ -55,6 +55,7 @@ app/
 **Pattern**: Test user-facing behavior, not implementation
 
 **Example**:
+
 ```typescript
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -83,27 +84,28 @@ describe("PlantCard", () => {
 **Pattern**: Test with mocked Supabase, file systems, etc.
 
 **Example**:
-```typescript
-import { createAIPlant } from "../plants.server";
-import { supabaseServer } from "../supabase.server";
 
-vi.mock("../supabase.server", () => ({
+```typescript
+import { createAIPlant } from '../plants.server';
+import { supabaseServer } from '../supabase.server';
+
+vi.mock('../supabase.server', () => ({
   supabaseServer: {
     from: vi.fn(),
   },
 }));
 
-describe("createAIPlant", () => {
-  it("should create plant with AI flag", async () => {
+describe('createAIPlant', () => {
+  it('should create plant with AI flag', async () => {
     vi.mocked(supabaseServer).from = vi.fn(() => ({
       insert: vi.fn().mockResolvedValue({
-        data: { id: "plant-1" },
+        data: { id: 'plant-1' },
         error: null,
       }),
     }));
 
-    const result = await createAIPlant("user-123", { name: "Monstera" });
-    expect(result.id).toBe("plant-1");
+    const result = await createAIPlant('user-123', { name: 'Monstera' });
+    expect(result.id).toBe('plant-1');
   });
 });
 ```
@@ -115,17 +117,18 @@ describe("createAIPlant", () => {
 **Pattern**: Test loader and action functions
 
 **Example**:
-```typescript
-import { loader } from "../dashboard.plants.$plantId";
 
-describe("plant details loader", () => {
-  it("should fetch plant by ID", async () => {
+```typescript
+import { loader } from '../dashboard.plants.$plantId';
+
+describe('plant details loader', () => {
+  it('should fetch plant by ID', async () => {
     const data = await loader({
-      request: new Request("http://localhost/dashboard/plants/plant-1"),
-      params: { plantId: "plant-1" },
+      request: new Request('http://localhost/dashboard/plants/plant-1'),
+      params: { plantId: 'plant-1' },
     } as any);
 
-    expect(data.plant.id).toBe("plant-1");
+    expect(data.plant.id).toBe('plant-1');
   });
 });
 ```
@@ -135,41 +138,45 @@ describe("plant details loader", () => {
 ### Best Practices
 
 1. **Test user behavior, not implementation**
+
    ```typescript
    // ✅ Good: Test what user sees
-   expect(screen.getByRole("button", { name: /watered/i })).toBeInTheDocument();
+   expect(screen.getByRole('button', { name: /watered/i })).toBeInTheDocument();
 
    // ❌ Bad: Test internal state
    expect(component.state.isLoading).toBe(false);
    ```
 
 2. **Use meaningful test descriptions**
+
    ```typescript
    // ✅ Good
-   it("should disable watering button while loading", () => {});
+   it('should disable watering button while loading', () => {});
 
    // ❌ Bad
-   it("should work", () => {});
+   it('should work', () => {});
    ```
 
 3. **Use factory functions for test data**
-   ```typescript
-   import { createMockPlant } from "~/test/factories";
 
-   const plant = createMockPlant({ name: "Monstera" });
+   ```typescript
+   import { createMockPlant } from '~/test/factories';
+
+   const plant = createMockPlant({ name: 'Monstera' });
    ```
 
 4. **Test error cases**
+
    ```typescript
-   it("should show error when plant creation fails", async () => {
+   it('should show error when plant creation fails', async () => {
      vi.mocked(supabaseServer).from = vi.fn(() => ({
        insert: vi.fn().mockResolvedValue({
          data: null,
-         error: { message: "Database error" },
+         error: { message: 'Database error' },
        }),
      }));
 
-     expect(await createPlant(data)).toThrow("Database error");
+     expect(await createPlant(data)).toThrow('Database error');
    });
    ```
 
@@ -186,23 +193,19 @@ describe("plant details loader", () => {
 Factory functions in `app/__tests__/factories.ts` create consistent test data:
 
 ```typescript
-import {
-  createMockPlant,
-  createMockRoom,
-  createMockWateringHistory,
-} from "~/test/factories";
+import { createMockPlant, createMockRoom, createMockWateringHistory } from '~/test/factories';
 
 const plant = createMockPlant({
-  id: "plant-1",
-  name: "Snake Plant",
+  id: 'plant-1',
+  name: 'Snake Plant',
   watering_frequency_days: 7,
 });
 
-const room = createMockRoom({ name: "Living Room" });
+const room = createMockRoom({ name: 'Living Room' });
 
 const watering = createMockWateringHistory({
-  plant_id: "plant-1",
-  watered_at: new Date("2025-01-15"),
+  plant_id: 'plant-1',
+  watered_at: new Date('2025-01-15'),
 });
 ```
 
@@ -211,7 +214,7 @@ const watering = createMockWateringHistory({
 Standard mock setup for server tests:
 
 ```typescript
-vi.mock("~/lib/supabase.server", () => ({
+vi.mock('~/lib/supabase.server', () => ({
   supabaseServer: {
     from: vi.fn(),
     rpc: vi.fn(),
@@ -223,7 +226,7 @@ vi.mocked(supabaseServer).from = vi.fn(() => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
       single: vi.fn().mockResolvedValue({
-        data: { id: "1", name: "Plant" },
+        data: { id: '1', name: 'Plant' },
         error: null,
       }),
     })),
@@ -244,6 +247,7 @@ vi.mock("~/components/expensive-component", () => ({
 ## Coverage Targets
 
 ### Overall Coverage
+
 - **Statements**: >80%
 - **Branches**: >75%
 - **Functions**: >80%
@@ -251,13 +255,13 @@ vi.mock("~/components/expensive-component", () => ({
 
 ### By File Type
 
-| Type | Target |
-|------|--------|
-| Server utilities | >85% |
-| React components | >80% |
-| Route handlers | >75% |
-| Type definitions | N/A |
-| Error boundaries | >70% |
+| Type             | Target |
+| ---------------- | ------ |
+| Server utilities | >85%   |
+| React components | >80%   |
+| Route handlers   | >75%   |
+| Type definitions | N/A    |
+| Error boundaries | >70%   |
 
 ### Viewing Coverage Report
 
@@ -267,6 +271,7 @@ open coverage/index.html
 ```
 
 This opens an HTML report showing:
+
 - Overall coverage percentage
 - Line-by-line coverage in each file
 - Uncovered branches and conditions
@@ -381,6 +386,7 @@ yarn test:ui
 ```
 
 This opens a visual dashboard where you can:
+
 - See tests organized by file
 - Click to re-run individual tests
 - See real-time coverage
@@ -395,6 +401,7 @@ yarn typecheck
 ## CI/CD Integration
 
 Tests run automatically on:
+
 - Every push to any branch
 - Every pull request
 - Before deployment to production
@@ -402,6 +409,7 @@ Tests run automatically on:
 **GitHub Actions workflow**: `.github/workflows/test.yml`
 
 Run locally to verify before pushing:
+
 ```bash
 yarn test    # Run all tests
 yarn build   # Check TypeScript compilation
@@ -414,11 +422,13 @@ Current test execution time: ~35-40 seconds for 439 tests
 ### Optimization Tips
 
 1. **Run specific test file** instead of all:
+
    ```bash
    yarn test app/components/__tests__/PlantCard.test.tsx
    ```
 
 2. **Run tests matching pattern**:
+
    ```bash
    yarn test --grep "watering"
    ```
@@ -435,6 +445,7 @@ Current test execution time: ~35-40 seconds for 439 tests
 **Problem**: Tests can't import components/utilities
 
 **Solution**: Check that module paths use `~` alias
+
 ```typescript
 // ✅ Correct
 import { Component } from "~/components/component";
@@ -448,6 +459,7 @@ import { Component } from "../../../components/component";
 **Problem**: Mock isn't being used in tests
 
 **Checklist**:
+
 - [ ] `vi.mock()` is at top of test file (before imports)
 - [ ] Module name matches exactly
 - [ ] Return value includes all exports
@@ -458,6 +470,7 @@ import { Component } from "../../../components/component";
 **Problem**: React warning "Encountered two children with the same key"
 
 **Solution**: Ensure list items have unique keys
+
 ```typescript
 // ✅ Good
 {plants.map((plant) => (
@@ -475,6 +488,7 @@ import { Component } from "../../../components/component";
 **Problem**: "Timeout of 5000ms exceeded"
 
 **Solution**: Increase timeout or fix async issues
+
 ```typescript
 it("should load data", async () => {
   render(<Component />);
@@ -495,6 +509,7 @@ it("should load data", async () => {
 ## Questions?
 
 Refer to specific test files for examples:
+
 - Component tests: `app/components/__tests__/PlantCard.test.tsx`
 - Server tests: `app/lib/__tests__/plants.server.test.ts`
 - Route tests: `app/routes/__tests__/dashboard.plants.new-ai.integration.test.ts`

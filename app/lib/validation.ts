@@ -2,7 +2,6 @@
  * Form validation schemas using Zod
  * Provides centralized, type-safe validation for all forms
  */
-
 import { z } from 'zod';
 
 /**
@@ -24,7 +23,7 @@ export const passwordSchema = z
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
   .regex(/\d/, 'Password must contain at least one number')
   .regex(
-    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/]/,
     'Password must contain at least one special character (!@#$%^&*)'
   );
 
@@ -39,15 +38,10 @@ export const plantNameSchema = z
 /**
  * Watering frequency validation schema
  */
-export const wateringFrequencySchema = z
-  .union([z.number(), z.string()])
-  .refine(
-    (val) => {
-      const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return !isNaN(num) && num >= 1 && num <= 365;
-    },
-    'Watering frequency must be between 1 and 365 days'
-  );
+export const wateringFrequencySchema = z.union([z.number(), z.string()]).refine((val) => {
+  const num = typeof val === 'string' ? parseInt(val, 10) : val;
+  return !isNaN(num) && num >= 1 && num <= 365;
+}, 'Watering frequency must be between 1 and 365 days');
 
 /**
  * Room name validation schema
@@ -66,10 +60,7 @@ export const imageFileSchema = z
     (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
     'Photo must be JPG, PNG, or WebP format'
   )
-  .refine(
-    (file) => file.size <= 10 * 1024 * 1024,
-    'Photo must be less than 10MB'
-  );
+  .refine((file) => file.size <= 10 * 1024 * 1024, 'Photo must be less than 10MB');
 
 /**
  * Login form schema

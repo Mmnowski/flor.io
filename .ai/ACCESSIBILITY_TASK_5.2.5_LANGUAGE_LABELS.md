@@ -5,6 +5,7 @@
 **Use clear, specific, non-technical language** that all users can understand.
 
 This helps:
+
 - People with cognitive disabilities
 - Non-native English speakers
 - Elderly users
@@ -58,6 +59,7 @@ For unclear actions:
 ```
 
 **Why specific?**
+
 - Tells user what's wrong
 - Suggests how to fix it
 - Reduces anxiety
@@ -166,6 +168,7 @@ Edit - NOT "Modify", "Change", "Update"
 #### 1. Auth Pages (Login/Register)
 
 **Current:**
+
 ```
 "Email"                           ✅ Good
 "Password"                        ✅ Good
@@ -175,6 +178,7 @@ Edit - NOT "Modify", "Change", "Update"
 ```
 
 **Check:**
+
 - [ ] All labels clear and specific
 - [ ] Error messages are specific
 - [ ] No jargon used
@@ -182,6 +186,7 @@ Edit - NOT "Modify", "Change", "Update"
 #### 2. Dashboard
 
 **Current:**
+
 ```
 "My Plants"                       ✅ Good (clear heading)
 "+ Add Plant"                     ⚠️ Could be "Add New Plant"
@@ -190,6 +195,7 @@ Edit - NOT "Modify", "Change", "Update"
 ```
 
 **Check:**
+
 - [ ] Plant card text is clear
 - [ ] Room filter labels are clear
 - [ ] Empty state message is helpful
@@ -197,6 +203,7 @@ Edit - NOT "Modify", "Change", "Update"
 #### 3. Plant Details
 
 **Current:**
+
 ```
 "Plant Name"                      ✅ Good
 "Watering Status: Due today"      ✅ Good
@@ -206,6 +213,7 @@ Edit - NOT "Modify", "Change", "Update"
 ```
 
 **Check:**
+
 - [ ] All section headings are clear
 - [ ] Status messages are specific
 - [ ] Edit/Delete buttons are clear
@@ -213,6 +221,7 @@ Edit - NOT "Modify", "Change", "Update"
 #### 4. Plant Form
 
 **Current:**
+
 ```
 "Plant Photo"                     ✅ Good
 "Plant Name *"                    ✅ Good (asterisk for required)
@@ -222,6 +231,7 @@ Edit - NOT "Modify", "Change", "Update"
 ```
 
 **Check:**
+
 - [ ] All labels use required/optional indicator
 - [ ] Help text is concrete
 - [ ] Error messages are specific
@@ -229,6 +239,7 @@ Edit - NOT "Modify", "Change", "Update"
 #### 5. Error Messages
 
 **Current:**
+
 ```
 "Plant name is required"          ✅ Specific
 "Watering frequency must be..."   ✅ Specific
@@ -236,6 +247,7 @@ Edit - NOT "Modify", "Change", "Update"
 ```
 
 **Check:**
+
 - [ ] All error messages tell user what's wrong
 - [ ] All error messages suggest how to fix it
 - [ ] No generic "Error" messages
@@ -245,44 +257,52 @@ Edit - NOT "Modify", "Change", "Update"
 ## Language Review Checklist
 
 ### Button Labels
+
 - [ ] All buttons have action words (verb)
 - [ ] No "OK", "Yes", "No", "..." buttons
 - [ ] Clear what happens when clicked
 - [ ] Specific ("Delete Plant" not "Delete")
 
 ### Form Labels
+
 - [ ] All labels use actual text (not just placeholder)
 - [ ] Labels describe what field is for
-- [ ] Required fields marked with * or "(Required)"
+- [ ] Required fields marked with \* or "(Required)"
 - [ ] Optional fields marked with "(Optional)"
 
 ### Help Text / Hints
+
 - [ ] All help text is concrete
 - [ ] Help text shows valid format (e.g., "1-365 days")
 - [ ] Help text includes constraints (e.g., "Max 100 chars")
 
 ### Error Messages
+
 - [ ] All errors are specific (not "Error")
 - [ ] Errors say what's wrong
 - [ ] Errors suggest how to fix
 - [ ] Errors use simple language
 
 ### Headings & Labels
+
 - [ ] Headings describe content
 - [ ] No vague headings ("Info", "Data", "Settings")
 - [ ] Consistent capitalization
 
 ### Confirmation Dialogs
+
 - [ ] Clear what will happen
 - [ ] Specific action ("Delete Plant" not "Delete")
 - [ ] Buttons are specific ("Delete Plant", "Cancel")
 
 ### Status Messages & Notifications
+
 - [ ] Success message is clear ("Plant created successfully")
 - [ ] Error message is specific
 - [ ] Messages use simple language
 
 ### Help / Documentation
+
 - [ ] Instructions are concrete
 - [ ] No jargon
 - [ ] Examples provided where helpful
@@ -381,26 +401,31 @@ return { error: "Email address is already registered" };
 ## Files to Review
 
 ### 1. Auth Pages
+
 - [ ] `app/routes/auth.login.tsx` - Check labels and error messages
 - [ ] `app/routes/auth.register.tsx` - Check labels and error messages
 - [ ] Form error messages - Verify they're specific
 
 ### 2. Plant Management
+
 - [ ] `app/components/plant-form.tsx` - Labels, help text, error messages
 - [ ] `app/components/plant-card.tsx` - Plant status text
 - [ ] `app/routes/dashboard.plants.$plantId.tsx` - Headings, section labels
 
 ### 3. Dashboard
+
 - [ ] `app/routes/dashboard._index.tsx` - Page heading, empty state text
 - [ ] `app/components/room-filter.tsx` - Filter labels
 - [ ] Empty state message - Is it helpful?
 
 ### 4. Modals & Dialogs
+
 - [ ] All modal titles - Are they specific?
 - [ ] All modal buttons - Action-oriented?
 - [ ] All confirmation messages - Clear what happens?
 
 ### 5. Notifications
+
 - [ ] Success messages - Specific?
 - [ ] Error messages - Suggest fix?
 - [ ] Toast notifications - Clear?
@@ -440,6 +465,7 @@ UPDATING:
 ```
 
 Once decided, use CONSISTENTLY everywhere:
+
 - All buttons
 - All labels
 - All help text
@@ -477,6 +503,7 @@ determined temporal intervals."
 ```
 
 ### Tool: Hemingway App
+
 - Go to: https://www.hemingwayapp.com/
 - Paste text
 - Red = hard to read, use simpler words
@@ -496,4 +523,3 @@ determined temporal intervals."
 ✅ Simple, clear language (Flesch Reading Ease > 70)
 ✅ Links have descriptive text (not "Click here")
 ✅ Headings are descriptive (not "Settings", "Info")
-
