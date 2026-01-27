@@ -4,6 +4,24 @@ import { callRpc, fetchMany, fetchOne, insertOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 /**
+ * Verify that a user owns a plant
+ * @param plantId - Plant ID
+ * @param userId - User ID
+ * @returns True if user owns the plant, false otherwise
+ */
+async function verifyPlantOwnership(plantId: string, userId: string): Promise<boolean> {
+  try {
+    const plant = await fetchOne(supabaseServer, 'plants', {
+      id: plantId,
+    });
+
+    return plant && plant.user_id === userId;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Record a watering event for a plant
  *
  * @param plantId - Plant ID
@@ -16,12 +34,9 @@ export async function recordWatering(
   userId: string,
   wateredAt?: Date
 ): Promise<void> {
-  // Verify plant ownership
-  const plant = await fetchOne(supabaseServer, 'plants', {
-    id: plantId,
-  });
+  const isOwned = await verifyPlantOwnership(plantId, userId);
 
-  if (!plant || plant.user_id !== userId) {
+  if (!isOwned) {
     throw new Error('Plant not found or unauthorized');
   }
 
@@ -46,12 +61,9 @@ export async function getWateringHistory(
   userId: string,
   limit: number = 10
 ): Promise<WateringHistory[]> {
-  // Verify plant ownership
-  const plant = await fetchOne(supabaseServer, 'plants', {
-    id: plantId,
-  });
+  const isOwned = await verifyPlantOwnership(plantId, userId);
 
-  if (!plant || plant.user_id !== userId) {
+  if (!isOwned) {
     return [];
   }
 

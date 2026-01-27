@@ -4,17 +4,59 @@ import { MS_PER_DAY } from './constants';
 import { supabaseServer } from './supabase.server';
 
 /**
- * Get all plants for a user, optionally filtered by room
- * Includes watering status information
- *
+ * Fetch room name from database
+ * @param roomId - Room ID
+ * @returns Room name or null if not found
+ */
+async function fetchRoomName(roomId: string): Promise<string | null> {
+  try {
+    const room = await supabaseServer.from('rooms').select('name').eq('id', roomId).single();
+    return (room.data as any)?.name || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Calculate days until next watering
+ * @param nextWateringDate - Next watering date
+ * @returns Days until watering or null if date is null
+ */
+function calculateDaysUntilWatering(nextWateringDate: Date | null): number | null {
+  if (!nextWateringDate) {
+    return null;
+  }
+  return Math.ceil((nextWateringDate.getTime() - new Date().getTime()) / MS_PER_DAY);
+}
+
+/**
+ * Enrich a plant with watering information
+ * @param plant - Raw plant data
+ * @returns Plant with watering information
+ */
+async function enrichSinglePlant(plant: any): Promise<PlantWithWatering> {
+  const nextWateringDate = await getNextWateringDate(plant.id);
+  const lastWateredDate = await getLastWateredDate(plant.id);
+  const roomName = plant.room_id ? await fetchRoomName(plant.room_id) : null;
+  const daysUntilWatering = calculateDaysUntilWatering(nextWateringDate);
+
+  return {
+    ...plant,
+    room_name: roomName,
+    next_watering_date: nextWateringDate,
+    last_watered_date: lastWateredDate,
+    days_until_watering: daysUntilWatering,
+    is_overdue: daysUntilWatering ? daysUntilWatering < 0 : false,
+  } as PlantWithWatering;
+}
+
+/**
+ * Fetch user plants from database
  * @param userId - User ID
  * @param roomId - Optional room ID filter
- * @returns Array of plants with watering information
+ * @returns Array of raw plant data
  */
-export async function getUserPlants(
-  userId: string,
-  roomId?: string | null
-): Promise<PlantWithWatering[]> {
+async function fetchUserPlantsFromDB(userId: string, roomId?: string | null): Promise<any[]> {
   try {
     let query: any = supabaseServer
       .from('plants')
@@ -29,50 +71,60 @@ export async function getUserPlants(
       ascending: false,
     });
 
-    if (error) {
-      return [];
-    }
-
-    // Fetch watering data and room names for all plants
-    const plantsWithWatering = await Promise.all(
-      ((data as any[]) || []).map(async (plant: any) => {
-        const nextWateringDate = await getNextWateringDate(plant.id);
-        const lastWateredDate = await getLastWateredDate(plant.id);
-
-        // Fetch room name if room_id exists
-        let roomName: string | null = null;
-        if (plant.room_id) {
-          const room = await supabaseServer
-            .from('rooms')
-            .select('name')
-            .eq('id', plant.room_id)
-            .single();
-          roomName = (room.data as any)?.name || null;
-        }
-
-        const daysUntilWatering = nextWateringDate
-          ? Math.ceil((nextWateringDate.getTime() - new Date().getTime()) / MS_PER_DAY)
-          : null;
-
-        return {
-          ...plant,
-          room_name: roomName,
-          next_watering_date: nextWateringDate,
-          last_watered_date: lastWateredDate,
-          days_until_watering: daysUntilWatering,
-          is_overdue: daysUntilWatering ? daysUntilWatering < 0 : false,
-        } as PlantWithWatering;
-      })
-    );
-
-    // Sort by next watering date (soonest first)
-    return plantsWithWatering.sort((a, b) => {
-      if (!a.next_watering_date) return 1;
-      if (!b.next_watering_date) return -1;
-      return a.next_watering_date.getTime() - b.next_watering_date.getTime();
-    });
+    return error ? [] : (data as any[]) || [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * Sort plants by watering date (soonest first)
+ * @param plants - Array of plants with watering info
+ * @returns Sorted array
+ */
+function sortByWateringDate(plants: PlantWithWatering[]): PlantWithWatering[] {
+  return plants.sort((a, b) => {
+    if (!a.next_watering_date) return 1;
+    if (!b.next_watering_date) return -1;
+    return a.next_watering_date.getTime() - b.next_watering_date.getTime();
+  });
+}
+
+/**
+ * Get all plants for a user, optionally filtered by room
+ * Includes watering status information
+ *
+ * @param userId - User ID
+ * @param roomId - Optional room ID filter
+ * @returns Array of plants with watering information
+ */
+export async function getUserPlants(
+  userId: string,
+  roomId?: string | null
+): Promise<PlantWithWatering[]> {
+  const plants = await fetchUserPlantsFromDB(userId, roomId);
+  const plantsWithWatering = await Promise.all(plants.map(enrichSinglePlant));
+  return sortByWateringDate(plantsWithWatering);
+}
+
+/**
+ * Fetch plant by ID from database
+ * @param plantId - Plant ID
+ * @param userId - User ID (for ownership verification)
+ * @returns Plant data or null if not found
+ */
+async function fetchPlantFromDB(plantId: string, userId: string): Promise<any | null> {
+  try {
+    const { data, error } = await (supabaseServer
+      .from('plants')
+      .select('*')
+      .eq('id', plantId)
+      .eq('user_id', userId)
+      .single() as any);
+
+    return error || !data ? null : data;
+  } catch {
+    return null;
   }
 }
 
@@ -88,56 +140,18 @@ export async function getPlantById(
   plantId: string,
   userId: string
 ): Promise<PlantWithDetails | null> {
-  try {
-    const { data, error } = await (supabaseServer
-      .from('plants')
-      .select('*')
-      .eq('id', plantId)
-      .eq('user_id', userId)
-      .single() as any);
-
-    if (error) {
-      return null;
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    const plantData = data;
-
-    // Fetch room name if room_id exists
-    let roomName: string | null = null;
-    if (plantData.room_id) {
-      const room = await supabaseServer
-        .from('rooms')
-        .select('name')
-        .eq('id', plantData.room_id)
-        .single();
-      roomName = (room.data as any)?.name || null;
-    }
-
-    // Fetch watering info
-    const nextWateringDate = await getNextWateringDate(plantId);
-    const lastWateredDate = await getLastWateredDate(plantId);
-    const wateringHistory = await getWateringHistory(plantId, userId, 10);
-
-    const daysUntilWatering = nextWateringDate
-      ? Math.ceil((nextWateringDate.getTime() - new Date().getTime()) / MS_PER_DAY)
-      : null;
-
-    return {
-      ...plantData,
-      room_name: roomName,
-      next_watering_date: nextWateringDate,
-      last_watered_date: lastWateredDate,
-      days_until_watering: daysUntilWatering,
-      is_overdue: daysUntilWatering ? daysUntilWatering < 0 : false,
-      watering_history: wateringHistory,
-    } as PlantWithDetails;
-  } catch {
+  const plantData = await fetchPlantFromDB(plantId, userId);
+  if (!plantData) {
     return null;
   }
+
+  const basePlant = await enrichSinglePlant(plantData);
+  const wateringHistory = await getWateringHistory(plantId, userId, 10);
+
+  return {
+    ...basePlant,
+    watering_history: wateringHistory,
+  } as PlantWithDetails;
 }
 
 /**
@@ -193,6 +207,26 @@ export async function getLastWateredDate(plantId: string): Promise<Date | null> 
 }
 
 /**
+ * Verify that a user owns a plant
+ * @param plantId - Plant ID
+ * @param userId - User ID
+ * @returns True if user owns the plant, false otherwise
+ */
+async function verifyPlantOwnership(plantId: string, userId: string): Promise<boolean> {
+  try {
+    const { data: plant, error } = await (supabaseServer
+      .from('plants')
+      .select('id, user_id')
+      .eq('id', plantId)
+      .single() as any);
+
+    return !error && plant && plant.user_id === userId;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Get watering history for a plant
  *
  * @param plantId - Plant ID
@@ -205,18 +239,13 @@ export async function getWateringHistory(
   userId: string,
   limit: number = 10
 ): Promise<WateringHistory[]> {
+  const isOwned = await verifyPlantOwnership(plantId, userId);
+
+  if (!isOwned) {
+    return [];
+  }
+
   try {
-    // Verify plant ownership
-    const { data: plant, error: plantError } = await (supabaseServer
-      .from('plants')
-      .select('id, user_id')
-      .eq('id', plantId)
-      .single() as any);
-
-    if (plantError || !plant || plant.user_id !== userId) {
-      return [];
-    }
-
     const { data, error } = await supabaseServer
       .from('watering_history')
       .select('id, plant_id, watered_at, created_at')
@@ -224,11 +253,7 @@ export async function getWateringHistory(
       .order('watered_at', { ascending: false })
       .limit(limit);
 
-    if (error) {
-      return [];
-    }
-
-    return (data || []) as WateringHistory[];
+    return error ? [] : ((data || []) as WateringHistory[]);
   } catch {
     return [];
   }
