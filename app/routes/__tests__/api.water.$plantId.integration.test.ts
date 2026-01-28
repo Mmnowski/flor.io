@@ -27,9 +27,19 @@ describe('Water Plant API Integration', () => {
     photo_url: null,
     room_id: null,
     watering_frequency_days: 7,
-    care_fields: {},
+    light_requirements: null,
+    fertilizing_tips: null,
+    pruning_tips: null,
+    troubleshooting: null,
+    created_with_ai: false,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-20T00:00:00Z',
+    room_name: null,
+    next_watering_date: null,
+    last_watered_date: null,
+    days_until_watering: null,
+    is_overdue: false,
+    watering_history: [],
   };
 
   const createMockRequest = (method = 'POST') =>
@@ -48,6 +58,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ success: true, plantId: mockPlantId });
@@ -61,6 +73,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(recordWatering).toHaveBeenCalledWith(mockPlantId, mockUserId);
@@ -75,6 +89,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.success).toBe(true);
@@ -93,6 +109,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request,
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(requireAuth).toHaveBeenCalledWith(request);
@@ -107,6 +125,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(getPlantById).toHaveBeenCalledWith(mockPlantId, mockUserId);
@@ -121,6 +141,8 @@ describe('Water Plant API Integration', () => {
         action({
           request: createMockRequest(),
           params: { plantId: mockPlantId },
+          unstable_pattern: '',
+          context: {},
         })
       ).rejects.toThrow('Unauthorized');
     });
@@ -132,6 +154,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Plant not found' });
@@ -145,6 +169,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(recordWatering).not.toHaveBeenCalled();
@@ -156,6 +182,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest('GET'),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Method not allowed' });
@@ -166,6 +194,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest('PUT'),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Method not allowed' });
@@ -175,6 +205,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest('DELETE'),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Method not allowed' });
@@ -184,6 +216,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest('PATCH'),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Method not allowed' });
@@ -194,7 +228,9 @@ describe('Water Plant API Integration', () => {
     it('should reject missing plantId', async () => {
       const result = await action({
         request: createMockRequest(),
-        params: {},
+        params: {} as any,
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Plant ID is required' });
@@ -204,6 +240,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: '' },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Plant ID is required' });
@@ -213,6 +251,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: null as any },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({ error: 'Plant ID is required' });
@@ -228,6 +268,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({
@@ -244,6 +286,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({
@@ -259,6 +303,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result).toEqual({
@@ -276,6 +322,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.error).toBeDefined();
@@ -290,6 +338,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       // getPlantById returns plant but should verify ownership
@@ -307,6 +357,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       const jsonString = JSON.stringify(result);
@@ -320,6 +372,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       const jsonString = JSON.stringify(result);
@@ -350,6 +404,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(callOrder).toEqual(['requireAuth', 'getPlantById', 'recordWatering']);
@@ -362,6 +418,8 @@ describe('Water Plant API Integration', () => {
       await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(recordWatering).not.toHaveBeenCalled();
@@ -374,6 +432,8 @@ describe('Water Plant API Integration', () => {
         action({
           request: createMockRequest(),
           params: { plantId: mockPlantId },
+          unstable_pattern: '',
+          context: {},
         })
       ).rejects.toThrow();
 
@@ -395,6 +455,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: specialId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.success).toBe(true);
@@ -414,6 +476,8 @@ describe('Water Plant API Integration', () => {
       const result = await action({
         request: createMockRequest(),
         params: { plantId: longId },
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.plantId).toBe(longId);
@@ -434,6 +498,8 @@ describe('Water Plant API Integration', () => {
         const result = await action({
           request: createMockRequest(),
           params: { plantId: mockPlantId },
+          unstable_pattern: '',
+          context: {},
         });
 
         expect(result.success).toBe(true);
@@ -450,6 +516,8 @@ describe('Water Plant API Integration', () => {
         const result = await action({
           request: createMockRequest(),
           params: { plantId: mockPlantId },
+          unstable_pattern: '',
+          context: {},
         });
 
         expect(result.success).toBe(true);

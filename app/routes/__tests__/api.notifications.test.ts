@@ -39,7 +39,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result).toEqual({
         notifications: mockPlants,
@@ -51,7 +56,7 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue([]);
 
-      await loader({ request: mockRequest, params: {} });
+      await loader({ request: mockRequest, params: {}, unstable_pattern: '', context: {} });
 
       expect(requireAuth).toHaveBeenCalledWith(mockRequest);
     });
@@ -60,7 +65,7 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue([]);
 
-      await loader({ request: mockRequest, params: {} });
+      await loader({ request: mockRequest, params: {}, unstable_pattern: '', context: {} });
 
       expect(getPlantsNeedingWater).toHaveBeenCalledWith(mockUserId);
     });
@@ -69,7 +74,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue([]);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result).toEqual({
         notifications: [],
@@ -83,7 +93,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockRejectedValue(new Error('Database error'));
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result).toEqual({
         notifications: [],
@@ -95,7 +110,9 @@ describe('api.notifications - Loader', () => {
       const authError = new Error('Unauthorized');
       vi.mocked(requireAuth).mockRejectedValue(authError);
 
-      await expect(loader({ request: mockRequest, params: {} })).rejects.toThrow('Unauthorized');
+      await expect(
+        loader({ request: mockRequest, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow('Unauthorized');
     });
   });
 
@@ -115,7 +132,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result.notifications[0]).toHaveProperty('plant_id');
       expect(result.notifications[0]).toHaveProperty('plant_name');
@@ -140,7 +162,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result.count).toBe(5);
       expect(result.notifications.length).toBe(5);
@@ -163,7 +190,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result.notifications[0].photo_url).toBeNull();
     });
@@ -183,7 +215,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result.notifications[0].days_overdue).toBe(-3);
     });
@@ -203,7 +240,12 @@ describe('api.notifications - Loader', () => {
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantsNeedingWater).mockResolvedValue(mockPlants);
 
-      const result = await loader({ request: mockRequest, params: {} });
+      const result = await loader({
+        request: mockRequest,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      });
 
       expect(result.notifications[0].days_overdue).toBe(365);
     });

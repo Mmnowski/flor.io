@@ -174,10 +174,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('troubleshooting', JSON.stringify(['Yellow leaves']));
       formData.append('roomId', 'room-1');
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(createAIPlant).toHaveBeenCalledWith('user-123', {
         name: 'Monstera deliciosa',
@@ -208,10 +210,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('pruningTips', JSON.stringify([]));
       formData.append('troubleshooting', JSON.stringify([]));
 
-      await action({
+      (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(incrementAIUsage).toHaveBeenCalledWith('user-123');
     });
@@ -219,10 +223,12 @@ describe('AI Wizard Integration Tests', () => {
     it('handles missing action gracefully', async () => {
       const { action } = await import('../dashboard.plants.new-ai');
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: new FormData() }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(result).toEqual({ error: 'Invalid action' });
     });
@@ -241,10 +247,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('pruningTips', JSON.stringify([]));
       formData.append('troubleshooting', JSON.stringify([]));
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(result).toEqual({
         error: 'Database error',
@@ -269,10 +277,12 @@ describe('AI Wizard Integration Tests', () => {
         })
       );
 
-      await action({
+      (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(recordAIFeedback).toHaveBeenCalledWith(
         'user-123',
@@ -293,10 +303,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('comment', '');
       formData.append('aiResponseSnapshot', JSON.stringify({}));
 
-      await action({
+      (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(recordAIFeedback).toHaveBeenCalledWith('user-123', 'plant-123', 'thumbs_down', '', {});
     });
@@ -322,13 +334,15 @@ describe('AI Wizard Integration Tests', () => {
       plantFormData.append('troubleshooting', JSON.stringify(['Yellow leaves']));
       plantFormData.append('roomId', 'room-1');
 
-      const plantResult = await action({
+      const plantResult = (await action({
         request: new Request('http://localhost', {
           method: 'POST',
           body: plantFormData,
         }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(plantResult).toHaveProperty('plantId');
       expect(createAIPlant).toHaveBeenCalled();
@@ -341,13 +355,15 @@ describe('AI Wizard Integration Tests', () => {
       feedbackFormData.append('comment', 'Perfect!');
       feedbackFormData.append('aiResponseSnapshot', JSON.stringify({}));
 
-      await action({
+      (await action({
         request: new Request('http://localhost', {
           method: 'POST',
           body: feedbackFormData,
         }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(recordAIFeedback).toHaveBeenCalled();
     });
@@ -370,10 +386,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('pruningTips', JSON.stringify([]));
       formData.append('troubleshooting', JSON.stringify([]));
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(result.error).toContain('Watering frequency');
     });
@@ -392,10 +410,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('pruningTips', JSON.stringify([]));
       formData.append('troubleshooting', JSON.stringify([]));
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(result.error).toContain('Plant name');
     });
@@ -412,10 +432,12 @@ describe('AI Wizard Integration Tests', () => {
       formData.append('comment', '');
       formData.append('aiResponseSnapshot', JSON.stringify({}));
 
-      const result = await action({
+      const result = (await action({
         request: new Request('http://localhost', { method: 'POST', body: formData }),
         params: {},
-      } as any);
+        unstable_pattern: '',
+        context: {},
+      } as any)) as any;
 
       expect(result).toHaveProperty('error');
       expect(result.error).toContain('Database');

@@ -61,6 +61,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       // ASSERT
@@ -85,6 +87,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       // Verify all required fields exist
@@ -109,6 +113,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications).toEqual([]);
@@ -131,6 +137,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications[0].photo_url).toBeNull();
@@ -143,7 +151,7 @@ describe('Notifications API Integration', () => {
       vi.mocked(getPlantsNeedingWater).mockResolvedValue([]);
 
       const request = createMockRequest();
-      await loader({ request, params: {} });
+      await loader({ request, params: {}, unstable_pattern: '', context: {} });
 
       expect(requireAuth).toHaveBeenCalledWith(request);
       expect(requireAuth).toHaveBeenCalledTimes(1);
@@ -156,6 +164,8 @@ describe('Notifications API Integration', () => {
       await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(getPlantsNeedingWater).toHaveBeenCalledWith(mockUserId);
@@ -165,9 +175,9 @@ describe('Notifications API Integration', () => {
       const authError = new Error('Unauthorized');
       vi.mocked(requireAuth).mockRejectedValue(authError);
 
-      await expect(loader({ request: createMockRequest(), params: {} })).rejects.toThrow(
-        'Unauthorized'
-      );
+      await expect(
+        loader({ request: createMockRequest(), params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow('Unauthorized');
     });
   });
 
@@ -190,6 +200,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.count).toBe(10);
@@ -214,6 +226,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       // Should maintain order from getPlantsNeedingWater
@@ -232,6 +246,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       // Should return empty array instead of throwing
@@ -246,6 +262,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications).toEqual([]);
@@ -270,6 +288,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       // Should be JSON serializable
@@ -297,6 +317,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       const dates = result.notifications.map((n) => ({
@@ -347,6 +369,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications).toHaveLength(3);
@@ -372,6 +396,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications[0].plant_name).toBe(longName);
@@ -393,6 +419,8 @@ describe('Notifications API Integration', () => {
       const result = await loader({
         request: createMockRequest(),
         params: {},
+        unstable_pattern: '',
+        context: {},
       });
 
       expect(result.notifications[0].days_overdue).toBe(365);
