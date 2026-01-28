@@ -44,6 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           name="description"
           content="Track and manage your plant care with AI-powered insights"
         />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <Meta />
         <Links />
         {/* Initialize theme from localStorage before rendering to prevent flash */}

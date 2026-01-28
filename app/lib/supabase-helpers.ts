@@ -114,28 +114,6 @@ export async function insertOne<T extends TableName>(
 }
 
 /**
- * Insert multiple rows into a table
- *
- * @param client - Supabase client instance
- * @param table - Table name
- * @param rows - Array of rows to insert
- * @returns Inserted rows
- */
-export async function insertMany<T extends TableName>(
-  client: SupabaseClient<Database>,
-  table: T,
-  rows: Insert<T>[]
-): Promise<Row<T>[]> {
-  const { data, error } = await client.from(table).insert(rows).select();
-
-  if (error) {
-    throw new Error(`Failed to insert into ${table}: ${error.message}`);
-  }
-
-  return (data || []) as Row<T>[];
-}
-
-/**
  * Update a single row in a table
  *
  * @param client - Supabase client instance

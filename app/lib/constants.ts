@@ -52,5 +52,3 @@ export const DEFAULT_PLANTS_DUE_SOON_THRESHOLD_DAYS = 2; // Plants watering due 
 
 // Feature flags (can be moved to environment variables)
 export const ENABLE_AI_PLANT_IDENTIFICATION = true;
-export const ENABLE_EXPORT_TO_PDF = false;
-export const ENABLE_MULTIPLAYER_SHARING = false;

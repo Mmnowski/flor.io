@@ -1,9 +1,7 @@
-export { CardCompound } from './Card.compound';
 export { EmptyState } from './empty-state';
 export { FormError } from './form-error';
 export { ImageUpload } from './image-upload';
 export { LoadingSpinner } from './loading-spinner';
-export { Modal } from './Modal';
 export { NavigationProgressBar } from './progress-bar';
 export {
   DashboardSkeleton,

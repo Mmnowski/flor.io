@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Background -->
+  <rect width="256" height="256" fill="#fff" rx="60"/>
+
+  <!-- Plant pot -->
+  <path d="M 80 140 L 85 190 Q 85 210 105 210 L 151 210 Q 171 210 171 190 L 176 140 Z"
+        fill="#92400e" stroke="#65280a" stroke-width="2"/>
+
+  <!-- Soil -->
+  <ellipse cx="128" cy="140" rx="48" ry="12" fill="#8B6F47"/>
+
+  <!-- Left leaf 1 (large) -->
+  <path d="M 100 140 Q 75 120 70 80 Q 68 50 85 40 Q 95 50 100 80 Q 105 110 100 140"
+        fill="#10b981" stroke="#065f46" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Left leaf 2 -->
+  <path d="M 105 135 Q 80 110 72 70 Q 68 40 88 25 Q 100 40 107 75 Q 112 105 105 135"
+        fill="#34d399" stroke="#065f46" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+
+  <!-- Center leaf (tall) -->
+  <path d="M 128 140 Q 128 90 125 50 Q 123 20 128 10 Q 133 20 135 50 Q 140 90 128 140"
+        fill="#10b981" stroke="#065f46" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Right leaf 1 (large) -->
+  <path d="M 156 140 Q 181 120 186 80 Q 188 50 171 40 Q 161 50 156 80 Q 151 110 156 140"
+        fill="#10b981" stroke="#065f46" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Right leaf 2 -->
+  <path d="M 151 135 Q 176 110 184 70 Q 188 40 168 25 Q 156 40 149 75 Q 144 105 151 135"
+        fill="#34d399" stroke="#065f46" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+
+  <!-- Leaf veins -->
+  <line x1="128" y1="50" x2="120" y2="100" stroke="#065f46" stroke-width="1" opacity="0.5"/>
+  <line x1="128" y1="50" x2="136" y2="100" stroke="#065f46" stroke-width="1" opacity="0.5"/>
+
+  <line x1="85" y1="50" x2="95" y2="90" stroke="#065f46" stroke-width="0.8" opacity="0.5"/>
+
+  <line x1="171" y1="50" x2="161" y2="90" stroke="#065f46" stroke-width="0.8" opacity="0.5"/>
+</svg>

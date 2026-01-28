@@ -1,10 +1,8 @@
 // Re-export all UI components from the ui directory
-export { Alert, AlertDescription, AlertTitle } from './alert';
-export { Avatar, AvatarFallback, AvatarImage } from './avatar';
+export { Alert, AlertDescription } from './alert';
 export { Badge } from './badge';
 export { Button } from './button';
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card';
-export { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
 export {
   Dialog,
   DialogContent,
@@ -25,5 +23,4 @@ export {
 export { Input } from './input';
 export { Label } from './label';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 export { Textarea } from './textarea';

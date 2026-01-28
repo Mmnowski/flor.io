@@ -35,12 +35,6 @@ export function GeneratingCareStep({ onComplete, onError }: GeneratingCareStepPr
       try {
         updateState({ isLoading: true, error: null });
 
-        // In a real scenario, this would call the server action
-        // const response = await fetch("/api/generate-care", {
-        //   method: "POST",
-        //   body: JSON.stringify({ plantName }),
-        // });
-
         // Simulate the 3-second delay from openai.server.ts with timeout
         const apiCall = new Promise<void>((resolve) => {
           setTimeout(resolve, 3000);

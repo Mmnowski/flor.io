@@ -32,16 +32,6 @@ export function IdentifyingStep({ onComplete, onError }: IdentifyingStepProps) {
       try {
         updateState({ isLoading: true, error: null });
 
-        // Create FormData to send to server
-        const formData = new FormData();
-        formData.append('photoFile', state.photoFile);
-
-        // In a real scenario, this would call the server action
-        // const response = await fetch("/api/identify-plant", {
-        //   method: "POST",
-        //   body: formData,
-        // });
-
         // Simulate the 2-second delay from plantnet.server.ts with timeout
         const apiCall = new Promise<void>((resolve) => {
           setTimeout(resolve, 2000);
