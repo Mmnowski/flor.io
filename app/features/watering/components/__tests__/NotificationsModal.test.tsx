@@ -1,6 +1,6 @@
 import { NotificationsModal, type PlantNeedingWater } from '~/features/watering/components';
 
-import { MemoryRouter } from 'react-router';
+import { RouterProvider, createMemoryRouter } from 'react-router';
 
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -39,11 +39,24 @@ describe('NotificationsModal', () => {
       ...props,
     };
 
-    return render(
-      <MemoryRouter>
-        <NotificationsModal {...defaultProps} />
-      </MemoryRouter>
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: <NotificationsModal {...defaultProps} />,
+        },
+        {
+          path: '/dashboard/plants/:plantId',
+          element: <div>Plant Detail</div>,
+        },
+      ],
+      {
+        initialEntries: ['/'],
+        initialIndex: 0,
+      }
     );
+
+    return render(<RouterProvider router={router} />);
   };
 
   beforeEach(() => {

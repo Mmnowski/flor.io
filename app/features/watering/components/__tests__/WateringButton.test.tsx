@@ -4,16 +4,27 @@ import { RouterProvider, createMemoryRouter } from 'react-router';
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 // Wrapper component to provide data router context required by Form component
-const renderWithRouter = (component: React.ReactElement) => {
-  const router = createMemoryRouter([
+const renderWithRouter = (component: React.ReactElement, plantId: string = 'plant-123') => {
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/',
+        element: component,
+      },
+      {
+        path: '/dashboard/plants/:plantId',
+        element: <div>Plant Detail</div>,
+        action: vi.fn(async () => ({ success: true })),
+      },
+    ],
     {
-      path: '/',
-      element: component,
-    },
-  ]);
+      initialEntries: ['/'],
+      initialIndex: 0,
+    }
+  );
   return render(<RouterProvider router={router} />);
 };
 
