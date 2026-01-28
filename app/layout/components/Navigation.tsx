@@ -35,27 +35,21 @@ export function Navigation({
 
   return (
     <nav className="border-b border-emerald-100 dark:border-emerald-900 bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-sm transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center h-16 px-4">
           {/* Logo */}
           <Link
-            to="/"
-            className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors focus:ring-2 focus:ring-emerald-300 focus:outline-none px-2 py-1 rounded-lg"
+            to={isAuthenticated ? '/dashboard' : '/'}
+            className="text-2xl font-bold hover:opacity-80 transition-opacity focus:ring-2 focus:ring-emerald-300 focus:outline-none py-1 rounded-lg"
           >
-            Flor
+            <span className="text-emerald-600 dark:text-emerald-400">Flor</span>
+            <span className="text-slate-700 dark:text-white">.io</span>
           </Link>
 
           {/* Navigation Links */}
           <div className="flex items-center gap-2 sm:gap-4">
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/dashboard"
-                  className="text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:ring-2 focus:ring-emerald-300 focus:outline-none px-3 py-2 rounded-lg"
-                >
-                  Dashboard
-                </Link>
-
                 <NotificationBell
                   count={notifications.notificationCount}
                   onClick={() => notifications.setIsOpen(true)}
