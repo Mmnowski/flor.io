@@ -1,5 +1,5 @@
-import { plantFormSchema } from '~/lib/validation';
-import type { PlantFormInput } from '~/lib/validation';
+import { plantFormSchema } from '~/lib/utils';
+import type { PlantFormInput } from '~/lib/utils';
 
 import { useCallback, useMemo, useState } from 'react';
 

@@ -6,16 +6,12 @@
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
 import { AIWizardPage } from '~/features/ai-wizard/components';
-import { processPlantImage } from '~/lib/image.server';
-import { createAIPlant, recordAIFeedback } from '~/lib/plants.server';
-import { requireAuth } from '~/lib/require-auth.server';
-import { getUserRooms } from '~/lib/rooms.server';
-import { uploadPlantPhoto } from '~/lib/storage.server';
-import {
-  checkAIGenerationLimit,
-  checkPlantLimit,
-  incrementAIUsage,
-} from '~/lib/usage-limits.server';
+import { requireAuth } from '~/lib/auth';
+import { createAIPlant, recordAIFeedback } from '~/lib/plants';
+import { getUserRooms } from '~/lib/rooms';
+import { processPlantImage } from '~/lib/storage';
+import { uploadPlantPhoto } from '~/lib/storage';
+import { checkAIGenerationLimit, checkPlantLimit, incrementAIUsage } from '~/lib/usage-limits';
 import { logger } from '~/shared/lib/logger';
 
 import { redirect, useLoaderData } from 'react-router';

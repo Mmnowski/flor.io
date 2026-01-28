@@ -1,6 +1,6 @@
-import { getPlantById } from '~/lib/plants.server';
-import { requireAuth } from '~/lib/require-auth.server';
-import { recordWatering } from '~/lib/watering.server';
+import { requireAuth } from '~/lib/auth';
+import { getPlantById } from '~/lib/plants';
+import { recordWatering } from '~/lib/watering';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

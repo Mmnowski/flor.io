@@ -1,10 +1,10 @@
 import { PlantForm } from '~/features/plants/components';
-import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib/image.server';
-import { createPlant } from '~/lib/plants.server';
-import { requireAuth } from '~/lib/require-auth.server';
-import { getUserRooms } from '~/lib/rooms.server';
-import { uploadPlantPhoto } from '~/lib/storage.server';
-import { plantFormSchema } from '~/lib/validation';
+import { requireAuth } from '~/lib/auth';
+import { createPlant } from '~/lib/plants';
+import { getUserRooms } from '~/lib/rooms';
+import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib/storage';
+import { uploadPlantPhoto } from '~/lib/storage';
+import { plantFormSchema } from '~/lib/utils';
 import { Button } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 

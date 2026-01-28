@@ -1,5 +1,5 @@
-import { loginUser } from '~/lib/auth.server';
-import { createUserSession, getUserId } from '~/lib/session.server';
+import { loginUser } from '~/lib/auth';
+import { createUserSession, getUserId } from '~/lib/auth';
 import { Button, Card, FormError, Input, Label } from '~/shared/components';
 
 import { Form, Link, redirect, useActionData } from 'react-router';
