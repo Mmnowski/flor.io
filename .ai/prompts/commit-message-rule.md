@@ -9,7 +9,7 @@ Generate a clear, concise commit message that accurately describes the changed f
 1. **Examine changed files** using `git diff` or `git status`
 2. **Identify the primary purpose** - what is the main goal of these changes?
 3. **Categorize the change type** - choose the most specific type
-4. **Summarize with bullet points** - list 2-4 key changes (only if multi-file or complex)
+4. **Determine if bullet points needed** - Use only if there are 2+ distinct logical changes. If the entire commit is one cohesive change, just use the header line.
 
 ## Format
 
@@ -25,7 +25,7 @@ Generate a clear, concise commit message that accurately describes the changed f
 - **[TYPE]**: One of: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 - **[CONTEXT]**: Phase/issue identifier or feature area (e.g., `PHASE-6`, `AUTH-LOGIN`)
 - **[description]**: ~72 characters max (guideline, not hard limit). Imperative mood ("add", "fix", "remove"). Lowercase. Focus on **what changed in the code**, not the result or impact.
-- **Bullet points**: Use only if changes span multiple files or require explanation. Otherwise, omit section entirely.
+- **Bullet points**: Use only if there are **2+ logical changes**. A single cohesive change (even affecting many files) doesn't need bullets. Rule of thumb: Can a developer understand the changes in under 1 minute by reading the code?
 
 ## Type Definitions
 
@@ -40,23 +40,33 @@ Generate a clear, concise commit message that accurately describes the changed f
 
 ## Examples
 
-**Single-file fix:**
+**Single logical change (no bullets needed):**
 
 ```
-fix(API): resolve null pointer in plant query response
+feat(Navigation): improve navbar branding and alignment
 ```
 
-**Multi-file refactor:**
+Even though this affected 1 file with 3 improvements (title text, split color, alignment fix), it's one cohesive navigation update. Developer can understand it instantly by reading the code.
+
+**Multi-file, single logical change (no bullets needed):**
+
+```
+chore: format code with linter
+```
+
+100 files changed, but one logical change. A developer knows exactly what happened.
+
+**Multiple distinct logical changes (bullets needed):**
 
 ```
 refactor(PHASE-6): eliminate 'as any' type casts from production code
 
 - Replace unsafe type casts with type-safe helper functions
 - Create TypedError class for proper error typing
-- Update 9 files to use proper type inference
+- Update UI components and helper modules for type safety
 ```
 
-**Feature with multiple changes:**
+**Feature with multiple distinct changes (bullets needed):**
 
 ```
 feat(AUTH): implement password reset flow
@@ -75,7 +85,7 @@ feat(AUTH): implement password reset flow
    - ✅ "Added tests for error handling" / "Replaced type casts with helpers"
 4. **One primary change per commit** - If describing multiple unrelated changes, reconsider the commit structure
 5. **Test changes**: Only list which tests were added/modified, not implementation details or coverage percentages
-6. **Skip bullet points** - If the change is simple enough to describe in one line, omit the bullet section
+6. **Bullet points decision** - Use bullets if and only if there are 2+ **distinct logical changes**. Don't create bullets just because multiple files changed.
 
 ## Decision Tree
 

@@ -38,7 +38,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Commit Messages
 
-Follow the commit message template defined in `.ai/prompts/create-commit-message.md`. Key principles:
+Follow the commit message template defined in `.ai/prompts/commit-message-rule.md`. Key principles:
 
 - **Format**: `[TYPE]([CONTEXT]): [description]`
 - **Types**: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
@@ -46,12 +46,12 @@ Follow the commit message template defined in `.ai/prompts/create-commit-message
   - ✅ "Replace type casts with helpers" (what changed)
   - ❌ "Improved type safety" (outcome)
 - **Character limit**: ~72 characters (guideline, not hard limit)
-- **Bullet points**: Use only for multi-file or complex changes (2-4 points)
-- **Process**: Reference `.ai/prompts/create-commit-message.md` for decision tree and examples
+- **Bullet points**: Use only if there are **2+ logical changes**. A single cohesive change (even affecting many files) doesn't need bullets.
+- **Process**: Reference `.ai/prompts/commit-message-rule.md` for decision tree and examples
 
 ### Component Generation
 
-Follow the standards in `.ai/prompts/component-generation-prompt.md` when creating React components. Key requirements:
+Follow the standards in `.ai/prompts/component-generation-rule.md` when creating React components. Key requirements:
 
 - **TypeScript**: Props interface with JSDoc, explicit return types, no `any` types
 - **Styling**: Tailwind CSS only, mobile-first responsive design
