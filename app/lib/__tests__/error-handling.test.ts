@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isNetworkError, isRetryable, parseError, withRetry, withTimeout } from '../error-handling';
+import {
+  isNetworkError,
+  isRetryable,
+  parseError,
+  withRetry,
+  withTimeout,
+} from '../utils/error-handling';
 
 describe('Error Handling Utilities', () => {
   describe('parseError', () => {

@@ -1,6 +1,7 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+/**
+ * Backward compatibility shim
+ *
+ * @deprecated Import from '~/lib/utils/utils' or '~/lib' instead
+ */
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+export * from './utils/utils';

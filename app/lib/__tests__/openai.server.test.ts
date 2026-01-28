@@ -4,7 +4,7 @@ import {
   type CareInstructions,
   generateCareInstructions,
   generateCareInstructionsInstant,
-} from '../openai.server';
+} from '../ai/openai.server';
 
 describe('openai.server', () => {
   describe('generateCareInstructions', () => {

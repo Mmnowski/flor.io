@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { identifyPlant, identifyPlantInstant } from '../plantnet.server';
+import { identifyPlant, identifyPlantInstant } from '../ai/plantnet.server';
 
 describe('plantnet.server', () => {
   describe('identifyPlant', () => {

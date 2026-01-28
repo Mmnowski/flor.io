@@ -17,7 +17,7 @@ import {
   roomNameSchema,
   validateForm,
   wateringFrequencySchema,
-} from '../validation';
+} from '../utils/validation';
 
 describe('validation.ts', () => {
   describe('emailSchema', () => {

@@ -1,24 +1,7 @@
 /**
- * Compatibility layer for plant-related operations
- * Re-exports functions from split modules for backward compatibility
+ * Backward compatibility shim
  *
- * New code should import directly from the specific modules:
- * - plants.crud.server.ts (create, read, update, delete)
- * - plants.queries.server.ts (queries and calculations)
- * - plants.ai.server.ts (AI-specific operations)
+ * @deprecated Import from '~/lib/plants' or '~/lib' instead
  */
 
-// Re-export CRUD operations
-export { createPlant, deletePlant, updatePlant } from './plants.crud.server';
-
-// Re-export query operations
-export {
-  getLastWateredDate,
-  getNextWateringDate,
-  getPlantById,
-  getUserPlants,
-  getWateringHistory,
-} from './plants.queries.server';
-
-// Re-export AI operations
-export { createAIPlant, recordAIFeedback } from './plants.ai.server';
+export * from './plants';

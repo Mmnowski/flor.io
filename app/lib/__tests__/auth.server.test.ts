@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getUserByEmail, getUserById, loginUser, registerUser } from '../auth.server';
-import { supabaseServer } from '../supabase.server';
+import { getUserByEmail, getUserById, loginUser, registerUser } from '../auth/auth.server';
+import { supabaseServer } from '../infrastructure/supabase.server';
 
-vi.mock('../supabase.server', () => ({
+vi.mock('../infrastructure/supabase.server', () => ({
   supabaseServer: {
     auth: {
       admin: {
