@@ -12,6 +12,19 @@ export type ErrorType =
   | 'cancelled'
   | 'unknown';
 
+/**
+ * Custom error class with type information
+ */
+export class TypedError extends Error {
+  type: ErrorType;
+
+  constructor(message: string, type: ErrorType = 'unknown') {
+    super(message);
+    this.type = type;
+    Object.setPrototypeOf(this, TypedError.prototype);
+  }
+}
+
 export interface ErrorInfo {
   type: ErrorType;
   message: string;
@@ -99,9 +112,7 @@ export function withTimeout<T>(
     promise,
     new Promise<T>((_, reject) =>
       setTimeout(() => {
-        const error = new Error(timeoutMessage);
-        (error as any).type = 'timeout';
-        reject(error);
+        reject(new TypedError(timeoutMessage, 'timeout'));
       }, timeoutMs)
     ),
   ]);

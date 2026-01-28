@@ -60,6 +60,9 @@ export interface WizardState {
   // Room selection
   selectedRoomId: string | null;
 
+  // Plant creation
+  plantId: string | null;
+
   // Feedback
   feedbackType: 'thumbs_up' | 'thumbs_down' | null;
   feedbackComment: string;
@@ -92,6 +95,7 @@ const defaultState: WizardState = {
   manualPlantName: '',
   careInstructions: null,
   selectedRoomId: null,
+  plantId: null,
   feedbackType: null,
   feedbackComment: '',
   isLoading: false,

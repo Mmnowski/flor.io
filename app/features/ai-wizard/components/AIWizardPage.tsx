@@ -86,10 +86,8 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       const result = await response.json();
       updateState({
         error: null,
+        plantId: result.plantId,
       });
-
-      // Store plant ID in state for feedback recording
-      (window as any).__plantId = result.plantId;
 
       // Move to feedback step
       goToStep('feedback');
@@ -117,9 +115,9 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
     feedbackType: 'thumbs_up' | 'thumbs_down' | null;
     feedbackComment: string;
   }) => {
-    const plantId = (window as any).__plantId;
+    const plantId = state.plantId;
     if (!plantId || !feedbackData.feedbackType) {
-      onComplete?.(plantId);
+      onComplete?.(plantId ?? '');
       return;
     }
 
@@ -178,7 +176,7 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
 
       // Still redirect to plant even if feedback fails
       setTimeout(() => {
-        onComplete?.((window as any).__plantId);
+        onComplete?.(state.plantId ?? '');
       }, 2000);
     } finally {
       setIsSubmitting(false);

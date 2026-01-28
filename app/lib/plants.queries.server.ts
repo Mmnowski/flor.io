@@ -1,6 +1,7 @@
 import type { PlantWithDetails, PlantWithWatering, WateringHistory } from '~/types/plant.types';
 
 import { MS_PER_DAY } from './constants';
+import { type Row, callRpc, fetchMany, fetchOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 /**
@@ -10,8 +11,8 @@ import { supabaseServer } from './supabase.server';
  */
 async function fetchRoomName(roomId: string): Promise<string | null> {
   try {
-    const room = await supabaseServer.from('rooms').select('name').eq('id', roomId).single();
-    return (room.data as any)?.name || null;
+    const room = await fetchOne(supabaseServer, 'rooms', { id: roomId });
+    return room?.name ?? null;
   } catch {
     return null;
   }
@@ -34,7 +35,7 @@ function calculateDaysUntilWatering(nextWateringDate: Date | null): number | nul
  * @param plant - Raw plant data
  * @returns Plant with watering information
  */
-async function enrichSinglePlant(plant: any): Promise<PlantWithWatering> {
+async function enrichSinglePlant(plant: Row<'plants'>): Promise<PlantWithWatering> {
   const nextWateringDate = await getNextWateringDate(plant.id);
   const lastWateredDate = await getLastWateredDate(plant.id);
   const roomName = plant.room_id ? await fetchRoomName(plant.room_id) : null;
@@ -56,22 +57,18 @@ async function enrichSinglePlant(plant: any): Promise<PlantWithWatering> {
  * @param roomId - Optional room ID filter
  * @returns Array of raw plant data
  */
-async function fetchUserPlantsFromDB(userId: string, roomId?: string | null): Promise<any[]> {
+async function fetchUserPlantsFromDB(userId: string, roomId?: string | null) {
   try {
-    let query: any = supabaseServer
-      .from('plants')
-      .select('*', { count: 'exact' })
-      .eq('user_id', userId);
-
+    const conditions: Record<string, string | undefined> = { user_id: userId };
     if (roomId) {
-      query = query.eq('room_id', roomId);
+      conditions.room_id = roomId;
     }
 
-    const { data, error } = await query.order('updated_at', {
-      ascending: false,
+    const plants = await fetchMany(supabaseServer, 'plants', conditions, {
+      orderBy: { column: 'updated_at', ascending: false },
     });
 
-    return error ? [] : (data as any[]) || [];
+    return plants;
   } catch {
     return [];
   }
@@ -113,16 +110,13 @@ export async function getUserPlants(
  * @param userId - User ID (for ownership verification)
  * @returns Plant data or null if not found
  */
-async function fetchPlantFromDB(plantId: string, userId: string): Promise<any | null> {
+async function fetchPlantFromDB(plantId: string, userId: string) {
   try {
-    const { data, error } = await (supabaseServer
-      .from('plants')
-      .select('*')
-      .eq('id', plantId)
-      .eq('user_id', userId)
-      .single() as any);
-
-    return error || !data ? null : data;
+    const plant = await fetchOne(supabaseServer, 'plants', {
+      id: plantId,
+      user_id: userId,
+    });
+    return plant ?? null;
   } catch {
     return null;
   }
@@ -162,19 +156,15 @@ export async function getPlantById(
  */
 export async function getNextWateringDate(plantId: string): Promise<Date | null> {
   try {
-    const { data, error } = await (supabaseServer as any).rpc('get_next_watering_date', {
+    const dateStr = await callRpc<string>(supabaseServer, 'get_next_watering_date', {
       p_plant_id: plantId,
     });
 
-    if (error) {
+    if (!dateStr) {
       return null;
     }
 
-    if (!data) {
-      return null;
-    }
-
-    return new Date(data);
+    return new Date(dateStr);
   } catch {
     return null;
   }
@@ -188,19 +178,19 @@ export async function getNextWateringDate(plantId: string): Promise<Date | null>
  */
 export async function getLastWateredDate(plantId: string): Promise<Date | null> {
   try {
-    const { data, error } = await (supabaseServer
-      .from('watering_history')
-      .select('watered_at, id')
-      .eq('plant_id', plantId)
-      .order('watered_at', { ascending: false })
-      .limit(1)
-      .single() as any);
+    // Fetch most recent watering history entry
+    const history = await fetchMany(
+      supabaseServer,
+      'watering_history',
+      { plant_id: plantId },
+      { limit: 1, orderBy: { column: 'watered_at', ascending: false } }
+    );
 
-    if (error || !data) {
+    if (history.length === 0) {
       return null;
     }
 
-    return new Date(data.watered_at);
+    return new Date(history[0].watered_at);
   } catch {
     return null;
   }
@@ -214,13 +204,8 @@ export async function getLastWateredDate(plantId: string): Promise<Date | null> 
  */
 async function verifyPlantOwnership(plantId: string, userId: string): Promise<boolean> {
   try {
-    const { data: plant, error } = await (supabaseServer
-      .from('plants')
-      .select('id, user_id')
-      .eq('id', plantId)
-      .single() as any);
-
-    return !error && plant && plant.user_id === userId;
+    const plant = await fetchOne(supabaseServer, 'plants', { id: plantId });
+    return plant ? plant.user_id === userId : false;
   } catch {
     return false;
   }

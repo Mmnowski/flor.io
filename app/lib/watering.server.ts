@@ -15,7 +15,7 @@ async function verifyPlantOwnership(plantId: string, userId: string): Promise<bo
       id: plantId,
     });
 
-    return plant && plant.user_id === userId;
+    return plant ? plant.user_id === userId : false;
   } catch {
     return false;
   }

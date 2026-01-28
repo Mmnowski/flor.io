@@ -6,6 +6,7 @@
  */
 import { logger } from '~/shared/lib/logger';
 
+import { fetchMany, fetchOne, insertOne, updateOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 // Configurable limits (can be moved to environment variables later)
@@ -65,29 +66,35 @@ function getResetDate(): Date {
  * }
  */
 export async function checkAIGenerationLimit(userId: string): Promise<AIGenerationLimitStatus> {
-  const supabase = supabaseServer;
   const monthYear = getCurrentMonthYear();
 
-  // Get or create usage record for current month
-  const { data, error } = await supabase
-    .from('usage_limits')
-    .select('ai_generations_this_month')
-    .eq('user_id', userId)
-    .eq('month_year', monthYear)
-    .single();
+  try {
+    // Get usage record for current month
+    const record = await fetchOne(supabaseServer, 'usage_limits', {
+      user_id: userId,
+      month_year: monthYear,
+    });
 
-  // If no record exists, user hasn't hit limit yet
-  if (error && error.code === 'PGRST116') {
-    // PGRST116 = no rows found
+    // If no record exists, user hasn't used any AI generations yet
+    if (!record) {
+      return {
+        allowed: true,
+        used: 0,
+        limit: LIMITS.AI_GENERATIONS_PER_MONTH,
+        resetsOn: getResetDate(),
+      };
+    }
+
+    const used = record.ai_generations_this_month || 0;
+    const allowed = used < LIMITS.AI_GENERATIONS_PER_MONTH;
+
     return {
-      allowed: true,
-      used: 0,
+      allowed,
+      used,
       limit: LIMITS.AI_GENERATIONS_PER_MONTH,
       resetsOn: getResetDate(),
     };
-  }
-
-  if (error) {
+  } catch (error) {
     logger.error('Error checking AI generation limit', error);
     // On error, allow the operation (fail open)
     return {
@@ -97,16 +104,6 @@ export async function checkAIGenerationLimit(userId: string): Promise<AIGenerati
       resetsOn: getResetDate(),
     };
   }
-
-  const used = data?.ai_generations_this_month || 0;
-  const allowed = used < LIMITS.AI_GENERATIONS_PER_MONTH;
-
-  return {
-    allowed,
-    used,
-    limit: LIMITS.AI_GENERATIONS_PER_MONTH,
-    resetsOn: getResetDate(),
-  };
 }
 
 /**
@@ -121,49 +118,38 @@ export async function checkAIGenerationLimit(userId: string): Promise<AIGenerati
  * await incrementAIUsage(userId);
  */
 export async function incrementAIUsage(userId: string): Promise<void> {
-  const supabase = supabaseServer;
   const monthYear = getCurrentMonthYear();
   const now = new Date().toISOString();
 
-  // Try to increment existing record
-  const { data: existing } = await supabase
-    .from('usage_limits')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('month_year', monthYear)
-    .single();
+  try {
+    // Try to fetch existing record
+    const existing = await fetchOne(supabaseServer, 'usage_limits', {
+      user_id: userId,
+      month_year: monthYear,
+    });
 
-  if (existing) {
-    // Record exists, increment it
-    const { error } = await supabase
-      .from('usage_limits')
-      .update({
-        ai_generations_this_month: (existing as any) + 1,
-        updated_at: now,
-      })
-      .eq('user_id', userId)
-      .eq('month_year', monthYear);
-
-    if (error) {
-      logger.error('Error incrementing AI usage', error);
-      throw error;
-    }
-  } else {
-    // No record exists, create one
-    const { error } = await supabase.from('usage_limits').insert([
-      {
+    if (existing) {
+      // Record exists, increment it
+      const newCount = (existing.ai_generations_this_month || 0) + 1;
+      await updateOne(
+        supabaseServer,
+        'usage_limits',
+        { user_id: userId, month_year: monthYear },
+        { ai_generations_this_month: newCount, updated_at: now }
+      );
+    } else {
+      // No record exists, create one
+      await insertOne(supabaseServer, 'usage_limits', {
         user_id: userId,
         month_year: monthYear,
         ai_generations_this_month: 1,
         created_at: now,
         updated_at: now,
-      },
-    ]);
-
-    if (error) {
-      logger.error('Error creating AI usage record', error);
-      throw error;
+      });
     }
+  } catch (error) {
+    logger.error('Error updating AI usage', error);
+    throw error;
   }
 }
 
@@ -181,15 +167,21 @@ export async function incrementAIUsage(userId: string): Promise<void> {
  * }
  */
 export async function checkPlantLimit(userId: string): Promise<PlantCountLimitStatus> {
-  const supabase = supabaseServer;
+  try {
+    // Fetch all user's plants
+    const plants = await fetchMany(supabaseServer, 'plants', {
+      user_id: userId,
+    });
 
-  // Count user's plants
-  const { count, error } = await supabase
-    .from('plants')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    const plantCount = plants.length;
+    const allowed = plantCount < LIMITS.MAX_PLANTS_PER_USER;
 
-  if (error) {
+    return {
+      allowed,
+      count: plantCount,
+      limit: LIMITS.MAX_PLANTS_PER_USER,
+    };
+  } catch (error) {
     logger.error('Error checking plant limit', error);
     // On error, allow the operation (fail open)
     return {
@@ -198,15 +190,6 @@ export async function checkPlantLimit(userId: string): Promise<PlantCountLimitSt
       limit: LIMITS.MAX_PLANTS_PER_USER,
     };
   }
-
-  const plantCount = count || 0;
-  const allowed = plantCount < LIMITS.MAX_PLANTS_PER_USER;
-
-  return {
-    allowed,
-    count: plantCount,
-    limit: LIMITS.MAX_PLANTS_PER_USER,
-  };
 }
 
 /**

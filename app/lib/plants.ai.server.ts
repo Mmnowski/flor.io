@@ -1,5 +1,6 @@
 import type { Plant, PlantInsertData } from '~/types/plant.types';
 
+import { fetchOne, insertOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 /**
@@ -28,9 +29,8 @@ export async function createAIPlant(
     throw new Error('Watering frequency must be between 1 and 365 days');
   }
 
-  const { data: plant, error } = await (supabaseServer
-    .from('plants')
-    .insert({
+  try {
+    const plant = await insertOne(supabaseServer, 'plants', {
       user_id: userId,
       name: data.name.trim(),
       photo_url: data.photo_url || null,
@@ -41,15 +41,14 @@ export async function createAIPlant(
       pruning_tips: data.pruning_tips || null,
       troubleshooting: data.troubleshooting || null,
       created_with_ai: true, // Mark as AI-created
-    } as any)
-    .select()
-    .single() as any);
+    });
 
-  if (error) {
-    throw new Error('Failed to create plant');
+    return plant as Plant;
+  } catch (error) {
+    throw new Error(
+      `Failed to create plant: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  return plant as Plant;
 }
 
 /**
@@ -71,27 +70,21 @@ export async function recordAIFeedback(
 ): Promise<boolean> {
   try {
     // Verify plant ownership
-    const { data: plant, error: plantError } = await (supabaseServer
-      .from('plants')
-      .select('id, user_id')
-      .eq('id', plantId)
-      .single() as any);
+    const plant = await fetchOne(supabaseServer, 'plants', {
+      id: plantId,
+    });
 
-    if (plantError || !plant || plant.user_id !== userId) {
+    if (!plant || plant.user_id !== userId) {
       throw new Error('Plant not found or access denied');
     }
 
-    const { error } = await supabaseServer.from('ai_feedback').insert({
+    await insertOne(supabaseServer, 'ai_feedback', {
       user_id: userId,
       plant_id: plantId,
       feedback_type: feedbackType,
       comment: comment.trim() || null,
       ai_response_snapshot: aiResponseSnapshot || null,
     });
-
-    if (error) {
-      return false;
-    }
 
     return true;
   } catch {

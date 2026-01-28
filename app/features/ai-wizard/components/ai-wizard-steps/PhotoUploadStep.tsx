@@ -20,10 +20,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
   const { state, updateState } = useAIWizard();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const handleFile = (file: File) => {
     // Validate file type
     if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
       updateState({
@@ -50,6 +47,12 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
     });
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    handleFile(file);
+  };
+
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -61,9 +64,7 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
 
     const files = event.dataTransfer.files;
     if (files.length > 0) {
-      handleFileSelect({
-        target: { files } as any,
-      } as React.ChangeEvent<HTMLInputElement>);
+      handleFile(files[0]);
     }
   };
 

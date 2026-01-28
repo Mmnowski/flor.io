@@ -1,6 +1,7 @@
 import type { Plant, PlantInsertData, PlantUpdateData } from '~/types/plant.types';
 
 import { deletePlantPhoto } from './storage.server';
+import { deleteOne, fetchOne, insertOne, updateOne } from './supabase-helpers';
 import { supabaseServer } from './supabase.server';
 
 /**
@@ -25,9 +26,8 @@ export async function createPlant(userId: string, data: PlantInsertData): Promis
     throw new Error('Watering frequency must be between 1 and 365 days');
   }
 
-  const { data: plant, error } = await (supabaseServer
-    .from('plants')
-    .insert({
+  try {
+    const plant = await insertOne(supabaseServer, 'plants', {
       user_id: userId,
       name: data.name.trim(),
       photo_url: data.photo_url || null,
@@ -38,15 +38,14 @@ export async function createPlant(userId: string, data: PlantInsertData): Promis
       pruning_tips: data.pruning_tips || null,
       troubleshooting: data.troubleshooting || null,
       created_with_ai: false,
-    } as any)
-    .select()
-    .single() as any);
+    });
 
-  if (error) {
-    throw new Error('Failed to create plant');
+    return plant as Plant;
+  } catch (error) {
+    throw new Error(
+      `Failed to create plant: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  return plant as Plant;
 }
 
 /**
@@ -63,45 +62,40 @@ export async function updatePlant(
   userId: string,
   data: PlantUpdateData
 ): Promise<Plant> {
-  // Verify ownership
-  const existing = await (supabaseServer
-    .from('plants')
-    .select('id, user_id')
-    .eq('id', plantId)
-    .single() as any);
+  try {
+    // Verify ownership
+    const existing = await fetchOne(supabaseServer, 'plants', {
+      id: plantId,
+    });
 
-  if (existing.error || existing.data?.user_id !== userId) {
-    throw new Error('Plant not found or unauthorized');
+    if (!existing || existing.user_id !== userId) {
+      throw new Error('Plant not found or unauthorized');
+    }
+
+    // Validate watering frequency if provided
+    if (
+      data.watering_frequency_days &&
+      (data.watering_frequency_days < 1 || data.watering_frequency_days > 365)
+    ) {
+      throw new Error('Watering frequency must be between 1 and 365 days');
+    }
+
+    const updateData: PlantUpdateData = {
+      ...data,
+      updated_at: new Date().toISOString(),
+    };
+
+    const plant = await updateOne(supabaseServer, 'plants', { id: plantId }, updateData);
+
+    return plant as Plant;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Plant not found')) {
+      throw error;
+    }
+    throw new Error(
+      `Failed to update plant: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  // Prepare update data
-  const updateData: any = {
-    ...data,
-    updated_at: new Date().toISOString(),
-  };
-
-  // Validate watering frequency if provided
-  if (
-    updateData.watering_frequency_days &&
-    (updateData.watering_frequency_days < 1 || updateData.watering_frequency_days > 365)
-  ) {
-    throw new Error('Watering frequency must be between 1 and 365 days');
-  }
-
-  const updateQuery = (supabaseServer as any)
-    .from('plants')
-    .update(updateData)
-    .eq('id', plantId)
-    .select()
-    .single();
-
-  const { data: plant, error } = await updateQuery;
-
-  if (error) {
-    throw new Error('Failed to update plant');
-  }
-
-  return plant as Plant;
 }
 
 /**
@@ -112,29 +106,29 @@ export async function updatePlant(
  * @throws {Error} If deletion fails or unauthorized
  */
 export async function deletePlant(plantId: string, userId: string): Promise<void> {
-  // Get plant to verify ownership and get photo URL
-  const { data, error: fetchError } = await (supabaseServer
-    .from('plants')
-    .select('id, user_id, photo_url')
-    .eq('id', plantId)
-    .single() as any);
+  try {
+    // Get plant to verify ownership and get photo URL
+    const plant = await fetchOne(supabaseServer, 'plants', {
+      id: plantId,
+    });
 
-  if (fetchError || data?.user_id !== userId) {
-    throw new Error('Plant not found or unauthorized');
-  }
+    if (!plant || plant.user_id !== userId) {
+      throw new Error('Plant not found or unauthorized');
+    }
 
-  // Delete photo from storage if exists
-  if (data?.photo_url) {
-    await deletePlantPhoto(data.photo_url);
-  }
+    // Delete photo from storage if exists
+    if (plant.photo_url) {
+      await deletePlantPhoto(plant.photo_url);
+    }
 
-  // Delete plant (cascades to watering_history)
-  const { error: deleteError } = await (supabaseServer
-    .from('plants')
-    .delete()
-    .eq('id', plantId) as any);
-
-  if (deleteError) {
-    throw new Error('Failed to delete plant');
+    // Delete plant (cascades to watering_history)
+    await deleteOne(supabaseServer, 'plants', { id: plantId });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Plant not found')) {
+      throw error;
+    }
+    throw new Error(
+      `Failed to delete plant: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
