@@ -67,7 +67,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -92,7 +92,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -118,7 +118,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -144,7 +144,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -170,7 +170,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -193,7 +193,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkPlantLimit('user-123');
 
@@ -213,7 +213,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkPlantLimit('user-123');
 
@@ -234,7 +234,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkPlantLimit('user-123');
 
@@ -262,7 +262,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getUserUsageLimits('user-123');
 
@@ -290,7 +290,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getUserUsageLimits('user-123');
 
@@ -317,7 +317,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getUserUsageLimits('user-123');
 
@@ -346,7 +346,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getDetailedUsage('user-123');
 
@@ -374,7 +374,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getDetailedUsage('user-123');
 
@@ -400,7 +400,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getDetailedUsage('user-123');
 
@@ -426,7 +426,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getDetailedUsage('user-123');
 
@@ -451,7 +451,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await getDetailedUsage('user-123');
 
@@ -496,7 +496,7 @@ describe('usage-limits.server', () => {
         })),
       };
 
-      vi.mocked(createServerClient).mockResolvedValue(mockSupabase as any);
+      vi.mocked(supabaseServer).from = mockSupabase.from;
 
       const result = await checkAIGenerationLimit('user-123');
       const today = new Date();
