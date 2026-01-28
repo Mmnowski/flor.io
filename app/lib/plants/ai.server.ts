@@ -1,7 +1,5 @@
+import { fetchOne, insertOne, supabaseServer } from '~/lib';
 import type { Plant, PlantInsertData } from '~/types/plant.types';
-
-import { fetchOne, insertOne } from '../infrastructure/supabase-helpers';
-import { supabaseServer } from '../infrastructure/supabase.server';
 
 /**
  * Create a plant from AI identification

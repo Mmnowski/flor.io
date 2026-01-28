@@ -1,9 +1,14 @@
-import { requireAuth } from '~/lib/auth';
-import { createAIPlant, recordAIFeedback } from '~/lib/plants';
-import { getUserRooms } from '~/lib/rooms';
-import { processPlantImage } from '~/lib/storage';
-import { uploadPlantPhoto } from '~/lib/storage';
-import { checkAIGenerationLimit, checkPlantLimit, incrementAIUsage } from '~/lib/usage-limits';
+import {
+  checkAIGenerationLimit,
+  checkPlantLimit,
+  createAIPlant,
+  getUserRooms,
+  incrementAIUsage,
+  processPlantImage,
+  recordAIFeedback,
+  requireAuth,
+  uploadPlantPhoto,
+} from '~/lib';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

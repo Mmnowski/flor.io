@@ -1,9 +1,8 @@
+import { getUserByEmail, getUserById, loginUser, registerUser, supabaseServer } from '~/lib';
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getUserByEmail, getUserById, loginUser, registerUser } from '../auth/auth.server';
-import { supabaseServer } from '../infrastructure/supabase.server';
-
-vi.mock('../infrastructure/supabase.server', () => ({
+vi.mock('~/lib', () => ({
   supabaseServer: {
     auth: {
       admin: {

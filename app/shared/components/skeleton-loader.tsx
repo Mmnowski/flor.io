@@ -3,7 +3,7 @@
  *
  * Provides placeholder skeletons while data is loading
  */
-import { cn } from '~/lib/utils';
+import { cn } from '~/lib';
 
 interface SkeletonProps {
   className?: string;

@@ -1,14 +1,11 @@
+import { getPlantById, recordWatering, requireAuth } from '~/lib';
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { requireAuth } from '../../lib/auth';
-import { getPlantById } from '../../lib/plants';
-import { recordWatering } from '../../lib/watering';
 import { action } from '../api.water.$plantId';
 
 // Mock dependencies
-vi.mock('../../lib/auth');
-vi.mock('../../lib/watering');
-vi.mock('../../lib/plants');
+vi.mock('~/lib');
 
 describe('api.water.$plantId - Action', () => {
   const mockUserId = 'user-123';

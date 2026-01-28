@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib';
 
-import { extractImageFromFormData, fileToBuffer, processPlantImage } from '../storage/image.server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('sharp', () => {
   return {

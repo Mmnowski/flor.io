@@ -3,7 +3,7 @@
  * Loading state while AI generates care instructions for the identified plant
  * Includes timeout and retry support
  */
-import { parseError, withTimeout } from '~/lib/utils';
+import { parseError, withTimeout } from '~/lib';
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { Button } from '~/shared/components/ui/button';
 

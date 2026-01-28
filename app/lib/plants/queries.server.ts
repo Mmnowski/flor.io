@@ -1,8 +1,5 @@
+import { MS_PER_DAY, type Row, callRpc, fetchMany, fetchOne, supabaseServer } from '~/lib';
 import type { PlantWithDetails, PlantWithWatering, WateringHistory } from '~/types/plant.types';
-
-import { type Row, callRpc, fetchMany, fetchOne } from '../infrastructure/supabase-helpers';
-import { supabaseServer } from '../infrastructure/supabase.server';
-import { MS_PER_DAY } from '../utils/constants';
 
 /**
  * Fetch room name from database

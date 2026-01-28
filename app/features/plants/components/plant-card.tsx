@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '~/lib/utils';
+import { cn } from '~/lib';
 import { Badge } from '~/shared/components/ui/badge';
 import { Card } from '~/shared/components/ui/card';
 import type { PlantWithWatering } from '~/types/plant.types';

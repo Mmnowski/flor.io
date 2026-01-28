@@ -1,4 +1,4 @@
-import { supabaseServer } from '../infrastructure/supabase.server';
+import { supabaseServer } from '~/lib';
 
 /**
  * Register a new user with email and password

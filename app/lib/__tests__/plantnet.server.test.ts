@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { identifyPlant, identifyPlantInstant } from '~/lib';
 
-import { identifyPlant, identifyPlantInstant } from '../ai/plantnet.server';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('plantnet.server', () => {
   describe('identifyPlant', () => {

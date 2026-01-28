@@ -7,9 +7,9 @@
  * - `import { X } from '~/lib/[item]'`
  *
  * New code should import directly from domain modules:
- * - `import { X } from '~/lib/plants'`
- * - `import { X } from '~/lib/auth'`
- * - `import { X } from '~/lib/storage'`
+ * - `import { X } from '~/lib'`
+ * - `import { X } from '~/lib'`
+ * - `import { X } from '~/lib'`
  *
  * Organized by domain/functional area:
  * - utils: Constants, validation, error handling

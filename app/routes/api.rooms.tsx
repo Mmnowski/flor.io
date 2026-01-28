@@ -7,16 +7,16 @@
  * - PATCH: Update room name
  * - DELETE: Delete room
  */
-import { requireAuth } from '~/lib/auth';
 import {
   countPlantsInRoom,
   createRoom,
   deleteRoom,
   getRoomById,
   getUserRooms,
+  requireAuth,
+  roomNameSchema,
   updateRoom,
-} from '~/lib/rooms';
-import { roomNameSchema } from '~/lib/utils';
+} from '~/lib';
 import { logger } from '~/shared/lib/logger';
 
 import type { Route } from './+types/api.rooms';

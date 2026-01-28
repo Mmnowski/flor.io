@@ -1,13 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { supabaseServer } from '../infrastructure/supabase.server';
 import {
   LIMITS,
   checkAIGenerationLimit,
   checkPlantLimit,
   getDetailedUsage,
   getUserUsageLimits,
-} from '../usage-limits/usage-limits.server';
+  supabaseServer,
+} from '~/lib';
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the supabase server client
 vi.mock('../infrastructure/supabase.server', () => ({

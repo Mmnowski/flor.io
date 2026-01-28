@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   type LoginInput,
   type PlantFormInput,
@@ -17,7 +15,9 @@ import {
   roomNameSchema,
   validateForm,
   wateringFrequencySchema,
-} from '../utils/validation';
+} from '~/lib';
+
+import { describe, expect, it } from 'vitest';
 
 describe('validation.ts', () => {
   describe('emailSchema', () => {

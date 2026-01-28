@@ -2,7 +2,7 @@
  * Step 2: Identifying
  * Loading state while AI identifies the plant with timeout and retry support
  */
-import { parseError, withTimeout } from '~/lib/utils';
+import { parseError, withTimeout } from '~/lib';
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { Button } from '~/shared/components/ui/button';
 

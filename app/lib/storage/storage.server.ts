@@ -1,8 +1,7 @@
+import { supabaseServer } from '~/lib';
 import { logger } from '~/shared/lib/logger';
 
 import { v4 as uuidv4 } from 'uuid';
-
-import { supabaseServer } from '../infrastructure/supabase.server';
 
 const BUCKET_NAME = 'plant-photos';
 

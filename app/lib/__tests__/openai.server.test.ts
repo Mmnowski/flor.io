@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   type CareInstructions,
   generateCareInstructions,
   generateCareInstructionsInstant,
-} from '../ai/openai.server';
+} from '~/lib';
+
+import { describe, expect, it } from 'vitest';
 
 describe('openai.server', () => {
   describe('generateCareInstructions', () => {

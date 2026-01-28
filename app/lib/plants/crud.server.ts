@@ -1,8 +1,5 @@
+import { deleteOne, deletePlantPhoto, fetchOne, insertOne, supabaseServer, updateOne } from '~/lib';
 import type { Plant, PlantInsertData, PlantUpdateData } from '~/types/plant.types';
-
-import { deleteOne, fetchOne, insertOne, updateOne } from '../infrastructure/supabase-helpers';
-import { supabaseServer } from '../infrastructure/supabase.server';
-import { deletePlantPhoto } from '../storage/storage.server';
 
 /**
  * Create a new plant

@@ -1,13 +1,5 @@
+import { deleteOne, fetchMany, fetchOne, insertOne, supabaseServer, updateOne } from '~/lib';
 import type { Room } from '~/types/plant.types';
-
-import {
-  deleteOne,
-  fetchMany,
-  fetchOne,
-  insertOne,
-  updateOne,
-} from '../infrastructure/supabase-helpers';
-import { supabaseServer } from '../infrastructure/supabase.server';
 
 /**
  * Get all rooms for a user

@@ -1,7 +1,7 @@
 'use client';
 
 import { CreateRoomDialog } from '~/features/rooms/components';
-import { cn } from '~/lib/utils';
+import { cn } from '~/lib';
 import { Badge } from '~/shared/components/ui/badge';
 import type { Room } from '~/types/plant.types';
 

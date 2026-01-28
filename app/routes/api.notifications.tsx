@@ -1,5 +1,4 @@
-import { requireAuth } from '~/lib/auth';
-import { getPlantsNeedingWater } from '~/lib/watering';
+import { getPlantsNeedingWater, requireAuth } from '~/lib';
 import { logger } from '~/shared/lib/logger';
 
 import type { Route } from './+types/api.notifications';

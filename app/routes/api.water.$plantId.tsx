@@ -1,6 +1,4 @@
-import { requireAuth } from '~/lib/auth';
-import { getPlantById } from '~/lib/plants';
-import { recordWatering } from '~/lib/watering';
+import { getPlantById, recordWatering, requireAuth } from '~/lib';
 import { logger } from '~/shared/lib/logger';
 
 import type { Route } from './+types/api.water.$plantId';

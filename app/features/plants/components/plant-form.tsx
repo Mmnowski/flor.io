@@ -1,6 +1,6 @@
 'use client';
 
-import { getFieldError, plantNameSchema, wateringFrequencySchema } from '~/lib/utils';
+import { getFieldError, plantNameSchema, wateringFrequencySchema } from '~/lib';
 import { FormError, ImageUpload } from '~/shared/components';
 import { Button } from '~/shared/components/ui/button';
 import { Input } from '~/shared/components/ui/input';

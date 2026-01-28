@@ -1,5 +1,4 @@
-import { requireAuth } from '~/lib/auth';
-import { getPlantsNeedingWater } from '~/lib/watering';
+import { getPlantsNeedingWater, requireAuth } from '~/lib';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

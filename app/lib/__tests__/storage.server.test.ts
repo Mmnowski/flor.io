@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { getPlantPhotoUrl } from '~/lib';
 
-import { getPlantPhotoUrl } from '../storage/storage.server';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../infrastructure/supabase.server', () => ({
   supabaseServer: {

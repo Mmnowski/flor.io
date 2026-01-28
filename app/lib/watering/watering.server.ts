@@ -1,7 +1,5 @@
+import { callRpc, fetchMany, fetchOne, insertOne, supabaseServer } from '~/lib';
 import type { WateringHistory } from '~/types/plant.types';
-
-import { callRpc, fetchMany, fetchOne, insertOne } from '../infrastructure/supabase-helpers';
-import { supabaseServer } from '../infrastructure/supabase.server';
 
 /**
  * Verify that a user owns a plant
