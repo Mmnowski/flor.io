@@ -1,14 +1,12 @@
 /**
- * OpenAI API Service (Mocked)
+ * OpenAI API Service
  *
  * Wrapper for AI-powered care instruction generation.
- * Currently returns mock data to simulate the service.
+ * Supports both real API calls and mocked responses via feature flag.
  *
- * To integrate real OpenAI API:
- * 1. Add OPENAI_API_KEY to environment variables
- * 2. Replace mock implementation with Anthropic SDK or OpenAI SDK
- * 3. Add prompt engineering for consistent response formatting
- * 4. Add error handling and rate limiting
+ * Environment variables:
+ * - OPENAI_API_KEY: API key for OpenAI (required if USE_REAL_OPENAI_API=true)
+ * - USE_REAL_OPENAI_API: Feature flag to toggle between real and mocked responses
  */
 
 export interface CareInstructions {
@@ -305,30 +303,135 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 };
 
 /**
- * Generate care instructions for a plant using AI (mocked).
+ * Generate care instructions for a plant using AI.
+ * Supports both real OpenAI API calls and mocked responses via USE_REAL_OPENAI_API flag.
  *
  * @param plantName - Common or scientific name of the plant
  * @returns Care instructions including watering, light, fertilizing, etc.
+ * @throws Error if OpenAI API fails
  *
  * @example
  * const care = await generateCareInstructions('Monstera deliciosa');
  * // Returns: { wateringFrequencyDays: 7, lightRequirements: "...", ... }
  */
 export async function generateCareInstructions(plantName: string): Promise<CareInstructions> {
+  const useRealApi = process.env.USE_REAL_OPENAI_API === 'true';
+
+  if (useRealApi) {
+    return generateCareInstructionsWithApi(plantName);
+  }
+
+  return generateCareInstructionsMocked(plantName);
+}
+
+/**
+ * Call the real OpenAI API to generate care instructions.
+ * Requires OPENAI_API_KEY environment variable.
+ */
+async function generateCareInstructionsWithApi(plantName: string): Promise<CareInstructions> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      'OPENAI_API_KEY environment variable is not set. Set USE_REAL_OPENAI_API=false to use mocked data.'
+    );
+  }
+
+  try {
+    const prompt = `Generate comprehensive care instructions for the plant: "${plantName}"
+
+Please respond with ONLY a valid JSON object (no markdown, no code blocks) with this exact structure:
+{
+  "wateringFrequencyDays": <number between 1-30>,
+  "lightRequirements": "<string describing light needs>",
+  "fertilizingTips": ["<tip1>", "<tip2>", "<tip3>", "<tip4>"],
+  "pruningTips": ["<tip1>", "<tip2>", "<tip3>", "<tip4>"],
+  "troubleshooting": ["<issue1>", "<issue2>", "<issue3>", "<issue4>"]
+}
+
+Be specific to this plant species. Each array should have exactly 4 items.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI API');
+    }
+
+    const content = data.choices[0].message.content.trim();
+
+    // Parse JSON response - handle potential markdown code blocks
+    let jsonStr = content;
+    if (content.includes('```json')) {
+      jsonStr = content.split('```json')[1].split('```')[0].trim();
+    } else if (content.includes('```')) {
+      jsonStr = content.split('```')[1].split('```')[0].trim();
+    }
+
+    const parsedResponse = JSON.parse(jsonStr);
+
+    // Validate required fields
+    if (
+      !parsedResponse.wateringFrequencyDays ||
+      !parsedResponse.lightRequirements ||
+      !Array.isArray(parsedResponse.fertilizingTips) ||
+      !Array.isArray(parsedResponse.pruningTips) ||
+      !Array.isArray(parsedResponse.troubleshooting)
+    ) {
+      throw new Error('Missing required fields in API response');
+    }
+
+    return {
+      wateringFrequencyDays: Math.max(1, Math.min(365, parsedResponse.wateringFrequencyDays)),
+      lightRequirements: String(parsedResponse.lightRequirements),
+      fertilizingTips: Array.isArray(parsedResponse.fertilizingTips)
+        ? parsedResponse.fertilizingTips.map(String)
+        : [],
+      pruningTips: Array.isArray(parsedResponse.pruningTips)
+        ? parsedResponse.pruningTips.map(String)
+        : [],
+      troubleshooting: Array.isArray(parsedResponse.troubleshooting)
+        ? parsedResponse.troubleshooting.map(String)
+        : [],
+    };
+  } catch (error) {
+    throw new Error(
+      `Care instruction generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+/**
+ * Generate care instructions using mocked data.
+ * Adds a 3-second delay to simulate API latency.
+ */
+async function generateCareInstructionsMocked(plantName: string): Promise<CareInstructions> {
   // Simulate AI generation delay (3 seconds)
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
-  // In production, this would make an actual API call to OpenAI/Claude:
-  // const response = await client.messages.create({
-  //   model: 'gpt-5',
-  //   max_tokens: 1024,
-  //   messages: [{
-  //     role: 'user',
-  //     content: `Generate care instructions for ${plantName}...`
-  //   }]
-  // });
-
-  // Mock: Look up plant in database or return generic care
+  // Look up plant in database or return generic care
   const normalizedName = plantName
     .toLowerCase()
     .replace(/[-_\s]+/g, ' ')
@@ -365,15 +468,15 @@ export async function generateCareInstructions(plantName: string): Promise<CareI
 }
 
 /**
- * Get care instructions without the delay.
- * Useful for testing step 4-5 transitions.
+ * Get care instructions without delay (instant mock).
+ * Useful for testing step 4-5 transitions in development.
  *
  * @internal For testing only
  */
 export async function generateCareInstructionsInstant(
   plantName: string
 ): Promise<CareInstructions> {
-  // Same as above but without delay
+  // Same as mocked but without delay
   const normalizedName = plantName
     .toLowerCase()
     .replace(/[-_\s]+/g, ' ')
