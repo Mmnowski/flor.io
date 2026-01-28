@@ -47,7 +47,10 @@ describe('NotificationsModal Integration', () => {
         element: (
           <div>
             Plant Detail Page
-            {onNavigate()}
+            {(() => {
+              onNavigate();
+              return null;
+            })()}
           </div>
         ),
       },
@@ -120,7 +123,7 @@ describe('NotificationsModal Integration', () => {
     it('should display plant photos when available', () => {
       renderModal();
 
-      const image = screen.getByAltText('Monstera Deliciosa');
+      const image = screen.getByAltText('Monstera Deliciosa') as HTMLImageElement;
       expect(image).toBeInTheDocument();
       expect(image.src).toBe('https://example.com/monstera.jpg');
     });

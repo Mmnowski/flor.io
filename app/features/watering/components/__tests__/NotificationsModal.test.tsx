@@ -93,7 +93,7 @@ describe('NotificationsModal', () => {
 
     it('should display plant photo when photo_url is provided', () => {
       renderModal();
-      const image = screen.getByAltText('Monstera Deliciosa');
+      const image = screen.getByAltText('Monstera Deliciosa') as HTMLImageElement;
       expect(image).toBeInTheDocument();
       expect(image.src).toBe('https://example.com/monstera.jpg');
     });

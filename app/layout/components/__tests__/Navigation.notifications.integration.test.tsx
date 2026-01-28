@@ -18,8 +18,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * - Data refetching after actions
  */
 
+interface NotificationData {
+  notifications: Array<{
+    plant_id: string;
+    plant_name: string;
+    photo_url: string | null;
+    last_watered: string;
+    next_watering: string;
+    days_overdue: number;
+  }>;
+  count: number;
+}
+
 // Mock the useFetcher hook
-const mockFetcher = {
+const mockFetcher: {
+  load: ReturnType<typeof vi.fn>;
+  submit: ReturnType<typeof vi.fn>;
+  state: 'idle';
+  data: NotificationData | null;
+} = {
   load: vi.fn(),
   submit: vi.fn(),
   state: 'idle' as const,

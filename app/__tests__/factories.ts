@@ -61,7 +61,7 @@ export function createMockPlantWithDetails(
   overrides?: Partial<PlantWithDetails>,
   wateringHistoryOverrides?: Partial<WateringHistory>[]
 ): PlantWithDetails {
-  const mockHistory = wateringHistoryOverrides || [
+  const mockHistory: WateringHistory[] = (wateringHistoryOverrides as WateringHistory[]) || [
     createMockWateringHistory(),
     createMockWateringHistory({
       watered_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),

@@ -6,7 +6,7 @@ import {
   createMockRooms,
   createMockWateringHistory,
   createMockWateringHistoryList,
-} from '~/app/__tests__/factories';
+} from '~/__tests__/factories';
 import type { Plant, PlantWithWatering, Room, WateringHistory } from '~/types/plant.types';
 
 import { vi } from 'vitest';

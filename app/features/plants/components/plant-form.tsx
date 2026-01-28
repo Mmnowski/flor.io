@@ -58,7 +58,7 @@ export function PlantForm({
       if (fieldName === 'name') {
         const error = getFieldError(plantNameSchema, fieldName, value);
         if (error) {
-          newErrors.name = error;
+          newErrors.name = [error];
         } else {
           delete newErrors.name;
         }
@@ -67,7 +67,7 @@ export function PlantForm({
       if (fieldName === 'watering_frequency_days') {
         const error = getFieldError(wateringFrequencySchema, fieldName, value);
         if (error) {
-          newErrors.watering_frequency_days = error;
+          newErrors.watering_frequency_days = [error];
         } else {
           delete newErrors.watering_frequency_days;
         }

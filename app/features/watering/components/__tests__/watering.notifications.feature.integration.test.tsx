@@ -17,6 +17,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * - Empty state handling
  */
 
+interface NotificationsData {
+  notifications: Array<{
+    plant_id: string;
+    plant_name: string;
+    photo_url: string | null;
+    last_watered: string;
+    next_watering: string;
+    days_overdue: number;
+  }>;
+  count: number;
+}
+
 describe('Watering Notifications Feature Flow Integration', () => {
   // Mock data representing plants needing water
   const plantsNeedingWater = [
@@ -46,7 +58,12 @@ describe('Watering Notifications Feature Flow Integration', () => {
     },
   ];
 
-  const mockFetcher = {
+  const mockFetcher: {
+    load: ReturnType<typeof vi.fn>;
+    submit: ReturnType<typeof vi.fn>;
+    state: 'idle';
+    data: NotificationsData | null;
+  } = {
     load: vi.fn(),
     submit: vi.fn(),
     state: 'idle' as const,
@@ -134,10 +151,12 @@ describe('Watering Notifications Feature Flow Integration', () => {
       };
 
       // ASSERT: Status colors correct
-      const overdueStatuses = mockFetcher.data.notifications.map((p) => ({
-        name: p.plant_name,
-        overdue: p.days_overdue,
-      }));
+      const overdueStatuses = mockFetcher.data!.notifications.map(
+        (p: (typeof plantsNeedingWater)[0]) => ({
+          name: p.plant_name,
+          overdue: p.days_overdue,
+        })
+      );
 
       expect(overdueStatuses).toEqual([
         { name: 'Monstera Deliciosa', overdue: 5 }, // Red - very overdue
@@ -154,7 +173,9 @@ describe('Watering Notifications Feature Flow Integration', () => {
       };
 
       // ASSERT: Photos present
-      const plantsWithPhotos = mockFetcher.data.notifications.filter((p) => p.photo_url !== null);
+      const plantsWithPhotos = mockFetcher.data!.notifications.filter(
+        (p: (typeof plantsNeedingWater)[0]) => p.photo_url !== null
+      );
       expect(plantsWithPhotos).toHaveLength(2);
       expect(plantsWithPhotos[0].plant_name).toBe('Monstera Deliciosa');
       expect(plantsWithPhotos[1].plant_name).toBe('Pothos');
@@ -349,14 +370,14 @@ describe('Watering Notifications Feature Flow Integration', () => {
       };
 
       // Initial state: 3 plants
-      expect(mockFetcher.data.notifications).toHaveLength(3);
+      expect(mockFetcher.data!.notifications).toHaveLength(3);
 
       // ACT: Water first plant (API call in progress)
       mockFetcher.state = 'loading' as any;
 
       // Optimistic update immediately
       const optimisticData = {
-        ...mockFetcher.data,
+        ...mockFetcher.data!,
         notifications: plantsNeedingWater.slice(1),
         count: 2,
       };
@@ -368,7 +389,7 @@ describe('Watering Notifications Feature Flow Integration', () => {
       mockFetcher.state = 'idle' as any;
 
       // Data confirmed
-      expect(mockFetcher.data.notifications).toHaveLength(3);
+      expect(mockFetcher.data!.notifications).toHaveLength(3);
     });
   });
 

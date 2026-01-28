@@ -40,23 +40,25 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
 
   const handleWateringFrequencyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
-    if (value > 0 && value <= 365) {
+    if (value > 0 && value <= 365 && state.careInstructions) {
       updateState({
         careInstructions: {
           ...state.careInstructions,
           wateringFrequencyDays: value,
-        },
+        } as typeof state.careInstructions,
       });
     }
   };
 
   const handleLightRequirementsChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateState({
-      careInstructions: {
-        ...state.careInstructions,
-        lightRequirements: event.target.value,
-      },
-    });
+    if (state.careInstructions) {
+      updateState({
+        careInstructions: {
+          ...state.careInstructions,
+          lightRequirements: event.target.value,
+        } as typeof state.careInstructions,
+      });
+    }
   };
 
   const handleTipsChange = (
@@ -64,13 +66,14 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
     index: number,
     value: string
   ) => {
+    if (!state.careInstructions) return;
     const tips = [...state.careInstructions[section]];
     tips[index] = value;
     updateState({
       careInstructions: {
         ...state.careInstructions,
         [section]: tips,
-      },
+      } as typeof state.careInstructions,
     });
   };
 

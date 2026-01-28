@@ -18,14 +18,14 @@ import {
 } from '~/lib/usage-limits.server';
 import { logger } from '~/shared/lib/logger';
 
-import { type Route, redirect } from 'react-router';
+import { redirect, useLoaderData } from 'react-router';
 
-export const meta: Route.MetaFunction = () => [{ title: 'Create Plant with AI - Flor' }];
+import type { Route } from './+types/dashboard.plants.new-ai';
 
 /**
  * Loader validates authentication and limits before entering wizard
  */
-export const loader: Route.LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await requireAuth(request);
 
   // Check if user can create plants
@@ -54,7 +54,7 @@ export const loader: Route.LoaderFunction = async ({ request }) => {
  * Action handler processes form submissions from wizard steps
  * Handles plant creation and feedback recording
  */
-export const action: Route.ActionFunction = async ({ request }) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const userId = await requireAuth(request);
   const formData = await request.formData();
   const action = formData.get('_action') as string;
@@ -90,8 +90,7 @@ export const action: Route.ActionFunction = async ({ request }) => {
           const processedBuffer = await processPlantImage(buffer);
 
           // Upload to storage
-          const filename = `${userId}/${Date.now()}-${name.replace(/\s+/g, '-')}.jpg`;
-          photoUrl = await uploadPlantPhoto(filename, processedBuffer);
+          photoUrl = await uploadPlantPhoto(userId, processedBuffer, 'image/jpeg');
         }
 
         // Create plant with AI flag
@@ -143,7 +142,9 @@ export const action: Route.ActionFunction = async ({ request }) => {
 /**
  * Component renders the AI wizard UI
  */
-export default function AIWizardRoute({ loaderData }: Route.ComponentProps) {
+export default function AIWizardRoute() {
+  const loaderData = useLoaderData<typeof loader>();
+
   const handleComplete = (plantId: string) => {
     // Navigate to plant details page
     window.location.href = `/dashboard/plants/${plantId}`;
