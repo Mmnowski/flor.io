@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getPlantById } from '../../lib/plants.server';
-import { requireAuth } from '../../lib/require-auth.server';
-import { recordWatering } from '../../lib/watering.server';
+import { requireAuth } from '../../lib/auth';
+import { getPlantById } from '../../lib/plants';
+import { recordWatering } from '../../lib/watering';
 import { action } from '../api.water.$plantId';
 
 // Mock dependencies
-vi.mock('../../lib/require-auth.server');
-vi.mock('../../lib/watering.server');
+vi.mock('../../lib/auth');
+vi.mock('../../lib/watering');
 vi.mock('../../lib/plants.server');
 
 describe('api.water.$plantId - Action', () => {

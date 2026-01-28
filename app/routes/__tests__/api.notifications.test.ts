@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { requireAuth } from '../../lib/require-auth.server';
-import { getPlantsNeedingWater } from '../../lib/watering.server';
+import { requireAuth } from '../../lib/auth';
+import { getPlantsNeedingWater } from '../../lib/watering';
 import { loader } from '../api.notifications';
 
 // Mock dependencies
-vi.mock('../../lib/require-auth.server');
-vi.mock('../../lib/watering.server');
+vi.mock('../../lib/auth');
+vi.mock('../../lib/watering');
 
 describe('api.notifications - Loader', () => {
   const mockUserId = 'user-123';
