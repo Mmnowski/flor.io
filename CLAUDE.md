@@ -36,6 +36,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - TypeScript strict mode is enforced (tsconfig.json)
 - No linter currently configured (ESLint/Prettier can be added)
 
+### Commit Messages
+
+Follow the commit message template defined in `.ai/prompts/create-commit-message.md`. Key principles:
+
+- **Format**: `[TYPE]([CONTEXT]): [description]`
+- **Types**: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+- **Description focus**: Describe _what changed in the code_, not the impact or outcome
+  - ✅ "Replace type casts with helpers" (what changed)
+  - ❌ "Improved type safety" (outcome)
+- **Character limit**: ~72 characters (guideline, not hard limit)
+- **Bullet points**: Use only for multi-file or complex changes (2-4 points)
+- **Process**: Reference `.ai/prompts/create-commit-message.md` for decision tree and examples
+
+### Component Generation
+
+Follow the standards in `.ai/prompts/component-generation-prompt.md` when creating React components. Key requirements:
+
+- **TypeScript**: Props interface with JSDoc, explicit return types, no `any` types
+- **Styling**: Tailwind CSS only, mobile-first responsive design
+- **Accessibility**: WCAG 2.1 AA compliant (4.5:1 contrast, 44px touch targets, focus states)
+- **Design system**: Use color palette, spacing grid (8px), rounded corners (16px minimum)
+- **Quality**: Use validation checklist before considering component complete
+- **Process**: Follow the 6-step workflow in the prompt for consistency
+
 ## Project Architecture
 
 ### Framework: React Router v7 (Full-Stack Framework)
