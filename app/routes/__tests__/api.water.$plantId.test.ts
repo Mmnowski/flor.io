@@ -8,7 +8,7 @@ import { action } from '../api.water.$plantId';
 // Mock dependencies
 vi.mock('../../lib/auth');
 vi.mock('../../lib/watering');
-vi.mock('../../lib/plants.server');
+vi.mock('../../lib/plants');
 
 describe('api.water.$plantId - Action', () => {
   const mockUserId = 'user-123';
