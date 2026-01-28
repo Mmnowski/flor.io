@@ -53,7 +53,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         if (!validation.success) {
           throw new Response(
             JSON.stringify({
-              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+              error: validation.error.issues[0]?.message || 'Invalid room name',
             }),
             { status: 400 }
           );
@@ -79,7 +79,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         if (!validation.success) {
           throw new Response(
             JSON.stringify({
-              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+              error: validation.error.issues[0]?.message || 'Invalid room name',
             }),
             { status: 400 }
           );

@@ -3,7 +3,7 @@ import { requireAuth } from '~/lib/require-auth.server';
 import { recordWatering } from '~/lib/watering.server';
 import { logger } from '~/shared/lib/logger';
 
-import type { Route } from '.react-router/types/app/routes/api.water.$plantId';
+import type { Route } from './+types/api.water.$plantId';
 
 export const action = async ({ request, params }: Route.ActionArgs) => {
   if (request.method !== 'POST') {

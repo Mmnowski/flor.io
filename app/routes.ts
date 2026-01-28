@@ -11,6 +11,7 @@ export default [
 
   // API Routes
   route('api/notifications', 'routes/api.notifications.tsx'),
+  route('api/rooms', 'routes/api.rooms.tsx'),
   route('api/water/:plantId', 'routes/api.water.$plantId.tsx'),
 
   // Dashboard Routes (Protected)
