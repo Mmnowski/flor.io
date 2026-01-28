@@ -5,12 +5,20 @@
 import { z } from 'zod';
 
 /**
+ * RFC 5322 compliant email regex pattern
+ * Validates email format according to RFC 5322 standards
+ */
+const RFC5322_EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+/**
  * Email validation schema
+ * Uses RFC 5322 compliant regex for better accuracy
  */
 export const emailSchema = z
   .string()
   .min(1, 'Email is required')
-  .email('Please enter a valid email address');
+  .regex(RFC5322_EMAIL_REGEX, 'Please enter a valid email address');
 
 /**
  * Password validation schema
@@ -117,7 +125,7 @@ export type RoomFormInput = z.infer<typeof roomFormSchema>;
  * Returns object with success boolean and either data or errors
  */
 export function validateForm<T>(
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   data: unknown
 ): { success: true; data: T } | { success: false; errors: Record<string, string> } {
   const result = schema.safeParse(data);
@@ -127,10 +135,15 @@ export function validateForm<T>(
   }
 
   const errors: Record<string, string> = {};
-  const flattened = result.error.flatten().fieldErrors;
 
-  Object.entries(flattened).forEach(([field, messages]) => {
-    errors[field] = Array.isArray(messages) ? messages[0] || field : field;
+  // Extract field errors from validation issues
+  result.error.issues.forEach((issue) => {
+    const fieldPath = issue.path.join('.');
+    const field = fieldPath || 'root';
+
+    if (!errors[field]) {
+      errors[field] = issue.message;
+    }
   });
 
   return { success: false, errors };
@@ -140,7 +153,7 @@ export function validateForm<T>(
  * Helper to get single field error
  */
 export function getFieldError(
-  schema: z.ZodSchema,
+  schema: z.ZodType,
   fieldName: string,
   value: unknown
 ): string | undefined {
@@ -149,7 +162,10 @@ export function getFieldError(
     return undefined;
   }
 
-  const flattened = result.error.flatten().fieldErrors;
-  const messages = flattened[fieldName];
-  return Array.isArray(messages) ? messages[0] : undefined;
+  // Find first error matching the field name
+  const fieldError = result.error.issues.find(
+    (issue) => issue.path.length === 0 || issue.path[0] === fieldName
+  );
+
+  return fieldError?.message;
 }
