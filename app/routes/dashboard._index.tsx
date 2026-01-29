@@ -1,16 +1,43 @@
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useNavigate, useSearchParams } from "react-router";
 import type { Route } from "./+types/dashboard._index";
 import { Button } from "~/components/ui/button";
 import { EmptyState } from "~/components/empty-state";
 import { Plus, Leaf } from "lucide-react";
+import { requireAuth } from "~/lib/require-auth.server";
+import { getUserPlants } from "~/lib/plants.server";
+import { getUserRooms } from "~/lib/rooms.server";
+import { PlantCard } from "~/components/plant-card";
+import { RoomFilter } from "~/components/room-filter";
+import type { PlantWithWatering, Room } from "~/types/plant.types";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  // TODO: Fetch plants from Supabase
-  return { plants: [] as [] };
+  const userId = await requireAuth(request);
+
+  // Get room filter from URL params
+  const url = new URL(request.url);
+  const roomId = url.searchParams.get('room');
+
+  // Fetch plants and rooms
+  const [plants, rooms] = await Promise.all([
+    getUserPlants(userId, roomId || undefined),
+    getUserRooms(userId),
+  ]);
+
+  return { plants, rooms, activeRoomId: roomId };
 };
 
 export default function DashboardIndex() {
-  const { plants } = useLoaderData() as { plants: [] };
+  const { plants, rooms, activeRoomId } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const handleFilterChange = (newRoomId: string | null) => {
+    if (newRoomId) {
+      navigate(`?room=${newRoomId}`);
+    } else {
+      navigate('');
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -30,17 +57,35 @@ export default function DashboardIndex() {
         </Link>
       </div>
 
+      {/* Room Filter */}
+      {rooms.length > 0 && (
+        <div className="mb-6">
+          <RoomFilter
+            rooms={rooms}
+            activeRoomId={activeRoomId}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
+      )}
+
       {plants.length === 0 ? (
         <EmptyState
           icon={Leaf}
           title="No plants yet"
           description="Start by adding your first plant to track its watering schedule"
           actionLabel="Add Plant"
-          onAction={() => {}}
+          onAction={() => navigate('/dashboard/plants/new')}
         />
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Plant cards will go here */}
+        <div>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            {plants.length} {plants.length === 1 ? 'plant' : 'plants'} in your collection
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {plants.map((plant) => (
+              <PlantCard key={plant.id} plant={plant} />
+            ))}
+          </div>
         </div>
       )}
     </div>
