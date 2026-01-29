@@ -77,12 +77,7 @@ export async function updatePlant(
       throw new Error('Watering frequency must be between 1 and 365 days');
     }
 
-    const updateData: PlantUpdateData = {
-      ...data,
-      updated_at: new Date().toISOString(),
-    };
-
-    const plant = await updateOne(supabaseServer, 'plants', { id: plantId }, updateData);
+    const plant = await updateOne(supabaseServer, 'plants', { id: plantId }, data);
 
     return plant as Plant;
   } catch (error) {
