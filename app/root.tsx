@@ -10,6 +10,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { Navigation } from "~/components/nav";
+import { NavigationProgressBar } from "~/components/progress-bar";
 import { getUserId } from "~/lib/session.server";
 import "./app.css";
 
@@ -71,6 +72,7 @@ export default function App() {
 
   return (
     <>
+      <NavigationProgressBar />
       <Navigation isAuthenticated={!!userId} />
       <main className="min-h-screen">
         <Outlet />

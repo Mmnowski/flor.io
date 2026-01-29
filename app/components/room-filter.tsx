@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { Badge } from '~/components/ui/badge';
+import { CreateRoomDialog } from '~/components/create-room-dialog';
 import { cn } from '~/lib/utils';
 import type { Room } from '~/types/plant.types';
 
@@ -67,6 +68,9 @@ export function RoomFilter({
           )}
         </button>
       ))}
+
+      {/* Create Room button */}
+      <CreateRoomDialog />
     </div>
   );
 }

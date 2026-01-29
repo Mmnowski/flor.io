@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Form } from 'react-router';
+import { AlertCircle } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -15,22 +16,68 @@ import {
 } from '~/components/ui/select';
 import { FormError } from '~/components/form-error';
 import { ImageUpload } from '~/components/image-upload';
+import { plantNameSchema, wateringFrequencySchema, getFieldError } from '~/lib/validation';
 import type { PlantWithDetails, Room } from '~/types/plant.types';
+
+interface FieldErrors {
+  [key: string]: string[] | undefined;
+  name?: string[];
+  watering_frequency_days?: string[];
+}
 
 interface PlantFormProps {
   plant?: PlantWithDetails;
   rooms: Room[];
   error?: string | null;
+  fieldErrors?: FieldErrors;
   mode: 'create' | 'edit';
 }
 
-export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
+export function PlantForm({ plant, rooms, error, fieldErrors: serverFieldErrors, mode }: PlantFormProps) {
   const isEdit = mode === 'edit';
   const [selectedRoom, setSelectedRoom] = useState<string>(isEdit && plant?.room_id ? plant.room_id : '');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>(serverFieldErrors || {});
 
   const handleRoomChange = (value: string) => {
     setSelectedRoom(value);
   };
+
+  const validateField = useCallback(
+    (fieldName: string, value: string | number) => {
+      const newErrors = { ...fieldErrors };
+
+      if (fieldName === 'name') {
+        const error = getFieldError(plantNameSchema, fieldName, value);
+        if (error) {
+          newErrors.name = error;
+        } else {
+          delete newErrors.name;
+        }
+      }
+
+      if (fieldName === 'watering_frequency_days') {
+        const error = getFieldError(wateringFrequencySchema, fieldName, value);
+        if (error) {
+          newErrors.watering_frequency_days = error;
+        } else {
+          delete newErrors.watering_frequency_days;
+        }
+      }
+
+      setFieldErrors(newErrors);
+    },
+    [fieldErrors]
+  );
+
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    validateField(e.target.name, e.target.value);
+  };
+
+  const isFormValid =
+    Object.keys(fieldErrors).length === 0 &&
+    plant?.name ||
+    (document.querySelector('input[name="name"]') as HTMLInputElement)?.value
+      ?.trim() !== '';
 
   return (
     <Form method="post" encType="multipart/form-data" className="space-y-6 max-w-2xl">
@@ -57,9 +104,28 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
           defaultValue={isEdit ? plant?.name : ''}
           required
           maxLength={100}
-          className="mt-2"
+          className={`mt-2 ${
+            fieldErrors.name
+              ? 'border-red-500 focus:ring-red-300'
+              : ''
+          }`}
+          onChange={handleFieldChange}
+          aria-invalid={!!fieldErrors.name}
+          aria-describedby={fieldErrors.name ? 'name-error' : undefined}
         />
-        <p className="text-sm text-slate-500 mt-1">Maximum 100 characters</p>
+        {fieldErrors.name && (
+          <div
+            id="name-error"
+            className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm mt-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {Array.isArray(fieldErrors.name) ? fieldErrors.name[0] : fieldErrors.name}
+          </div>
+        )}
+        {!fieldErrors.name && (
+          <p className="text-sm text-slate-500 mt-1">Maximum 100 characters</p>
+        )}
       </div>
 
       {/* Watering Frequency */}
@@ -76,9 +142,34 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
           required
           min="1"
           max="365"
-          className="mt-2"
+          className={`mt-2 ${
+            fieldErrors.watering_frequency_days
+              ? 'border-red-500 focus:ring-red-300'
+              : ''
+          }`}
+          onChange={handleFieldChange}
+          aria-invalid={!!fieldErrors.watering_frequency_days}
+          aria-describedby={
+            fieldErrors.watering_frequency_days
+              ? 'watering-frequency-error'
+              : undefined
+          }
         />
-        <p className="text-sm text-slate-500 mt-1">How often to water in days (1-365)</p>
+        {fieldErrors.watering_frequency_days && (
+          <div
+            id="watering-frequency-error"
+            className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm mt-2"
+            role="alert"
+          >
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {Array.isArray(fieldErrors.watering_frequency_days) ? fieldErrors.watering_frequency_days[0] : fieldErrors.watering_frequency_days}
+          </div>
+        )}
+        {!fieldErrors.watering_frequency_days && (
+          <p className="text-sm text-slate-500 mt-1">
+            How often to water in days (1-365)
+          </p>
+        )}
       </div>
 
       {/* Room */}
@@ -163,7 +254,11 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
 
       {/* Form Actions */}
       <div className="flex gap-3 pt-4">
-        <Button type="submit" className="flex-1">
+        <Button
+          type="submit"
+          className="flex-1"
+          disabled={Object.keys(fieldErrors).length > 0}
+        >
           {isEdit ? 'Save Changes' : 'Create Plant'}
         </Button>
         <Button

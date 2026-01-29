@@ -5,6 +5,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Card } from "~/components/ui/card";
 import { FormError } from "~/components/form-error";
+import { registerSchema } from "~/lib/validation";
 import { registerUser } from "~/lib/auth.server";
 import { createUserSession, getUserId } from "~/lib/session.server";
 
@@ -23,31 +24,21 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     const formData = await request.formData();
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const confirmPassword = formData.get("confirmPassword");
+    const data = {
+      email: String(formData.get("email")),
+      password: String(formData.get("password")),
+      confirmPassword: String(formData.get("confirmPassword")),
+    };
 
-    if (!email || typeof email !== "string") {
-      return { error: "Email is required" };
+    // Validate using Zod schema
+    const validation = registerSchema.safeParse(data);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      return { error: firstError || "Validation failed" };
     }
 
-    if (!email.includes("@")) {
-      return { error: "Please enter a valid email address" };
-    }
-
-    if (!password || typeof password !== "string") {
-      return { error: "Password is required" };
-    }
-
-    if (password.length < 8) {
-      return { error: "Password must be at least 8 characters" };
-    }
-
-    if (password !== confirmPassword) {
-      return { error: "Passwords do not match" };
-    }
-
-    const user = await registerUser(email, password);
+    const user = await registerUser(validation.data.email, validation.data.password);
 
     if (!user?.id) {
       return { error: "Failed to create account" };

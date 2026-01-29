@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link, useLoaderData, redirect } from "react-router";
+import { Link, useLoaderData, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard.plants.$plantId";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Leaf, Pencil, Sun, Droplet, Bug, Leaf as LeafIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { PlantDetailsSkeleton } from "~/components/skeleton-loader";
 import { requireAuth } from "~/lib/require-auth.server";
 import { getPlantById, deletePlant } from "~/lib/plants.server";
 import { recordWatering } from "~/lib/watering.server";
@@ -65,7 +66,14 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
 export default function PlantDetail() {
   const { plant } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const isLoading = navigation.state === 'loading';
+
+  if (isLoading) {
+    return <PlantDetailsSkeleton />;
+  }
 
   const getWateringColor = () => {
     if (plant.is_overdue) {
@@ -112,7 +120,11 @@ export default function PlantDetail() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800">
+            <div
+              className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800"
+              role="img"
+              aria-label={`No photo available for ${plant.name}`}
+            >
               <Leaf className="w-24 h-24 text-emerald-600 dark:text-emerald-400" />
             </div>
           )}

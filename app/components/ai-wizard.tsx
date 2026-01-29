@@ -13,7 +13,8 @@
  * 6. FeedbackModal - Collect feedback on AI quality
  */
 
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
+import type { ReactNode } from "react";
 
 export type WizardStep =
   | "photo-upload"

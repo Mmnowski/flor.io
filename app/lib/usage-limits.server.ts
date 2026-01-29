@@ -5,7 +5,7 @@
  * Uses Supabase database for persistence.
  */
 
-import { createServerClient } from "./supabase.server";
+import { supabaseServer } from "./supabase.server";
 
 // Configurable limits (can be moved to environment variables later)
 export const LIMITS = {
@@ -66,7 +66,7 @@ function getResetDate(): Date {
 export async function checkAIGenerationLimit(
   userId: string
 ): Promise<AIGenerationLimitStatus> {
-  const supabase = await createServerClient();
+  const supabase = supabaseServer;
   const monthYear = getCurrentMonthYear();
 
   // Get or create usage record for current month
@@ -122,7 +122,7 @@ export async function checkAIGenerationLimit(
  * await incrementAIUsage(userId);
  */
 export async function incrementAIUsage(userId: string): Promise<void> {
-  const supabase = await createServerClient();
+  const supabase = supabaseServer;
   const monthYear = getCurrentMonthYear();
   const now = new Date().toISOString();
 
@@ -184,7 +184,7 @@ export async function incrementAIUsage(userId: string): Promise<void> {
 export async function checkPlantLimit(
   userId: string
 ): Promise<PlantCountLimitStatus> {
-  const supabase = await createServerClient();
+  const supabase = supabaseServer;
 
   // Count user's plants
   const { count, error } = await supabase
