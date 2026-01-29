@@ -13,6 +13,10 @@ export type Update<T extends TableName> = Database['public']['Tables'][T]['Updat
 /**
  * Fetch a single row from a table
  *
+ * NOTE: Supabase's generic query builder has limitations with dynamic filtering.
+ * We use .match() which properly handles Record<string, unknown> filters.
+ * The cast is necessary due to Supabase's complex generic types.
+ *
  * @param client - Supabase client instance
  * @param table - Table name
  * @param conditions - Filter conditions as key-value pairs
@@ -24,14 +28,9 @@ export async function fetchOne<T extends TableName>(
   table: T,
   conditions: Record<string, unknown>
 ): Promise<Row<T> | null> {
-  let query = client.from(table).select('*');
-
-  // Apply all filter conditions
-  for (const [key, value] of Object.entries(conditions)) {
-    query = query.eq(key, value);
-  }
-
-  const { data, error } = await query.single();
+  // Cast needed: Supabase .match() is designed for this use case but types don't reflect it
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client.from(table).select('*') as any).match(conditions).single();
 
   if (error?.code === 'PGRST116') {
     // No rows found - this is not an error
@@ -42,11 +41,14 @@ export async function fetchOne<T extends TableName>(
     throw new Error(`Failed to fetch from ${table}: ${error.message}`);
   }
 
-  return data as Row<T>;
+  return data as unknown as Row<T>;
 }
 
 /**
  * Fetch multiple rows from a table
+ *
+ * NOTE: Supabase's generic query builder has limitations with dynamic filtering.
+ * We use .match() which properly handles Record<string, unknown> filters.
  *
  * @param client - Supabase client instance
  * @param table - Table name
@@ -63,12 +65,9 @@ export async function fetchMany<T extends TableName>(
     orderBy?: { column: string; ascending?: boolean };
   }
 ): Promise<Row<T>[]> {
-  let query = client.from(table).select('*');
-
-  // Apply filter conditions
-  for (const [key, value] of Object.entries(conditions)) {
-    query = query.eq(key, value);
-  }
+  // Cast needed: Supabase .match() is designed for this use case but types don't reflect it
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query = (client.from(table).select('*') as any).match(conditions);
 
   // Apply ordering
   if (options?.orderBy) {
@@ -88,7 +87,7 @@ export async function fetchMany<T extends TableName>(
     throw new Error(`Failed to fetch from ${table}: ${error.message}`);
   }
 
-  return (data || []) as Row<T>[];
+  return (data || []) as unknown as Row<T>[];
 }
 
 /**
@@ -104,17 +103,22 @@ export async function insertOne<T extends TableName>(
   table: T,
   row: Insert<T>
 ): Promise<Row<T>> {
-  const { data, error } = await client.from(table).insert(row).select().single();
+  // Cast needed: Insert() type is complex union but we know it's valid for the specific table
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client.from(table) as any).insert(row).select().single();
 
   if (error) {
     throw new Error(`Failed to insert into ${table}: ${error.message}`);
   }
 
-  return data as Row<T>;
+  return data as unknown as Row<T>;
 }
 
 /**
  * Update a single row in a table
+ *
+ * NOTE: Supabase's generic query builder has limitations with dynamic filtering.
+ * We use .match() which properly handles Record<string, unknown> filters.
  *
  * @param client - Supabase client instance
  * @param table - Table name
@@ -128,12 +132,9 @@ export async function updateOne<T extends TableName>(
   conditions: Record<string, unknown>,
   updates: Update<T>
 ): Promise<Row<T>> {
-  let query = client.from(table).update(updates);
-
-  // Apply filter conditions
-  for (const [key, value] of Object.entries(conditions)) {
-    query = query.eq(key, value);
-  }
+  // Cast needed: Update() type is complex union but we know it's valid for the specific table
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query = (client.from(table) as any).update(updates).match(conditions);
 
   const { data, error } = await query.select().single();
 
@@ -141,11 +142,14 @@ export async function updateOne<T extends TableName>(
     throw new Error(`Failed to update ${table}: ${error.message}`);
   }
 
-  return data as Row<T>;
+  return data as unknown as Row<T>;
 }
 
 /**
  * Delete a single row from a table
+ *
+ * NOTE: Supabase's generic query builder has limitations with dynamic filtering.
+ * We use .match() which properly handles Record<string, unknown> filters.
  *
  * @param client - Supabase client instance
  * @param table - Table name
@@ -156,12 +160,9 @@ export async function deleteOne<T extends TableName>(
   table: T,
   conditions: Record<string, unknown>
 ): Promise<void> {
-  let query = client.from(table).delete();
-
-  // Apply filter conditions
-  for (const [key, value] of Object.entries(conditions)) {
-    query = query.eq(key, value);
-  }
+  // Cast needed: Supabase .match() is designed for this use case but types don't reflect it
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query = (client.from(table) as any).delete().match(conditions);
 
   const { error } = await query;
 
@@ -181,13 +182,16 @@ export async function deleteOne<T extends TableName>(
 export async function callRpc<T>(
   client: SupabaseClient<Database>,
   functionName: string,
-  args: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  args: any = undefined
 ): Promise<T> {
-  const { data, error } = await client.rpc(functionName, args);
+  // Cast needed: RPC argument typing cannot be inferred from generic parameters
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (client.rpc(functionName, args) as any);
 
   if (error) {
     throw new Error(`RPC call ${functionName} failed: ${error.message}`);
   }
 
-  return data as T;
+  return data as unknown as T;
 }

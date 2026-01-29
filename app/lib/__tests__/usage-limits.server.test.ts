@@ -4,16 +4,19 @@ import {
   checkPlantLimit,
   getDetailedUsage,
   getUserUsageLimits,
-  supabaseServer,
 } from '~/lib';
+import { fetchMany, fetchOne } from '~/lib';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the supabase server client
-vi.mock('../infrastructure/supabase.server', () => ({
-  supabaseServer: {
-    from: vi.fn(),
-  },
+// Mock the fetchOne and fetchMany helper functions
+vi.mock('../infrastructure/supabase-helpers', () => ({
+  fetchOne: vi.fn(),
+  fetchMany: vi.fn(),
+  insertOne: vi.fn(),
+  updateOne: vi.fn(),
+  deleteOne: vi.fn(),
+  callRpc: vi.fn(),
 }));
 
 describe('usage-limits.server', () => {
@@ -23,24 +26,7 @@ describe('usage-limits.server', () => {
 
   describe('checkAIGenerationLimit', () => {
     it('returns allowed=true when no record exists (first month)', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -50,24 +36,7 @@ describe('usage-limits.server', () => {
     });
 
     it('returns correct limit value', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -75,24 +44,7 @@ describe('usage-limits.server', () => {
     });
 
     it('includes reset date in response', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -101,24 +53,9 @@ describe('usage-limits.server', () => {
     });
 
     it('returns allowed=false when at limit', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: { ai_generations_this_month: 20 },
-                    error: null,
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue({
+        ai_generations_this_month: 20,
+      } as any);
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -127,24 +64,9 @@ describe('usage-limits.server', () => {
     });
 
     it('returns allowed=true when below limit', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: { ai_generations_this_month: 5 },
-                    error: null,
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue({
+        ai_generations_this_month: 5,
+      } as any);
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -153,24 +75,7 @@ describe('usage-limits.server', () => {
     });
 
     it('fails open on database error', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { message: 'Database error' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockRejectedValue(new Error('Database error'));
 
       const result = await checkAIGenerationLimit('user-123');
 
@@ -181,19 +86,7 @@ describe('usage-limits.server', () => {
 
   describe('checkPlantLimit', () => {
     it('limit is set to MAX_PLANTS_PER_USER', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(async () => ({
-              count: 0,
-              data: [],
-              error: null,
-            })),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await checkPlantLimit('user-123');
 
@@ -201,19 +94,7 @@ describe('usage-limits.server', () => {
     });
 
     it('returns allowed=true when under limit', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(async () => ({
-              count: 25,
-              data: Array(25).fill({}),
-              error: null,
-            })),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchMany).mockResolvedValue(Array(25).fill({}) as any);
 
       const result = await checkPlantLimit('user-123');
 
@@ -222,19 +103,7 @@ describe('usage-limits.server', () => {
     });
 
     it('returns allowed=false when at limit', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(async () => ({
-              count: 100,
-              data: Array(100).fill({}),
-              error: null,
-            })),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchMany).mockResolvedValue(Array(100).fill({}) as any);
 
       const result = await checkPlantLimit('user-123');
 
@@ -245,24 +114,8 @@ describe('usage-limits.server', () => {
 
   describe('getUserUsageLimits', () => {
     it('returns both AI and plant limits', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getUserUsageLimits('user-123');
 
@@ -273,24 +126,8 @@ describe('usage-limits.server', () => {
     });
 
     it('AI generation limit is properly populated', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getUserUsageLimits('user-123');
 
@@ -300,24 +137,8 @@ describe('usage-limits.server', () => {
     });
 
     it('plant count limit is properly populated', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getUserUsageLimits('user-123');
 
@@ -329,24 +150,8 @@ describe('usage-limits.server', () => {
 
   describe('getDetailedUsage', () => {
     it('returns human-readable usage display strings', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getDetailedUsage('user-123');
 
@@ -357,24 +162,8 @@ describe('usage-limits.server', () => {
     });
 
     it('display shows used/limit format', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getDetailedUsage('user-123');
 
@@ -383,24 +172,8 @@ describe('usage-limits.server', () => {
     });
 
     it('remaining is calculated correctly', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getDetailedUsage('user-123');
 
@@ -409,24 +182,8 @@ describe('usage-limits.server', () => {
     });
 
     it('includes reset date for AI generations', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getDetailedUsage('user-123');
 
@@ -434,24 +191,8 @@ describe('usage-limits.server', () => {
     });
 
     it('all display strings are human-readable', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
+      vi.mocked(fetchMany).mockResolvedValue([]);
 
       const result = await getDetailedUsage('user-123');
 
@@ -479,24 +220,7 @@ describe('usage-limits.server', () => {
 
   describe('Edge cases', () => {
     it('returns reset date as next month', async () => {
-      const mockSupabase = {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(function () {
-              return {
-                eq: vi.fn(() => ({
-                  single: vi.fn(async () => ({
-                    data: null,
-                    error: { code: 'PGRST116' },
-                  })),
-                })),
-              };
-            }),
-          })),
-        })),
-      };
-
-      vi.mocked(supabaseServer).from = mockSupabase.from;
+      vi.mocked(fetchOne).mockResolvedValue(null);
 
       const result = await checkAIGenerationLimit('user-123');
       const today = new Date();

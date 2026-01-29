@@ -334,6 +334,7 @@ describe('Water Plant API Integration', () => {
       const otherUserPlant = { ...mockPlant, user_id: 'other-user-id' };
       vi.mocked(requireAuth).mockResolvedValue(mockUserId);
       vi.mocked(getPlantById).mockResolvedValue(otherUserPlant);
+      vi.mocked(recordWatering).mockResolvedValue(undefined);
 
       const result = await action({
         request: createMockRequest(),
@@ -369,6 +370,9 @@ describe('Water Plant API Integration', () => {
     });
 
     it('should return JSON-serializable response on error', async () => {
+      vi.mocked(requireAuth).mockResolvedValue(mockUserId);
+      vi.mocked(getPlantById).mockResolvedValue(null);
+
       const result = await action({
         request: createMockRequest(),
         params: { plantId: mockPlantId },

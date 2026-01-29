@@ -13,8 +13,13 @@ import { loader } from '../api.notifications';
  * - Data formatting and error handling
  */
 
-vi.mock('~/lib/require-auth.server');
-vi.mock('~/lib/watering.server');
+vi.mock('~/lib/auth', () => ({
+  requireAuth: vi.fn(),
+}));
+
+vi.mock('~/lib/watering', () => ({
+  getPlantsNeedingWater: vi.fn(),
+}));
 
 describe('Notifications API Integration', () => {
   const mockUserId = 'user-test-123';

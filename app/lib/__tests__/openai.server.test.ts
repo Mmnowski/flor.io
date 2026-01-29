@@ -40,7 +40,7 @@ describe('openai.server', () => {
       [result.fertilizingTips, result.pruningTips, result.troubleshooting].forEach((tips) => {
         expect(Array.isArray(tips)).toBe(true);
         expect(tips.length).toBeGreaterThan(0);
-        tips.forEach((tip) => {
+        tips.forEach((tip: string) => {
           expect(typeof tip).toBe('string');
           expect(tip.length).toBeGreaterThan(0);
         });
@@ -106,7 +106,7 @@ describe('openai.server', () => {
 
       const allTips = [...result.fertilizingTips, ...result.pruningTips, ...result.troubleshooting];
 
-      allTips.forEach((tip) => {
+      allTips.forEach((tip: string) => {
         // Tips should be reasonably long (not just 1-2 words)
         expect(tip.split(' ').length).toBeGreaterThanOrEqual(3);
       });

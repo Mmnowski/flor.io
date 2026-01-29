@@ -3,6 +3,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 /**
  * Watering Notifications Complete Feature Flow Integration Tests
@@ -59,8 +60,8 @@ describe('Watering Notifications Feature Flow Integration', () => {
   ];
 
   const mockFetcher: {
-    load: ReturnType<typeof vi.fn>;
-    submit: ReturnType<typeof vi.fn>;
+    load: Mock;
+    submit: Mock;
     state: 'idle';
     data: NotificationsData | null;
   } = {

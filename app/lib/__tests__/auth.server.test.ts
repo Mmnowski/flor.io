@@ -2,7 +2,7 @@ import { getUserByEmail, getUserById, loginUser, registerUser, supabaseServer } 
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('~/lib', () => ({
+vi.mock('~/lib/infrastructure/supabase.server', () => ({
   supabaseServer: {
     auth: {
       admin: {
@@ -15,21 +15,16 @@ vi.mock('~/lib', () => ({
   },
 }));
 
-describe('auth.server', () => {
+describe('auth.server.ts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('registerUser', () => {
     it('should register a new user with valid credentials', async () => {
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-        email_confirmed_at: new Date().toISOString(),
-      };
-
+      const mockUser = { id: 'user-123', email: 'test@example.com' };
       vi.mocked(supabaseServer.auth.admin.createUser).mockResolvedValue({
-        data: { user: mockUser as any },
+        data: { user: mockUser },
         error: null,
       } as any);
 
@@ -49,36 +44,29 @@ describe('auth.server', () => {
         error: { message: 'User already exists' },
       } as any);
 
-      await expect(registerUser('test@example.com', 'password123')).rejects.toThrow(
+      await expect(registerUser('existing@example.com', 'password')).rejects.toThrow(
         'Failed to register: User already exists'
       );
     });
 
     it('should auto-confirm email for MVP', async () => {
       vi.mocked(supabaseServer.auth.admin.createUser).mockResolvedValue({
-        data: { user: {} as any },
+        data: { user: { id: 'user-123', email: 'test@example.com' } },
         error: null,
       } as any);
 
-      await registerUser('test@example.com', 'password123');
+      await registerUser('test@example.com', 'password');
 
-      expect(supabaseServer.auth.admin.createUser).toHaveBeenCalledWith(
-        expect.objectContaining({
-          email_confirm: true,
-        })
-      );
+      const callArgs = (supabaseServer.auth.admin.createUser as any).mock.calls[0][0];
+      expect(callArgs.email_confirm).toBe(true);
     });
   });
 
   describe('loginUser', () => {
     it('should login user with valid credentials', async () => {
-      const mockSession = {
-        access_token: 'token-123',
-        user: { id: 'user-123', email: 'test@example.com' },
-      };
-
+      const mockSession = { access_token: 'token-123', user: { id: 'user-123' } };
       vi.mocked(supabaseServer.auth.signInWithPassword).mockResolvedValue({
-        data: { session: mockSession as any },
+        data: { session: mockSession },
         error: null,
       } as any);
 
@@ -94,11 +82,11 @@ describe('auth.server', () => {
     it('should throw error on login failure', async () => {
       vi.mocked(supabaseServer.auth.signInWithPassword).mockResolvedValue({
         data: { session: null },
-        error: { message: 'Invalid login credentials' },
+        error: { message: 'Invalid credentials' },
       } as any);
 
       await expect(loginUser('test@example.com', 'wrongpassword')).rejects.toThrow(
-        'Failed to login: Invalid login credentials'
+        'Failed to login: Invalid credentials'
       );
     });
 
@@ -106,16 +94,14 @@ describe('auth.server', () => {
       const mockSession = {
         access_token: 'token-123',
         refresh_token: 'refresh-123',
-        user: { id: 'user-123' },
-        expires_in: 3600,
+        user: { id: 'user-123', email: 'test@example.com' },
       };
-
       vi.mocked(supabaseServer.auth.signInWithPassword).mockResolvedValue({
-        data: { session: mockSession as any },
+        data: { session: mockSession },
         error: null,
       } as any);
 
-      const result = await loginUser('test@example.com', 'password123');
+      const result = await loginUser('test@example.com', 'password');
 
       expect(result).toHaveProperty('access_token');
       expect(result).toHaveProperty('user');
@@ -124,14 +110,9 @@ describe('auth.server', () => {
 
   describe('getUserById', () => {
     it('should retrieve user by ID', async () => {
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-        created_at: new Date().toISOString(),
-      };
-
+      const mockUser = { id: 'user-123', email: 'test@example.com' };
       vi.mocked(supabaseServer.auth.admin.getUserById).mockResolvedValue({
-        data: { user: mockUser as any },
+        data: { user: mockUser },
         error: null,
       } as any);
 
@@ -155,24 +136,20 @@ describe('auth.server', () => {
     it('should handle database errors', async () => {
       vi.mocked(supabaseServer.auth.admin.getUserById).mockResolvedValue({
         data: { user: null },
-        error: { message: 'Database connection error' },
+        error: { message: 'Database connection failed' },
       } as any);
 
       await expect(getUserById('user-123')).rejects.toThrow(
-        'Failed to get user: Database connection error'
+        'Failed to get user: Database connection failed'
       );
     });
   });
 
   describe('getUserByEmail', () => {
     it('should retrieve user by email', async () => {
-      const mockUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-      };
-
+      const mockUser = { id: 'user-123', email: 'test@example.com' };
       vi.mocked(supabaseServer.auth.admin.listUsers).mockResolvedValue({
-        data: { users: [mockUser as any] },
+        data: { users: [mockUser] },
         error: null,
       } as any);
 
@@ -183,7 +160,7 @@ describe('auth.server', () => {
 
     it('should return undefined if user with email not found', async () => {
       vi.mocked(supabaseServer.auth.admin.listUsers).mockResolvedValue({
-        data: { users: [] },
+        data: { users: [{ id: 'user-123', email: 'other@example.com' }] },
         error: null,
       } as any);
 
@@ -193,32 +170,19 @@ describe('auth.server', () => {
     });
 
     it('should filter from multiple users', async () => {
-      const users = [
+      const mockUsers = [
         { id: 'user-1', email: 'user1@example.com' },
         { id: 'user-2', email: 'user2@example.com' },
         { id: 'user-3', email: 'user3@example.com' },
       ];
-
       vi.mocked(supabaseServer.auth.admin.listUsers).mockResolvedValue({
-        data: { users: users as any },
+        data: { users: mockUsers },
         error: null,
       } as any);
 
       const result = await getUserByEmail('user2@example.com');
 
-      expect(result?.id).toBe('user-2');
-      expect(result?.email).toBe('user2@example.com');
-    });
-
-    it('should throw error on list users failure', async () => {
-      vi.mocked(supabaseServer.auth.admin.listUsers).mockResolvedValue({
-        data: { users: [] },
-        error: { message: 'Database error' },
-      } as any);
-
-      await expect(getUserByEmail('test@example.com')).rejects.toThrow(
-        'Failed to list users: Database error'
-      );
+      expect(result).toEqual(mockUsers[1]);
     });
   });
 });

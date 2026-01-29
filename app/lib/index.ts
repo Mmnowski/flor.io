@@ -185,24 +185,6 @@ export {
 } from './watering';
 
 // ============================================================================
-// AI Domain (External Integrations)
-// ============================================================================
-export {
-  // OpenAI
-  generateCareInstructions,
-  generateCareInstructionsWithApi,
-  generateCareInstructionsMocked,
-  generateCareInstructionsInstant,
-  type CareInstructions,
-  // PlantNet
-  identifyPlant,
-  identifyPlantWithApi,
-  identifyPlantMocked,
-  identifyPlantInstant,
-  type PlantIdentificationResult,
-} from './ai';
-
-// ============================================================================
 // Usage Limits Domain
 // ============================================================================
 export {
@@ -216,3 +198,18 @@ export {
   type PlantCountLimitStatus,
   type UserUsageLimits,
 } from './usage-limits';
+
+// ============================================================================
+// AI Integration
+// ============================================================================
+export {
+  generateCareInstructions,
+  generateCareInstructionsInstant,
+  type CareInstructions,
+} from './ai/openai.server';
+
+export {
+  identifyPlant,
+  identifyPlantInstant,
+  type PlantIdentificationResult,
+} from './ai/plantnet.server';
