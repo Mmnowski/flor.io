@@ -1,23 +1,21 @@
-import { vi } from 'vitest';
 import {
   createMockPlant,
   createMockPlantWithWatering,
-  createMockRoom,
-  createMockWateringHistory,
   createMockPlantsWithWatering,
+  createMockRoom,
   createMockRooms,
+  createMockWateringHistory,
   createMockWateringHistoryList,
-} from '~/app/__tests__/factories';
+} from '~/__tests__/factories';
 import type { Plant, PlantWithWatering, Room, WateringHistory } from '~/types/plant.types';
+
+import { vi } from 'vitest';
 
 /**
  * Mock Supabase Select Query Response
  * Simulates the chain: .from('table').select(...)
  */
-export function createMockSupabaseSelectQuery<T>(
-  data: T | null,
-  error: Error | null = null
-) {
+export function createMockSupabaseSelectQuery<T>(data: T | null, error: Error | null = null) {
   return {
     eq: vi.fn().mockResolvedValue({ data, error }),
     order: vi.fn().mockReturnThis(),
@@ -30,14 +28,9 @@ export function createMockSupabaseSelectQuery<T>(
  * Mock Supabase From Query
  * Simulates: supabaseServer.from('table')
  */
-export function createMockSupabaseFrom<T>(
-  data: T | T[] | null,
-  error: Error | null = null
-) {
+export function createMockSupabaseFrom<T>(data: T | T[] | null, error: Error | null = null) {
   return {
-    select: vi.fn().mockReturnValue(
-      createMockSupabaseSelectQuery(data, error)
-    ),
+    select: vi.fn().mockReturnValue(createMockSupabaseSelectQuery(data, error)),
     insert: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({ data, error }),
@@ -60,19 +53,14 @@ export function createMockSupabaseFrom<T>(
  * Mock Supabase RPC Call
  * Simulates: supabaseServer.rpc('function_name', { param })
  */
-export function createMockSupabaseRpc<T>(
-  data: T | null,
-  error: Error | null = null
-) {
+export function createMockSupabaseRpc<T>(data: T | null, error: Error | null = null) {
   return vi.fn().mockResolvedValue({ data, error });
 }
 
 /**
  * Mock get_next_watering_date RPC Response
  */
-export function createMockGetNextWateringDateResponse(
-  daysFromNow: number = 3
-): string {
+export function createMockGetNextWateringDateResponse(daysFromNow: number = 3): string {
   const date = new Date();
   date.setDate(date.getDate() + daysFromNow);
   return date.toISOString();
@@ -81,14 +69,14 @@ export function createMockGetNextWateringDateResponse(
 /**
  * Mock get_plants_needing_water RPC Response
  */
-export function createMockGetPlantsNeedingWaterResponse(
-  count: number = 2
-): any[] {
+export function createMockGetPlantsNeedingWaterResponse(count: number = 2): any[] {
   return Array.from({ length: count }, (_, i) => ({
     id: `plant-${i}`,
     name: `Plant ${i}`,
     days_until_watering: Math.floor(Math.random() * -5), // Negative = overdue
-    next_watering_date: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+    next_watering_date: new Date(
+      Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
+    ).toISOString(),
   }));
 }
 
@@ -164,9 +152,7 @@ export function createMockValidationError(field: string) {
 /**
  * Mock Plant Query Responses
  */
-export function createMockGetPlantsResponse(
-  count: number = 3
-): PlantWithWatering[] {
+export function createMockGetPlantsResponse(count: number = 3): PlantWithWatering[] {
   return createMockPlantsWithWatering(count);
 }
 
@@ -176,15 +162,11 @@ export function createMockGetPlantByIdResponse(
   return createMockPlantWithWatering(overrides);
 }
 
-export function createMockCreatePlantResponse(
-  overrides?: Partial<Plant>
-): Plant {
+export function createMockCreatePlantResponse(overrides?: Partial<Plant>): Plant {
   return createMockPlant(overrides);
 }
 
-export function createMockUpdatePlantResponse(
-  overrides?: Partial<Plant>
-): Plant {
+export function createMockUpdatePlantResponse(overrides?: Partial<Plant>): Plant {
   return createMockPlant(overrides);
 }
 
@@ -195,18 +177,14 @@ export function createMockGetRoomsResponse(count: number = 3): Room[] {
   return createMockRooms(count);
 }
 
-export function createMockGetRoomByIdResponse(
-  overrides?: Partial<Room>
-): Room {
+export function createMockGetRoomByIdResponse(overrides?: Partial<Room>): Room {
   return createMockRoom(overrides);
 }
 
 /**
  * Mock Watering Query Responses
  */
-export function createMockGetWateringHistoryResponse(
-  count: number = 5
-): WateringHistory[] {
+export function createMockGetWateringHistoryResponse(count: number = 5): WateringHistory[] {
   return createMockWateringHistoryList(count);
 }
 
@@ -289,9 +267,7 @@ export function setupMockSupabaseStorage() {
 /**
  * Helper to setup complete Supabase mock
  */
-export function setupMockSupabaseComplete(
-  plantsData?: PlantWithWatering[]
-) {
+export function setupMockSupabaseComplete(plantsData?: PlantWithWatering[]) {
   return {
     ...setupMockSupabaseForPlants(plantsData),
     ...setupMockSupabaseStorage(),

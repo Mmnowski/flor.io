@@ -1,21 +1,24 @@
-import { Link, redirect } from "react-router";
-import type { Route } from "./+types/home";
-import { Button } from "~/components/ui/button";
-import { Leaf, Droplets, Brain } from "lucide-react";
-import { getUserId } from "~/lib/session.server";
+import { getUserId } from '~/lib';
+import { Button } from '~/shared/components';
+
+import { Link, redirect } from 'react-router';
+
+import { Brain, Droplets, Leaf } from 'lucide-react';
+
+import type { Route } from './+types/home';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await getUserId(request);
   if (userId) {
-    return redirect("/dashboard");
+    return redirect('/dashboard');
   }
   return null;
 };
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_: Route.MetaArgs) {
   return [
-    { title: "Flor - Plant Care Companion" },
-    { name: "description", content: "Track and manage your plant care with AI-powered insights" },
+    { title: 'Flor - Plant Care Companion' },
+    { name: 'description', content: 'Track and manage your plant care with AI-powered insights' },
   ];
 }
 
@@ -29,7 +32,8 @@ export default function Home() {
             Your AI Plant Care Companion
           </h1>
           <p className="text-xl text-gray-600 dark:text-slate-400 mb-8 leading-relaxed">
-            Never forget to water your plants again. Get smart watering reminders and AI-powered care tips.
+            Never forget to water your plants again. Get smart watering reminders and AI-powered
+            care tips.
           </p>
         </div>
 
@@ -61,7 +65,9 @@ export default function Home() {
                 <Droplets className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">Smart Watering</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
+              Smart Watering
+            </h3>
             <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
               Get timely reminders based on your plant's needs and your location.
             </p>
@@ -73,7 +79,9 @@ export default function Home() {
                 <Brain className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">AI Insights</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
+              AI Insights
+            </h3>
             <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
               Identify plants with your camera and get personalized care instructions.
             </p>
@@ -85,7 +93,9 @@ export default function Home() {
                 <Leaf className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">Track Growth</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
+              Track Growth
+            </h3>
             <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
               Keep records of your plants and monitor their health over time.
             </p>

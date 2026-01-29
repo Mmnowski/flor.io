@@ -1,17 +1,15 @@
-import { useState } from "react";
-import { useLoaderData, useNavigate, useSearchParams, useNavigation } from "react-router";
-import type { Route } from "./+types/dashboard._index";
-import { Button } from "~/components/ui/button";
-import { EmptyState } from "~/components/empty-state";
-import { DashboardSkeleton } from "~/components/skeleton-loader";
-import { Plus, Leaf } from "lucide-react";
-import { requireAuth } from "~/lib/require-auth.server";
-import { getUserPlants } from "~/lib/plants.server";
-import { getUserRooms } from "~/lib/rooms.server";
-import { PlantCard } from "~/components/plant-card";
-import { RoomFilter } from "~/components/room-filter";
-import { AddPlantDialog } from "~/components/add-plant-dialog";
-import type { PlantWithWatering, Room } from "~/types/plant.types";
+import { AddPlantDialog, PlantCard } from '~/features/plants/components';
+import { RoomFilter } from '~/features/rooms/components';
+import { getUserPlants, getUserRooms, requireAuth } from '~/lib';
+import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
+import type { PlantWithWatering, Room } from '~/types/plant.types';
+
+import { useState } from 'react';
+import { useLoaderData, useNavigate, useNavigation, useSearchParams } from 'react-router';
+
+import { Leaf, Plus } from 'lucide-react';
+
+import type { Route } from './+types/dashboard._index';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await requireAuth(request);
@@ -55,7 +53,9 @@ export default function DashboardIndex() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">My Plants</h1>
-          <p className="text-gray-600 dark:text-slate-400 mt-1">Track and manage your plant collection</p>
+          <p className="text-gray-600 dark:text-slate-400 mt-1">
+            Track and manage your plant collection
+          </p>
         </div>
         <Button
           size="lg"
@@ -67,10 +67,7 @@ export default function DashboardIndex() {
         </Button>
       </div>
 
-      <AddPlantDialog
-        open={addPlantDialogOpen}
-        onOpenChange={setAddPlantDialogOpen}
-      />
+      <AddPlantDialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen} />
 
       {/* Room Filter */}
       {rooms.length > 0 && (

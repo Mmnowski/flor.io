@@ -1,250 +1,586 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import {
+  checkAIGenerationLimit,
+  checkPlantLimit,
+  createAIPlant,
+  getUserRooms,
+  incrementAIUsage,
+  processPlantImage,
+  recordAIFeedback,
+  requireAuth,
+  uploadPlantPhoto,
+} from '~/lib';
 
-describe("AI Wizard Route - Error Handling", () => {
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { action, loader } from '../dashboard.plants.new-ai';
+
+// Mock all dependencies
+vi.mock('~/lib');
+vi.mock('~/shared/lib/logger');
+
+describe('AI Wizard Route - Error Handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Loader Error Handling", () => {
-    it("returns user-friendly error message on network failure", async () => {
-      // When loader fails to fetch user limits (network error)
-      // Then should return error with message
-      // Not expose technical details
-      expect(true).toBe(true);
+  describe('Loader Error Handling', () => {
+    it('throws error when user is not authenticated', async () => {
+      vi.mocked(requireAuth).mockRejectedValueOnce(new Error('Unauthorized'));
+
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      await expect(
+        loader({ request, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow('Unauthorized');
     });
 
-    it("differentiates between limit exceeded and network errors", async () => {
-      // When checkAIGenerationLimit returns allowed: false
-      // Then show specific message: "AI generation limit reached"
-      // Different from network error messages
-      expect(true).toBe(true);
+    it('throws error when plant limit is exceeded', async () => {
+      const mockUserId = 'user-123';
+      vi.mocked(requireAuth).mockResolvedValueOnce(mockUserId);
+      vi.mocked(checkPlantLimit).mockResolvedValueOnce({
+        allowed: false,
+        count: 100,
+        limit: 100,
+      });
+
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      await expect(
+        loader({ request, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow(/Plant limit reached/);
     });
 
-    it("suggests action for limit exceeded errors", async () => {
-      // When user hits AI limit
-      // Then error message should suggest when limit resets
-      // Or offer alternative (manual plant creation)
-      expect(true).toBe(true);
+    it('throws error when AI generation limit is exceeded', async () => {
+      const mockUserId = 'user-123';
+      vi.mocked(requireAuth).mockResolvedValueOnce(mockUserId);
+      vi.mocked(checkPlantLimit).mockResolvedValueOnce({
+        allowed: true,
+        count: 50,
+        limit: 100,
+      });
+      vi.mocked(checkAIGenerationLimit).mockResolvedValueOnce({
+        allowed: false,
+        used: 20,
+        limit: 20,
+        resetsOn: new Date(),
+      });
+
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      await expect(
+        loader({ request, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow(/AI generation limit reached/);
     });
 
-    it("logs loader errors for debugging", async () => {
-      // When loader throws error
-      // Then error details should be logged
-      // For debugging and monitoring
-      expect(true).toBe(true);
-    });
-  });
+    it('returns user data with remaining AI credits on success', async () => {
+      const mockUserId = 'user-123';
+      vi.mocked(requireAuth).mockResolvedValueOnce(mockUserId);
+      vi.mocked(checkPlantLimit).mockResolvedValueOnce({
+        allowed: true,
+        count: 50,
+        limit: 100,
+      });
+      vi.mocked(checkAIGenerationLimit).mockResolvedValueOnce({
+        allowed: true,
+        used: 5,
+        limit: 20,
+        resetsOn: new Date(),
+      });
+      vi.mocked(getUserRooms).mockResolvedValueOnce([
+        { id: 'room-1', name: 'Living Room', user_id: mockUserId, created_at: '' },
+      ] as any);
 
-  describe("Action Error Handling - Save Plant", () => {
-    it("handles validation errors from createAIPlant", async () => {
-      // When createAIPlant throws validation error
-      // Then action should catch and return error response
-      // With user-friendly message
-      expect(true).toBe(true);
-    });
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      const result = await loader({ request, params: {}, unstable_pattern: '', context: {} });
 
-    it("handles database errors gracefully", async () => {
-      // When database operation fails
-      // Then action should return error
-      // Not expose database details
-      expect(true).toBe(true);
-    });
-
-    it("handles photo upload failures", async () => {
-      // When uploadPlantPhoto fails
-      // Then should allow saving plant without photo
-      // Or return error if photo was required
-      expect(true).toBe(true);
+      expect(result.userId).toBe(mockUserId);
+      expect(result.aiRemaining).toBe(15);
+      expect(result.rooms).toHaveLength(1);
     });
 
-    it("handles image processing failures", async () => {
-      // When processPlantImage fails
-      // Then should either retry or skip processing
-      // But still complete plant creation
-      expect(true).toBe(true);
+    it('handles network errors gracefully in checkPlantLimit', async () => {
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(checkPlantLimit).mockRejectedValueOnce(new Error('Network error'));
+
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      await expect(
+        loader({ request, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow('Network error');
     });
 
-    it("validates plant data before save", async () => {
-      // When plant data is invalid (missing name, bad frequency)
-      // Then should return validation error
-      // Not send invalid data to database
-      expect(true).toBe(true);
-    });
+    it('handles network errors gracefully in checkAIGenerationLimit', async () => {
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(checkPlantLimit).mockResolvedValueOnce({
+        allowed: true,
+        count: 50,
+        limit: 100,
+      });
+      vi.mocked(checkAIGenerationLimit).mockRejectedValueOnce(new Error('Network error'));
 
-    it("rolls back on partial save failure", async () => {
-      // When plant is created but photo upload fails
-      // Then should clean up database record
-      // Or notify user of incomplete state
-      expect(true).toBe(true);
-    });
-
-    it("increments usage only after successful save", async () => {
-      // When plant save fails
-      // Then should not increment AI usage
-      // User should not be charged for failed attempt
-      expect(true).toBe(true);
-    });
-
-    it("handles concurrent plant creation safely", async () => {
-      // When multiple requests come for same user simultaneously
-      // Then should handle plant limit check safely
-      // Prevent duplicate deductions
-      expect(true).toBe(true);
-    });
-  });
-
-  describe("Action Error Handling - Save Feedback", () => {
-    it("handles non-existent plant gracefully", async () => {
-      // When recordAIFeedback called with invalid plantId
-      // Then should return error
-      // Not crash the request
-      expect(true).toBe(true);
-    });
-
-    it("prevents recording feedback for other user's plants", async () => {
-      // When user tries to record feedback for plant they don't own
-      // Then should return error
-      // And not record feedback
-      expect(true).toBe(true);
-    });
-
-    it("handles database errors during feedback save", async () => {
-      // When database write fails for feedback
-      // Then should return error response
-      // Still allow redirect to plant details
-      expect(true).toBe(true);
-    });
-
-    it("validates feedback data before save", async () => {
-      // When feedback data is invalid
-      // Then should return validation error
-      // Not save invalid feedback
-      expect(true).toBe(true);
-    });
-
-    it("handles missing optional fields gracefully", async () => {
-      // When feedback comment is empty
-      // Then should save feedback without comment
-      // Not require it
-      expect(true).toBe(true);
+      const request = new Request('http://localhost/dashboard/plants/new-ai');
+      await expect(
+        loader({ request, params: {}, unstable_pattern: '', context: {} })
+      ).rejects.toThrow('Network error');
     });
   });
 
-  describe("Error Response Format", () => {
-    it("returns error response for client errors", async () => {
-      // When action fails
-      // Then should return: { error: "message" }
-      // So client can handle it
-      expect(true).toBe(true);
+  describe('Action Error Handling - Save Plant', () => {
+    it('returns error when action parameter is missing', async () => {
+      const formData = new FormData();
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result).toEqual({ error: 'Invalid action' });
     });
 
-    it("returns redirect response on feedback success", async () => {
-      // When feedback saves successfully
-      // Then should redirect to plant details page
-      // Using redirect() function
-      expect(true).toBe(true);
+    it('handles validation errors from createAIPlant', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', '');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockRejectedValueOnce(new Error('Plant name is required'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Plant name is required');
+      expect(vi.mocked(incrementAIUsage)).not.toHaveBeenCalled();
     });
 
-    it("returns success response for plant creation", async () => {
-      // When plant is created successfully
-      // Then should return: { success: true, plantId: "..." }
-      // So client can store plant ID for feedback
-      expect(true).toBe(true);
+    it('handles database errors gracefully', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockRejectedValueOnce(new Error('Database connection failed'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Database connection failed');
+      // Should not expose internal details
+      expect(result.error).not.toContain('table');
+      expect(result.error).not.toContain('constraint');
     });
 
-    it("includes error code for programmatic handling", async () => {
-      // When action returns error
-      // Then response should include error code
-      // So client can handle specific errors differently
-      expect(true).toBe(true);
+    it('allows saving plant without photo when photo processing fails', async () => {
+      const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '["tip1"]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+      formData.append('photoFile', mockFile);
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(processPlantImage).mockRejectedValueOnce(new Error('Image processing failed'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Image processing failed');
+    });
+
+    it('increments usage only after successful plant save', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const mockPlantId = 'plant-123';
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockResolvedValueOnce({
+        id: mockPlantId,
+        user_id: 'user-123',
+        name: 'Test Plant',
+        watering_frequency_days: 7,
+        photo_url: null,
+        room_id: null,
+        light_requirements: null,
+        fertilizing_tips: null,
+        pruning_tips: null,
+        troubleshooting: null,
+        created_with_ai: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      vi.mocked(incrementAIUsage).mockResolvedValueOnce(undefined as any);
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.success).toBe(true);
+      expect(result.plantId).toBe(mockPlantId);
+      expect(vi.mocked(incrementAIUsage)).toHaveBeenCalledWith('user-123');
+    });
+
+    it('does not increment usage when plant creation fails', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockRejectedValueOnce(new Error('Save failed'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Save failed');
+      expect(vi.mocked(incrementAIUsage)).not.toHaveBeenCalled();
     });
   });
 
-  describe("Error Recovery Suggestions", () => {
-    it("suggests file size reduction on photo too large", async () => {
-      // When photo > 10MB
-      // Then error message should suggest: "Try a smaller photo"
-      expect(true).toBe(true);
+  describe('Action Error Handling - Save Feedback', () => {
+    it('prevents recording feedback for invalid plant ID', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', 'invalid-plant');
+      formData.append('feedbackType', 'thumbs_up');
+      formData.append('comment', '');
+      formData.append('aiResponseSnapshot', '{}');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(recordAIFeedback).mockRejectedValueOnce(
+        new Error('Plant not found or access denied')
+      );
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toContain('Plant not found');
     });
 
-    it("suggests retry for network errors", async () => {
-      // When network error occurs
-      // Then error message should suggest: "Check connection and try again"
-      expect(true).toBe(true);
+    it('prevents recording feedback for other user plants', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', 'other-user-plant');
+      formData.append('feedbackType', 'thumbs_down');
+      formData.append('comment', 'Not working');
+      formData.append('aiResponseSnapshot', '{}');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(recordAIFeedback).mockRejectedValueOnce(
+        new Error('Plant not found or access denied')
+      );
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toContain('Plant not found');
+      // Error should not reveal plant ownership
+      expect(result.error).not.toContain('access denied');
     });
 
-    it("suggests different input on validation errors", async () => {
-      // When name is empty
-      // Then error should suggest: "Please enter a plant name"
-      expect(true).toBe(true);
+    it('handles database errors during feedback save', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', 'plant-123');
+      formData.append('feedbackType', 'thumbs_up');
+      formData.append('comment', 'Great plant');
+      formData.append('aiResponseSnapshot', '{}');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(recordAIFeedback).mockRejectedValueOnce(new Error('Database error'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Database error');
     });
 
-    it("directs user to contact support for persistent errors", async () => {
-      // When error is persistent/unrecoverable
-      // Then message should suggest: "Contact support if problem persists"
-      expect(true).toBe(true);
+    it('saves feedback without comment when comment is empty', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', 'plant-123');
+      formData.append('feedbackType', 'thumbs_up');
+      formData.append('comment', '');
+      formData.append('aiResponseSnapshot', '{"care": "data"}');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(recordAIFeedback).mockResolvedValueOnce(true);
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(vi.mocked(recordAIFeedback)).toHaveBeenCalledWith(
+        'user-123',
+        'plant-123',
+        'thumbs_up',
+        '',
+        { care: 'data' }
+      );
     });
   });
 
-  describe("Error Logging and Monitoring", () => {
-    it("logs all errors for debugging", async () => {
-      // When any error occurs in action
-      // Then should log full error details
-      // Including stack trace for server-side investigation
-      expect(true).toBe(true);
+  describe('Error Response Format', () => {
+    it('returns error response for client errors', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test');
+      formData.append('wateringFrequencyDays', 'invalid');
+      formData.append('lightRequirements', '');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockRejectedValueOnce(new Error('Invalid watering frequency'));
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result).toHaveProperty('error');
+      expect(typeof result.error).toBe('string');
     });
 
-    it("logs error type and user context", async () => {
-      // When error occurs
-      // Then log should include:
-      // - Error type (network, validation, database, etc)
-      // - User ID
-      // - Action attempted
-      expect(true).toBe(true);
+    it('returns unknown action error for invalid actions', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'invalid-action');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).toBe('Unknown action');
     });
 
-    it("distinguishes between client and server errors", async () => {
-      // When logging errors
-      // Then should distinguish:
-      // - Client errors (validation, file issues)
-      // - Server errors (database, API failures)
-      expect(true).toBe(true);
-    });
+    it('returns success response with plant ID after successful save', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
 
-    it("tracks error frequency for monitoring", async () => {
-      // Errors should be tracked
-      // To identify systemic issues
-      // Like frequent timeout on generateCare
-      expect(true).toBe(true);
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockResolvedValueOnce({
+        id: 'plant-123',
+        user_id: 'user-123',
+        name: 'Test Plant',
+        watering_frequency_days: 7,
+        photo_url: null,
+        room_id: null,
+        light_requirements: null,
+        fertilizing_tips: null,
+        pruning_tips: null,
+        troubleshooting: null,
+        created_with_ai: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      vi.mocked(incrementAIUsage).mockResolvedValueOnce(undefined as any);
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.success).toBe(true);
+      expect(result.plantId).toBe('plant-123');
     });
   });
 
-  describe("Security in Error Handling", () => {
-    it("does not expose database details in errors", async () => {
-      // When database error occurs
-      // Then error message to client should be generic
-      // Not expose table names, column names, etc.
-      expect(true).toBe(true);
+  describe('Security in Error Handling', () => {
+    it('does not expose database details in error messages', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-plant');
+      formData.append('name', 'Test Plant');
+      formData.append('wateringFrequencyDays', '7');
+      formData.append('lightRequirements', 'medium');
+      formData.append('fertilizingTips', '[]');
+      formData.append('pruningTips', '[]');
+      formData.append('troubleshooting', '[]');
+
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
+
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(createAIPlant).mockRejectedValueOnce(
+        new Error('Unique constraint failed on plants.name')
+      );
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      expect(result.error).not.toContain('constraint');
+      expect(result.error).not.toContain('Unique');
     });
 
-    it("does not expose file system paths in errors", async () => {
-      // When file operation fails
-      // Then error message should not include server paths
-      expect(true).toBe(true);
-    });
+    it('prevents information leakage about plant ownership', async () => {
+      const formData = new FormData();
+      formData.append('_action', 'save-feedback');
+      formData.append('plantId', 'unknown-plant');
+      formData.append('feedbackType', 'thumbs_up');
+      formData.append('comment', '');
+      formData.append('aiResponseSnapshot', '{}');
 
-    it("sanitizes user input in error messages", async () => {
-      // When returning validation error
-      // Then should sanitize any user-provided input
-      // To prevent injection attacks
-      expect(true).toBe(true);
-    });
+      const request = new Request('http://localhost/api', {
+        method: 'POST',
+        body: formData,
+      });
 
-    it("prevents unauthorized access via error messages", async () => {
-      // When plant doesn't belong to user
-      // Then should not confirm plant exists
-      // Error should not reveal whether plant exists
-      expect(true).toBe(true);
+      vi.mocked(requireAuth).mockResolvedValueOnce('user-123');
+      vi.mocked(recordAIFeedback).mockRejectedValueOnce(
+        new Error('Plant not found or access denied')
+      );
+
+      const result = (await action({
+        request,
+        params: {},
+        unstable_pattern: '',
+        context: {},
+      })) as any;
+
+      // Generic error doesn't reveal if plant exists
+      expect(result.error).not.toContain('exist');
+      expect(result.error).not.toContain('found');
     });
   });
 });

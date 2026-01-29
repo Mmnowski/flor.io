@@ -1,6 +1,6 @@
-import { expect, afterEach, vi, beforeEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeEach, expect, vi } from 'vitest';
 
 // Cleanup after each test
 afterEach(() => {
@@ -86,10 +86,7 @@ if (typeof File !== 'undefined' && !File.prototype.arrayBuffer) {
 const originalError = console.error;
 beforeEach(() => {
   console.error = (...args: any[]) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render')
-    ) {
+    if (typeof args[0] === 'string' && args[0].includes('Warning: ReactDOM.render')) {
       return;
     }
     originalError.call(console, ...args);

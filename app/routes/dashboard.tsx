@@ -1,6 +1,8 @@
-import { Outlet } from "react-router";
-import type { Route } from "./+types/dashboard";
-import { requireAuth } from "~/lib/require-auth.server";
+import { requireAuth } from '~/lib';
+
+import { Outlet } from 'react-router';
+
+import type { Route } from './+types/dashboard';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await requireAuth(request);

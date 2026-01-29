@@ -1,54 +1,51 @@
-import { Form, Link, redirect, useActionData } from "react-router";
-import type { Route } from "./+types/auth.login";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Card } from "~/components/ui/card";
-import { FormError } from "~/components/form-error";
-import { loginUser } from "~/lib/auth.server";
-import { createUserSession, getUserId } from "~/lib/session.server";
+import { createUserSession, getUserId, loginUser } from '~/lib';
+import { Button, Card, FormError, Input, Label } from '~/shared/components';
+
+import { Form, Link, redirect, useActionData } from 'react-router';
+
+import type { Route } from './+types/auth.login';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await getUserId(request);
   if (userId) {
-    return redirect("/dashboard");
+    return redirect('/dashboard');
   }
   return null;
 };
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  if (request.method !== "POST") {
+  if (request.method !== 'POST') {
     return { error: null as string | null };
   }
 
   try {
     const formData = await request.formData();
-    const email = formData.get("email");
-    const password = formData.get("password");
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-    if (!email || typeof email !== "string") {
-      return { error: "Email is required" };
+    if (!email || typeof email !== 'string') {
+      return { error: 'Email is required' };
     }
 
-    if (!password || typeof password !== "string") {
-      return { error: "Password is required" };
+    if (!password || typeof password !== 'string') {
+      return { error: 'Password is required' };
     }
 
     const session = await loginUser(email, password);
 
     if (!session?.user?.id) {
-      return { error: "Email address or password is incorrect" };
+      return { error: 'Email address or password is incorrect' };
     }
 
     return createUserSession(session.user.id);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Login failed";
+    const message = error instanceof Error ? error.message : 'Login failed';
     return { error: message };
   }
 };
 
 export default function LoginPage() {
-  const actionData = useActionData() as { error: string | null } | undefined;
+  const actionData = useActionData();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-white dark:from-slate-950 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -108,7 +105,7 @@ export default function LoginPage() {
           </Form>
 
           <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-6 leading-relaxed">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link
               to="/auth/register"
               className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors focus:ring-2 focus:ring-emerald-300 rounded px-1 focus:outline-none"

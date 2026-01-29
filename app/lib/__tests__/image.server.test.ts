@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { processPlantImage, extractImageFromFormData, fileToBuffer } from '../image.server';
+import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib';
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('sharp', () => {
   return {
@@ -39,7 +40,10 @@ describe('Image Server Utilities', () => {
         await processPlantImage(exactBuffer);
       } catch (error) {
         // May fail on processing, not on size validation
-        if ((error as Error).message.includes('10MB') && (error as Error).message.includes('must')) {
+        if (
+          (error as Error).message.includes('10MB') &&
+          (error as Error).message.includes('must')
+        ) {
           throw error;
         }
       }

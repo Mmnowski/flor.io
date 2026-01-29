@@ -7,18 +7,19 @@
  * - PATCH: Update room name
  * - DELETE: Delete room
  */
+import {
+  countPlantsInRoom,
+  createRoom,
+  deleteRoom,
+  getRoomById,
+  getUserRooms,
+  requireAuth,
+  roomNameSchema,
+  updateRoom,
+} from '~/lib';
+import { logger } from '~/shared/lib/logger';
 
 import type { Route } from './+types/api.rooms';
-import { requireAuth } from '~/lib/require-auth.server';
-import {
-  getUserRooms,
-  getRoomById,
-  createRoom,
-  updateRoom,
-  deleteRoom,
-  countPlantsInRoom,
-} from '~/lib/rooms.server';
-import { roomNameSchema } from '~/lib/validation';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   if (request.method !== 'GET') {
@@ -52,7 +53,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         if (!validation.success) {
           throw new Response(
             JSON.stringify({
-              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+              error: validation.error.issues[0]?.message || 'Invalid room name',
             }),
             { status: 400 }
           );
@@ -78,7 +79,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         if (!validation.success) {
           throw new Response(
             JSON.stringify({
-              error: validation.error.flatten().fieldErrors.name?.[0] || 'Invalid room name',
+              error: validation.error.issues[0]?.message || 'Invalid room name',
             }),
             { status: 400 }
           );
@@ -121,7 +122,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       throw error;
     }
     const message = error instanceof Error ? error.message : 'Operation failed';
-    console.error('Room API error:', error);
+    logger.error('Room API error', error);
     throw new Response(JSON.stringify({ error: message }), { status: 500 });
   }
 };

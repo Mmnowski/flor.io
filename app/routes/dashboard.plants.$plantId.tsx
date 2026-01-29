@@ -1,31 +1,29 @@
-import { useState } from "react";
-import { Link, useLoaderData, redirect, useNavigation } from "react-router";
-import type { Route } from "./+types/dashboard.plants.$plantId";
-import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
-import { Leaf, Pencil, Sun, Droplet, Bug, Leaf as LeafIcon } from "lucide-react";
-import { cn } from "~/lib/utils";
-import { PlantDetailsSkeleton } from "~/components/skeleton-loader";
-import { requireAuth } from "~/lib/require-auth.server";
-import { getPlantById, deletePlant } from "~/lib/plants.server";
-import { recordWatering } from "~/lib/watering.server";
-import { WateringButton } from "~/components/watering-button";
-import { PlantInfoSection } from "~/components/plant-info-section";
-import { DeletePlantDialog } from "~/components/delete-plant-dialog";
-import type { PlantWithDetails } from "~/types/plant.types";
+import { DeletePlantDialog, PlantInfoSection } from '~/features/plants/components';
+import { WateringButton } from '~/features/watering/components';
+import { cn, deletePlant, getPlantById, recordWatering, requireAuth } from '~/lib';
+import { Badge, Button, PlantDetailsSkeleton } from '~/shared/components';
+import { logger } from '~/shared/lib/logger';
+import type { PlantWithDetails } from '~/types/plant.types';
+
+import { useState } from 'react';
+import { Link, redirect, useLoaderData, useNavigation } from 'react-router';
+
+import { Bug, Droplet, Leaf, Leaf as LeafIcon, Pencil, Sun } from 'lucide-react';
+
+import type { Route } from './+types/dashboard.plants.$plantId';
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const userId = await requireAuth(request);
   const plantId = params.plantId;
 
   if (!plantId) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response('Not Found', { status: 404 });
   }
 
   const plant = await getPlantById(plantId, userId);
 
   if (!plant) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response('Not Found', { status: 404 });
   }
 
   return { plant };
@@ -36,27 +34,27 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   const plantId = params.plantId;
 
   if (!plantId) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response('Not Found', { status: 404 });
   }
 
-  if (request.method === "POST") {
+  if (request.method === 'POST') {
     const formData = await request.formData();
-    const action = formData.get("_action");
+    const action = formData.get('_action');
 
     try {
-      if (action === "water") {
+      if (action === 'water') {
         // Record watering
         await recordWatering(plantId, userId);
         // Return to trigger revalidation
         return null;
-      } else if (action === "delete") {
+      } else if (action === 'delete') {
         // Delete plant
         await deletePlant(plantId, userId);
-        return redirect("/dashboard");
+        return redirect('/dashboard');
       }
     } catch (error) {
-      console.error("Error in plant action:", error);
-      const message = error instanceof Error ? error.message : "An error occurred";
+      logger.error('Error in plant action', error);
+      const message = error instanceof Error ? error.message : 'An error occurred';
       return { error: message };
     }
   }
@@ -77,27 +75,27 @@ export default function PlantDetail() {
 
   const getWateringColor = () => {
     if (plant.is_overdue) {
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
     }
     if (plant.days_until_watering === 0) {
-      return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200";
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
     }
-    return "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200";
+    return 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200';
   };
 
   const getWateringLabel = () => {
-    if (plant.is_overdue) return "Overdue";
-    if (plant.days_until_watering === 0) return "Water Today";
-    if (plant.days_until_watering === 1) return "Tomorrow";
-    return "Upcoming";
+    if (plant.is_overdue) return 'Overdue';
+    if (plant.days_until_watering === 0) return 'Water Today';
+    if (plant.days_until_watering === 1) return 'Tomorrow';
+    return 'Upcoming';
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return "Never";
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+    if (!date) return 'Never';
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -114,11 +112,7 @@ export default function PlantDetail() {
         {/* Photo */}
         <div className="rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 aspect-square">
           {plant.photo_url ? (
-            <img
-              src={plant.photo_url}
-              alt={plant.name}
-              className="w-full h-full object-cover"
-            />
+            <img src={plant.photo_url} alt={plant.name} className="w-full h-full object-cover" />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800"
@@ -134,9 +128,7 @@ export default function PlantDetail() {
         <div className="flex flex-col justify-between">
           <div>
             {/* Plant name and room */}
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-              {plant.name}
-            </h1>
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">{plant.name}</h1>
             {plant.room_name && (
               <Badge variant="outline" className="mb-6">
                 {plant.room_name}
@@ -145,12 +137,10 @@ export default function PlantDetail() {
 
             {/* Watering status */}
             <div className="mb-6">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                Watering Status
-              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Watering Status</p>
               <div
                 className={cn(
-                  "px-4 py-2 rounded-lg font-semibold inline-block",
+                  'px-4 py-2 rounded-lg font-semibold inline-block',
                   getWateringColor()
                 )}
               >
@@ -159,7 +149,7 @@ export default function PlantDetail() {
                   ? plant.days_until_watering < 0
                     ? `${Math.abs(plant.days_until_watering)} days overdue`
                     : `${plant.days_until_watering} days`
-                  : "Unknown"}
+                  : 'Unknown'}
                 )
               </div>
             </div>
@@ -167,25 +157,19 @@ export default function PlantDetail() {
             {/* Quick info */}
             <div className="space-y-2 mb-6">
               <p className="text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
-                  Watering Frequency:
-                </span>
+                <span className="text-slate-600 dark:text-slate-400">Watering Frequency:</span>
                 <span className="ml-2 font-semibold text-slate-900 dark:text-white">
                   Every {plant.watering_frequency_days} days
                 </span>
               </p>
               <p className="text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
-                  Last Watered:
-                </span>
+                <span className="text-slate-600 dark:text-slate-400">Last Watered:</span>
                 <span className="ml-2 font-semibold text-slate-900 dark:text-white">
                   {formatDate(plant.last_watered_date)}
                 </span>
               </p>
               <p className="text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
-                  Next Watering:
-                </span>
+                <span className="text-slate-600 dark:text-slate-400">Next Watering:</span>
                 <span className="ml-2 font-semibold text-slate-900 dark:text-white">
                   {formatDate(plant.next_watering_date)}
                 </span>
@@ -204,9 +188,7 @@ export default function PlantDetail() {
 
       {/* Info sections */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-          Care Information
-        </h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Care Information</h2>
         <div className="space-y-2">
           <PlantInfoSection
             title="Light Requirements"
@@ -219,16 +201,8 @@ export default function PlantDetail() {
             content={plant.fertilizing_tips}
             icon={LeafIcon}
           />
-          <PlantInfoSection
-            title="Pruning Tips"
-            content={plant.pruning_tips}
-            icon={LeafIcon}
-          />
-          <PlantInfoSection
-            title="Troubleshooting"
-            content={plant.troubleshooting}
-            icon={Bug}
-          />
+          <PlantInfoSection title="Pruning Tips" content={plant.pruning_tips} icon={LeafIcon} />
+          <PlantInfoSection title="Troubleshooting" content={plant.troubleshooting} icon={Bug} />
         </div>
       </div>
 
@@ -262,10 +236,7 @@ export default function PlantDetail() {
             Edit Plant
           </Button>
         </Link>
-        <Button
-          variant="destructive"
-          onClick={() => setDeleteDialogOpen(true)}
-        >
+        <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
           Delete
         </Button>
       </div>
