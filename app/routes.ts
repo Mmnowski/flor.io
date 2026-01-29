@@ -9,6 +9,10 @@ export default [
   route("auth/register", "routes/auth.register.tsx"),
   route("auth/logout", "routes/auth.logout.tsx"),
 
+  // API Routes
+  route("api/notifications", "routes/api.notifications.tsx"),
+  route("api/water/:plantId", "routes/api.water.$plantId.tsx"),
+
   // Dashboard Routes (Protected)
   route("dashboard", "routes/dashboard.tsx", [
     index("routes/dashboard._index.tsx"),

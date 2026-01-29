@@ -97,7 +97,7 @@ export async function getNextWateringDate(
   try {
     const { data, error } = await (supabaseServer as any).rpc(
       'get_next_watering_date',
-      { plant_id: plantId }
+      { p_plant_id: plantId }
     );
 
     if (error) {
@@ -125,7 +125,7 @@ export async function getPlantsNeedingWater(userId: string): Promise<any[]> {
   try {
     const { data, error } = await (supabaseServer as any).rpc(
       'get_plants_needing_water',
-      { user_id: userId }
+      { p_user_id: userId }
     );
 
     if (error) {

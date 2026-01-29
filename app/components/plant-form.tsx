@@ -26,12 +26,7 @@ interface PlantFormProps {
 
 export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
   const isEdit = mode === 'edit';
-  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string>(isEdit && plant?.room_id ? plant.room_id : '');
-
-  const handlePhotoChange = (file: File | null) => {
-    setSelectedPhoto(file);
-  };
 
   const handleRoomChange = (value: string) => {
     setSelectedRoom(value);
@@ -44,25 +39,9 @@ export function PlantForm({ plant, rooms, error, mode }: PlantFormProps) {
       {/* Photo Upload */}
       <div>
         <Label className="text-base font-semibold mb-3 block">Plant Photo</Label>
-        <div>
-          <input
-            type="hidden"
-            name="photo"
-            value={selectedPhoto?.name || ''}
-          />
-          {selectedPhoto && (
-            <input
-              type="hidden"
-              name="photo_file"
-              value={selectedPhoto.name}
-            />
-          )}
-          <ImageUpload
-            currentPhotoUrl={isEdit ? plant?.photo_url : undefined}
-            onFileChange={handlePhotoChange}
-          />
-        </div>
-        {/* Actual file input is handled inside ImageUpload via FormData */}
+        <ImageUpload
+          currentPhotoUrl={isEdit ? plant?.photo_url : undefined}
+        />
       </div>
 
       {/* Plant Name */}

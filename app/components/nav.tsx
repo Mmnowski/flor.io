@@ -1,13 +1,16 @@
-import { Link, useLocation } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useFetcher } from "react-router";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Menu, Moon, Sun } from "lucide-react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "~/hooks/useTheme";
+import { NotificationsModal, type PlantNeedingWater } from "~/components/notifications-modal";
 
 export function Navigation({
   isAuthenticated,
@@ -18,6 +21,49 @@ export function Navigation({
 }) {
   const location = useLocation();
   const { isDark, toggleTheme } = useTheme();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<PlantNeedingWater[]>([]);
+  const notificationsFetcher = useFetcher<{
+    notifications: PlantNeedingWater[];
+    count: number;
+  }>();
+  const wateringFetcher = useFetcher();
+  const initialFetchDone = useRef(false);
+
+  // Fetch notifications on mount for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && !initialFetchDone.current && notificationsFetcher.state === "idle") {
+      initialFetchDone.current = true;
+      notificationsFetcher.load("/api/notifications");
+    }
+  }, [isAuthenticated]);
+
+  // Refetch notifications when modal opens
+  useEffect(() => {
+    if (isAuthenticated && notificationsOpen && notificationsFetcher.state === "idle") {
+      notificationsFetcher.load("/api/notifications");
+    }
+  }, [isAuthenticated, notificationsOpen]);
+
+  // Update notifications when fetcher data changes
+  useEffect(() => {
+    if (notificationsFetcher.data?.notifications) {
+      setNotifications(notificationsFetcher.data.notifications);
+    }
+  }, [notificationsFetcher.data]);
+
+  // Refetch notifications after watering action completes
+  useEffect(() => {
+    if (wateringFetcher.state === "idle" && wateringFetcher.data) {
+      // Refetch notifications after a successful watering
+      notificationsFetcher.load("/api/notifications");
+    }
+  }, [wateringFetcher.state, wateringFetcher.data]);
+
+  // Handle watering action
+  const handleWatered = (plantId: string) => {
+    wateringFetcher.submit({}, { method: "post", action: `/api/water/${plantId}` });
+  };
 
   // Don't show nav on auth pages
   if (location.pathname.startsWith("/auth")) {
@@ -46,6 +92,25 @@ export function Navigation({
                 >
                   Dashboard
                 </Link>
+
+                {/* Notifications Bell */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setNotificationsOpen(true)}
+                  className="relative h-10 w-10 focus:ring-2 focus:ring-emerald-300 hover:bg-emerald-50 dark:hover:bg-slate-800"
+                  aria-label={`Notifications (${notifications.length})`}
+                >
+                  <Bell className="h-5 w-5 text-gray-700 dark:text-slate-300" />
+                  {notifications.length > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    >
+                      {notifications.length}
+                    </Badge>
+                  )}
+                </Button>
 
                 {/* Theme Toggle */}
                 <Button
@@ -128,6 +193,17 @@ export function Navigation({
           </div>
         </div>
       </div>
+
+      {/* Notifications Modal */}
+      {isAuthenticated && (
+        <NotificationsModal
+          open={notificationsOpen}
+          onOpenChange={setNotificationsOpen}
+          notifications={notifications}
+          onWatered={handleWatered}
+          isLoading={wateringFetcher.state !== "idle"}
+        />
+      )}
     </nav>
   );
 }
