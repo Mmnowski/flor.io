@@ -1,4 +1,5 @@
-import { Link, useLoaderData, useNavigate, useSearchParams } from "react-router";
+import { useState } from "react";
+import { useLoaderData, useNavigate, useSearchParams } from "react-router";
 import type { Route } from "./+types/dashboard._index";
 import { Button } from "~/components/ui/button";
 import { EmptyState } from "~/components/empty-state";
@@ -8,6 +9,7 @@ import { getUserPlants } from "~/lib/plants.server";
 import { getUserRooms } from "~/lib/rooms.server";
 import { PlantCard } from "~/components/plant-card";
 import { RoomFilter } from "~/components/room-filter";
+import { AddPlantDialog } from "~/components/add-plant-dialog";
 import type { PlantWithWatering, Room } from "~/types/plant.types";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -30,6 +32,7 @@ export default function DashboardIndex() {
   const { plants, rooms, activeRoomId } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false);
 
   const handleFilterChange = (newRoomId: string | null) => {
     if (newRoomId) {
@@ -46,16 +49,20 @@ export default function DashboardIndex() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">My Plants</h1>
           <p className="text-gray-600 dark:text-slate-400 mt-1">Track and manage your plant collection</p>
         </div>
-        <Link to="/dashboard/plants/new">
-          <Button
-            size="lg"
-            className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white focus:ring-2 focus:ring-emerald-300 whitespace-nowrap"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Add Plant
-          </Button>
-        </Link>
+        <Button
+          size="lg"
+          onClick={() => setAddPlantDialogOpen(true)}
+          className="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white focus:ring-2 focus:ring-emerald-300 whitespace-nowrap"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add Plant
+        </Button>
       </div>
+
+      <AddPlantDialog
+        open={addPlantDialogOpen}
+        onOpenChange={setAddPlantDialogOpen}
+      />
 
       {/* Room Filter */}
       {rooms.length > 0 && (
