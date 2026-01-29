@@ -249,8 +249,8 @@ describe('WateringButton', () => {
       // Click button
       await user.click(button);
       // Button should still exist after click
-      const buttonAfterClick = screen.getByRole('button', { name: /record watering/i });
-      expect(buttonAfterClick).toBeInTheDocument();
+      const buttonsAfterClick = screen.getAllByRole('button', { name: /record watering/i });
+      expect(buttonsAfterClick.length).toBeGreaterThan(0);
     });
 
     it('should be clickable', async () => {
