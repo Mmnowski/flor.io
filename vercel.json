@@ -1,0 +1,12 @@
+{
+  "buildCommand": "yarn build",
+  "outputDirectory": "build/client",
+  "installCommand": "yarn install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
