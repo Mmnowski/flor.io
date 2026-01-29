@@ -13,8 +13,21 @@ import { loader } from '../api.notifications';
  * - Data formatting and error handling
  */
 
-vi.mock('~/lib/require-auth.server');
-vi.mock('~/lib/watering.server');
+vi.mock('~/lib/auth', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    requireAuth: vi.fn(),
+  };
+});
+
+vi.mock('~/lib/watering', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    getPlantsNeedingWater: vi.fn(),
+  };
+});
 
 describe('Notifications API Integration', () => {
   const mockUserId = 'user-test-123';

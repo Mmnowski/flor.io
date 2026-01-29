@@ -12,6 +12,9 @@ export default defineConfig({
       SUPABASE_URL: 'https://example.supabase.co',
       SUPABASE_SERVICE_ROLE_KEY: 'test-key',
       SUPABASE_ANON_KEY: 'test-anon-key',
+      VITE_SUPABASE_URL: 'https://example.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+      SESSION_SECRET: 'test-session-secret-min-32-chars-long',
     },
     coverage: {
       provider: 'v8',
