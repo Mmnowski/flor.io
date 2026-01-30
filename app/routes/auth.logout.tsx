@@ -1,4 +1,4 @@
-import { logout } from '~/lib';
+import { logout } from '~/lib/auth/session.server';
 
 import type { Route } from './+types/auth.logout';
 

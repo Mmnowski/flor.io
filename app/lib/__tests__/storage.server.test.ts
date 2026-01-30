@@ -1,4 +1,4 @@
-import { getPlantPhotoUrl } from '~/lib';
+import { getPlantPhotoUrl } from '~/lib/storage/storage.server';
 
 import { describe, expect, it, vi } from 'vitest';
 

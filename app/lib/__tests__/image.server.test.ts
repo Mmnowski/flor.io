@@ -1,4 +1,8 @@
-import { extractImageFromFormData, fileToBuffer, processPlantImage } from '~/lib';
+import {
+  extractImageFromFormData,
+  fileToBuffer,
+  processPlantImage,
+} from '~/lib/storage/image.server';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

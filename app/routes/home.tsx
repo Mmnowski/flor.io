@@ -1,4 +1,4 @@
-import { getUserId } from '~/lib';
+import { getUserId } from '~/lib/auth/session.server';
 import { Button } from '~/shared/components';
 
 import { Link, redirect } from 'react-router';

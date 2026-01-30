@@ -1,4 +1,4 @@
-import { identifyPlant, identifyPlantInstant } from '~/lib';
+import { identifyPlant, identifyPlantInstant } from '~/lib/ai/plantnet.server';
 
 import { describe, expect, it } from 'vitest';
 

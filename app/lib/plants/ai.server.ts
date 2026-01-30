@@ -1,4 +1,5 @@
-import { fetchOne, insertOne, supabaseServer } from '~/lib';
+import { fetchOne, insertOne } from '~/lib/infrastructure/supabase-helpers';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 import type { Plant, PlantInsertData } from '~/types/plant.types';
 
 /**

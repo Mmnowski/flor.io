@@ -1,4 +1,5 @@
-import { getUserByEmail, getUserById, loginUser, registerUser, supabaseServer } from '~/lib';
+import { getUserByEmail, getUserById, loginUser, registerUser } from '~/lib/auth/auth.server';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

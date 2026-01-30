@@ -2,7 +2,7 @@ import {
   type CareInstructions,
   generateCareInstructions,
   generateCareInstructionsInstant,
-} from '~/lib';
+} from '~/lib/ai/openai.server';
 
 import { describe, expect, it } from 'vitest';
 

@@ -89,127 +89,54 @@ export {
 // Infrastructure Domain (Supabase & Database)
 // ============================================================================
 export {
-  // Server-side Supabase client
-  supabaseServer,
-  createAuthenticatedSupabaseClient,
-  // Browser-side Supabase client
+  // Browser-side Supabase client only
   supabaseClient,
-  // Database helpers
-  fetchOne,
-  fetchMany,
-  insertOne,
-  updateOne,
-  deleteOne,
-  callRpc,
-  type TableName,
-  type Row,
-  type Insert,
-  type Update,
 } from './infrastructure';
 
-// ============================================================================
-// Auth Domain
-// ============================================================================
-export {
-  // Session management
-  sessionStorage,
-  getSession,
-  commitSession,
-  destroySession,
-  getUserId,
-  requireUserId,
-  createUserSession,
-  logout,
-  // Authentication
-  registerUser,
-  loginUser,
-  getUserById,
-  getUserByEmail,
-  // Route protection
-  requireAuth,
-} from './auth';
+// Note: Server-only infrastructure (supabaseServer, database helpers, etc.)
+// must be imported directly from './infrastructure/supabase.server' and
+// './infrastructure/supabase-helpers' in server-side contexts to prevent
+// server code from being bundled into the client.
 
 // ============================================================================
-// Storage Domain (Photos & Images)
+// Auth Domain (Server-Only)
 // ============================================================================
-export {
-  // Photo management
-  uploadPlantPhoto,
-  deletePlantPhoto,
-  getPlantPhotoUrl,
-  // Image processing
-  processPlantImage,
-  extractImageFromFormData,
-  fileToBuffer,
-} from './storage';
+// All auth functions are server-only and must be imported directly from
+// their .server files in server-side contexts (loaders/actions).
+//
+// Import directly:
+// - import { getSession, requireAuth, ... } from '~/lib/auth/session.server'
+// - import { registerUser, loginUser, ... } from '~/lib/auth/auth.server'
 
 // ============================================================================
-// Plants Domain
+// Storage Domain (Photos & Images - Server-Only)
 // ============================================================================
-export {
-  // CRUD operations
-  createPlant,
-  updatePlant,
-  deletePlant,
-  // Query operations
-  getUserPlants,
-  getPlantById,
-  getNextWateringDate,
-  getLastWateredDate,
-  getWateringHistory,
-  // AI operations
-  createAIPlant,
-  recordAIFeedback,
-} from './plants';
+// Photo upload/deletion and image processing are server-only and must be imported
+// directly from their .server files in server-side contexts (loaders/actions).
+//
+// Import directly:
+// - import { uploadPlantPhoto, deletePlantPhoto, ... } from '~/lib/storage/storage.server'
+// - import { processPlantImage, extractImageFromFormData, ... } from '~/lib/storage/image.server'
 
 // ============================================================================
-// Rooms Domain
+// Plants Domain (Server-Only)
 // ============================================================================
-export {
-  getUserRooms,
-  getRoomById,
-  countPlantsInRoom,
-  createRoom,
-  updateRoom,
-  deleteRoom,
-} from './rooms';
+// Plant CRUD, queries, and AI operations are server-only and must be imported
+// directly from their specific .server files in server-side contexts.
+//
+// Import directly:
+// - import { createPlant, updatePlant, ... } from '~/lib/plants/crud.server'
+// - import { getUserPlants, getPlantById, ... } from '~/lib/plants/queries.server'
+// - import { createAIPlant, recordAIFeedback } from '~/lib/plants/ai.server'
 
 // ============================================================================
-// Watering Domain
+// Server-Only Domains (not exported from barrel)
 // ============================================================================
-export {
-  recordWatering,
-  getWateringHistory as getWateringHistoryFromWatering,
-  getNextWateringDate as getNextWateringDateFromWatering,
-  getPlantsNeedingWater,
-} from './watering';
-
-// ============================================================================
-// Usage Limits Domain
-// ============================================================================
-export {
-  LIMITS,
-  checkAIGenerationLimit,
-  incrementAIUsage,
-  checkPlantLimit,
-  getUserUsageLimits,
-  getDetailedUsage,
-  type AIGenerationLimitStatus,
-  type PlantCountLimitStatus,
-  type UserUsageLimits,
-} from './usage-limits';
-
-// ============================================================================
-// AI Integration
-// ============================================================================
-export {
-  generateCareInstructions,
-  generateCareInstructionsInstant,
-  type CareInstructions,
-} from './ai/openai.server';
-
-export {
-  identifyPlant,
-  identifyPlantInstant,
-  type PlantIdentificationResult,
-} from './ai/plantnet.server';
+// Rooms, Watering, and Usage Limits are server-only and must be imported
+// directly from their .server files in server-side contexts (loaders/actions)
+// to prevent server code from being bundled into the client.
+//
+// Import directly:
+// - import { getUserRooms, ... } from '~/lib/rooms/rooms.server'
+// - import { recordWatering, ... } from '~/lib/watering/watering.server'
+// - import { checkAIGenerationLimit, ... } from '~/lib/usage-limits/usage-limits.server'

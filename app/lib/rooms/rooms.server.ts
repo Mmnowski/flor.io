@@ -1,4 +1,11 @@
-import { deleteOne, fetchMany, fetchOne, insertOne, supabaseServer, updateOne } from '~/lib';
+import {
+  deleteOne,
+  fetchMany,
+  fetchOne,
+  insertOne,
+  updateOne,
+} from '~/lib/infrastructure/supabase-helpers';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 import type { Room } from '~/types/plant.types';
 
 /**

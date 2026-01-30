@@ -1,4 +1,6 @@
-import { getPlantById, recordWatering, requireAuth } from '~/lib';
+import { requireAuth } from '~/lib/auth/require-auth.server';
+import { getPlantById } from '~/lib/plants/queries.server';
+import { recordWatering } from '~/lib/watering/watering.server';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +16,9 @@ import { action } from '../api.water.$plantId';
  * - Error handling and validation
  */
 
-vi.mock('~/lib');
+vi.mock('~/lib/auth/require-auth.server');
+vi.mock('~/lib/plants/queries.server');
+vi.mock('~/lib/watering/watering.server');
 
 describe('Water Plant API Integration', () => {
   const mockUserId = 'user-test-123';

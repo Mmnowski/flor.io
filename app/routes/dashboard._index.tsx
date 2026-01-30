@@ -1,6 +1,8 @@
 import { AddPlantDialog, PlantCard } from '~/features/plants/components';
 import { RoomFilter } from '~/features/rooms/components';
-import { getUserPlants, getUserRooms, requireAuth } from '~/lib';
+import { requireAuth } from '~/lib/auth/require-auth.server';
+import { getUserPlants } from '~/lib/plants/queries.server';
+import { getUserRooms } from '~/lib/rooms/rooms.server';
 import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
 import type { PlantWithWatering, Room } from '~/types/plant.types';
 

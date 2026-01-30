@@ -1,4 +1,4 @@
-import { requireAuth } from '~/lib';
+import { requireAuth } from '~/lib/auth/require-auth.server';
 
 import { Outlet } from 'react-router';
 
