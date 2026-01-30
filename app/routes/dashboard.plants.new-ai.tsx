@@ -6,7 +6,9 @@
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
 import { AIWizardPage } from '~/features/ai-wizard/components';
+import { identifyPlant } from '~/lib/ai/plantnet.server';
 import { requireAuth } from '~/lib/auth/require-auth.server';
+import { base64ToBuffer } from '~/lib/file';
 import { createAIPlant, recordAIFeedback } from '~/lib/plants/ai.server';
 import { getUserRooms } from '~/lib/rooms/rooms.server';
 import { processPlantImage } from '~/lib/storage/image.server';
@@ -66,6 +68,30 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     switch (action) {
+      case 'identify-plant': {
+        // Identify plant from uploaded image (base64 encoded)
+        const imageBase64 = formData.get('plantImageBase64') as string | null;
+
+        if (!imageBase64) {
+          return { error: 'Image file is required' };
+        }
+
+        try {
+          // Decode base64 to buffer
+          const buffer = base64ToBuffer(imageBase64);
+          const result = await identifyPlant(buffer);
+          return {
+            success: true,
+            identification: result,
+          };
+        } catch (error) {
+          logger.error('Plant identification failed', error);
+          return {
+            error: error instanceof Error ? error.message : 'Plant identification failed',
+          };
+        }
+      }
+
       case 'save-plant': {
         // Parse plant data from form
         const name = formData.get('name') as string;
