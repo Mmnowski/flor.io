@@ -2,11 +2,12 @@
  * Step 2: Identifying
  * Loading state while AI identifies the plant with timeout and retry support
  */
-import { parseError, withTimeout } from '~/lib';
+import { fileToBase64 } from '~/lib/file';
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { Button } from '~/shared/components/ui/button';
 
 import { useEffect, useState } from 'react';
+import { useFetcher } from 'react-router';
 
 import { useAIWizard } from '../ai-wizard';
 
@@ -15,73 +16,64 @@ interface IdentifyingStepProps {
   onError?: (error: string) => void;
 }
 
-const IDENTIFY_TIMEOUT_MS = 30000; // 30 second timeout for identification
-
 export function IdentifyingStep({ onComplete, onError }: IdentifyingStepProps) {
   const { state, updateState, incrementRetry } = useAIWizard();
   const [isRetrying, setIsRetrying] = useState(false);
+  const fetcher = useFetcher();
 
+  // Submit identification request when photo is ready
   useEffect(() => {
-    // Simulate API call to identify plant
-    const identifyPlant = async () => {
-      if (!state.photoFile) {
-        onError?.('No photo provided');
-        return;
-      }
-
-      try {
-        updateState({ isLoading: true, error: null });
-
-        // Simulate the 2-second delay from plantnet.server.ts with timeout
-        const apiCall = new Promise<void>((resolve) => {
-          setTimeout(resolve, 2000);
-        });
-
-        await withTimeout(apiCall, IDENTIFY_TIMEOUT_MS, 'Plant identification took too long');
-
-        // Mock: randomly select a plant (in real app, this comes from API)
-        const mockPlants = [
-          {
-            scientificName: 'Monstera deliciosa',
-            commonNames: ['Monstera', 'Swiss Cheese Plant'],
-            confidence: 0.92,
-          },
-          {
-            scientificName: 'Epipremnum aureum',
-            commonNames: ['Pothos', "Devil's Ivy"],
-            confidence: 0.88,
-          },
-          {
-            scientificName: 'Sansevieria trifasciata',
-            commonNames: ['Snake Plant', "Mother-in-law's Tongue"],
-            confidence: 0.95,
-          },
-        ];
-
-        const randomPlant = mockPlants[Math.floor(Math.random() * mockPlants.length)];
-
-        updateState({
-          identification: randomPlant,
-          isLoading: false,
-          retryCount: 0,
-        });
-
-        onComplete?.();
-      } catch (error) {
-        const errorInfo = parseError(error);
-        updateState({
-          isLoading: false,
-          error: errorInfo.userMessage,
-        });
-        onError?.(errorInfo.userMessage);
-        setIsRetrying(false);
-      }
-    };
-
-    if (!isRetrying) {
-      identifyPlant();
+    const photoFile = state.photoFile;
+    if (!photoFile || isRetrying || state.isLoading) {
+      return;
     }
-  }, [state.photoFile, updateState, onComplete, onError, isRetrying]);
+
+    // Submit identification request
+    updateState({ isLoading: true, error: null });
+
+    // Convert file to base64 and submit
+    fileToBase64(photoFile)
+      .then((base64Data) => {
+        const formData = new FormData();
+        formData.append('_action', 'identify-plant');
+        formData.append('plantImageBase64', base64Data);
+        formData.append('plantImageName', photoFile.name);
+
+        fetcher.submit(formData, { method: 'POST' });
+      })
+      .catch(() => {
+        updateState({ isLoading: false, error: 'Failed to read file' });
+      });
+    // Only re-run when photo or retry state changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.photoFile, isRetrying]);
+
+  // Handle fetcher response separately
+  useEffect(() => {
+    if (!fetcher.data) {
+      return;
+    }
+
+    if (fetcher.data.error) {
+      updateState({
+        isLoading: false,
+        error: fetcher.data.error,
+      });
+      onError?.(fetcher.data.error);
+      setIsRetrying(false);
+      return;
+    }
+
+    if (fetcher.data.identification) {
+      updateState({
+        identification: fetcher.data.identification,
+        isLoading: false,
+        retryCount: 0,
+      });
+      onComplete?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetcher.data]);
 
   const handleRetry = () => {
     setIsRetrying(true);

@@ -8,6 +8,7 @@
  * - PLANTNET_API_KEY: API key for PlantNet (required if USE_REAL_PLANTNET_API=true)
  * - USE_REAL_PLANTNET_API: Feature flag to toggle between real and mocked responses
  */
+import FormData from 'form-data';
 
 export interface PlantIdentificationResult {
   scientificName: string;
@@ -230,82 +231,90 @@ const mockPlantDatabase: Record<string, PlantNetResult> = {
  * const result = await identifyPlant('https://...');
  * // Returns: { scientificName: "Monstera deliciosa Liebm.", commonNames: [...], confidence: 0.92 }
  */
-export async function identifyPlant(imageUrl: string): Promise<PlantIdentificationResult> {
+export async function identifyPlant(imageBuffer: Buffer): Promise<PlantIdentificationResult> {
   const useRealApi = process.env.USE_REAL_PLANTNET_API === 'true';
 
   if (useRealApi) {
-    return identifyPlantWithApi(imageUrl);
+    return identifyPlantWithApi(imageBuffer);
   }
 
-  return identifyPlantMocked(imageUrl);
+  return identifyPlantMocked(imageBuffer);
+}
+
+/**
+ * Create multipart form data buffer and headers for PlantNet API request
+ */
+function createPlantNetRequest(imageBuffer: Buffer): {
+  buffer: Buffer;
+  headers: Record<string, string>;
+} {
+  const form = new FormData();
+  form.append('images', imageBuffer, { filename: 'plant.jpg' });
+  form.append('organs', 'leaf,flower,fruit,bark');
+  form.append('lang', 'en');
+  form.append('include-related-images', 'false');
+
+  const buffer = form.getBuffer();
+  const headers = {
+    ...form.getHeaders(),
+    'Content-Length': buffer.length.toString(),
+  };
+
+  return { buffer, headers };
 }
 
 /**
  * Call the real PlantNet API to identify a plant.
  * Requires PLANTNET_API_KEY environment variable.
  */
-async function identifyPlantWithApi(imageUrl: string): Promise<PlantIdentificationResult> {
+async function identifyPlantWithApi(imageBuffer: Buffer): Promise<PlantIdentificationResult> {
   const apiKey = process.env.PLANTNET_API_KEY;
+
   if (!apiKey) {
     throw new Error(
       'PLANTNET_API_KEY environment variable is not set. Set USE_REAL_PLANTNET_API=false to use mocked data.'
     );
   }
 
-  try {
-    // Fetch image and convert to base64
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-    }
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
+  // Create multipart form data
+  const { buffer, headers } = createPlantNetRequest(imageBuffer);
 
-    // Call PlantNet API
-    const response = await fetch('https://api.plantnet.org/v2/identify', {
+  // Call PlantNet API with proper endpoint format
+  const response = await fetch(
+    `https://my-api.plantnet.org/v2/identify/all?api-key=${encodeURIComponent(apiKey)}`,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        images: [`data:image/jpeg;base64,${base64Image}`],
-        organs: ['leaf', 'flower', 'fruit', 'habit'],
-        includeRelatedImages: false,
-        noResize: false,
-        lang: 'en',
-        api_key: apiKey,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`PlantNet API error: ${response.statusText}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      body: buffer as any,
+      headers,
     }
+  );
 
-    const data: PlantNetAPIResponse = await response.json();
-
-    if (!data.results || data.results.length === 0) {
-      throw new Error('No plant identification results from PlantNet API');
-    }
-
-    // Use the best match (top result)
-    const topResult = data.results[0];
-    return {
-      scientificName: topResult.species.scientificName,
-      commonNames: topResult.species.commonNames || [],
-      confidence: Math.round(topResult.score * 100) / 100,
-    };
-  } catch (error) {
-    throw new Error(
-      `Plant identification failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    );
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`PlantNet API error: ${response.statusText} - ${errorText}`);
   }
+
+  const data: PlantNetAPIResponse = await response.json();
+
+  if (!data.results || data.results.length === 0) {
+    throw new Error('No plant identification results from PlantNet API');
+  }
+
+  // Use the best match (top result)
+  const topResult = data.results[0];
+  return {
+    scientificName: topResult.species.scientificName,
+    commonNames: topResult.species.commonNames || [],
+    confidence: Math.round(topResult.score * 100) / 100,
+  };
 }
 
 /**
  * Get plant identification using mocked data.
  * Adds a 2-second delay to simulate API latency.
  */
-async function identifyPlantMocked(imageUrl: string): Promise<PlantIdentificationResult> {
+async function identifyPlantMocked(_imageBuffer: Buffer): Promise<PlantIdentificationResult> {
   // Simulate API call delay (2 seconds)
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -331,7 +340,9 @@ async function identifyPlantMocked(imageUrl: string): Promise<PlantIdentificatio
  *
  * @internal For testing only
  */
-export async function identifyPlantInstant(imageUrl: string): Promise<PlantIdentificationResult> {
+export async function identifyPlantInstant(
+  _imageBuffer: Buffer
+): Promise<PlantIdentificationResult> {
   // Same as mocked but without delay
   const plantKeys = Object.keys(mockPlantDatabase);
   const randomKey = plantKeys[Math.floor(Math.random() * plantKeys.length)];
