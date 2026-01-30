@@ -241,16 +241,21 @@ describe('WateringButton', () => {
         <WateringButton plantId={mockPlantId} nextWateringDate={null} lastWateredDate={null} />
       );
 
+      // Verify no "Last watered" text initially
+      let lastWateredText = screen.queryByText(/last watered:/i);
+      expect(lastWateredText).not.toBeInTheDocument();
+
       const button = screen.getByRole('button', { name: /record watering/i });
-      // Verify button is interactive and clickable
-      expect(button).toBeInTheDocument();
       expect(button).not.toBeDisabled();
 
       // Click button
       await user.click(button);
-      // Button should still exist after click
-      const buttonsAfterClick = screen.getAllByRole('button', { name: /record watering/i });
-      expect(buttonsAfterClick.length).toBeGreaterThan(0);
+
+      // Verify optimistic UI: "Last watered" should appear after click
+      lastWateredText = screen.getByText(/last watered:/i);
+      expect(lastWateredText).toBeInTheDocument();
+      // Verify it shows pending state
+      expect(screen.getByText(/\(pending\)/)).toBeInTheDocument();
     });
 
     it('should be clickable', async () => {
