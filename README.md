@@ -30,7 +30,7 @@ A full-stack plant care management application built with React Router v7, TypeS
 ### Prerequisites
 
 - Node.js 18+ (ES2022 target)
-- Yarn (package manager, switched from npm)
+- Yarn
 - Supabase account (for backend database and authentication)
 
 ### Installation
