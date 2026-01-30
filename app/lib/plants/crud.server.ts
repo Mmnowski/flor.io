@@ -1,4 +1,6 @@
-import { deleteOne, deletePlantPhoto, fetchOne, insertOne, supabaseServer, updateOne } from '~/lib';
+import { deleteOne, fetchOne, insertOne, updateOne } from '~/lib/infrastructure/supabase-helpers';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
+import { deletePlantPhoto } from '~/lib/storage/storage.server';
 import type { Plant, PlantInsertData, PlantUpdateData } from '~/types/plant.types';
 
 /**

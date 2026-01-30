@@ -4,7 +4,8 @@
  * Tracks and enforces monthly quotas for AI generation and total plant count.
  * Uses Supabase database for persistence.
  */
-import { fetchMany, fetchOne, insertOne, supabaseServer, updateOne } from '~/lib';
+import { fetchMany, fetchOne, insertOne, updateOne } from '~/lib/infrastructure/supabase-helpers';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 import { logger } from '~/shared/lib/logger';
 
 // Configurable limits (can be moved to environment variables later)

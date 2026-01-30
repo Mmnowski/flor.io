@@ -1,4 +1,4 @@
-import { supabaseServer } from '~/lib';
+import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 import { logger } from '~/shared/lib/logger';
 
 import { v4 as uuidv4 } from 'uuid';

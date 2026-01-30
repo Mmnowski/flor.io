@@ -1,23 +1,8 @@
 /**
  * Auth Domain - User authentication and session management
  *
- * Handles user registration, login, session management, and route protection.
+ * All auth functions are server-only. Import directly from specific modules:
+ * - './session.server' for session management
+ * - './auth.server' for user authentication
+ * - './require-auth.server' for route protection
  */
-
-// Session management
-export {
-  sessionStorage,
-  getSession,
-  commitSession,
-  destroySession,
-  getUserId,
-  requireUserId,
-  createUserSession,
-  logout,
-} from './session.server';
-
-// Authentication
-export { registerUser, loginUser, getUserById, getUserByEmail } from './auth.server';
-
-// Route protection
-export { requireAuth } from './require-auth.server';

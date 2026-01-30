@@ -5,7 +5,7 @@ import {
   getDetailedUsage,
   getUserUsageLimits,
 } from '~/lib';
-import { fetchMany, fetchOne } from '~/lib';
+import { fetchMany, fetchOne } from '~/lib/infrastructure/supabase-helpers';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

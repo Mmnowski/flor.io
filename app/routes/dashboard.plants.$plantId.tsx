@@ -1,6 +1,10 @@
 import { DeletePlantDialog, PlantInfoSection } from '~/features/plants/components';
 import { WateringButton } from '~/features/watering/components';
-import { cn, deletePlant, getPlantById, recordWatering, requireAuth } from '~/lib';
+import { cn } from '~/lib';
+import { requireAuth } from '~/lib/auth/require-auth.server';
+import { deletePlant } from '~/lib/plants/crud.server';
+import { getPlantById } from '~/lib/plants/queries.server';
+import { recordWatering } from '~/lib/watering/watering.server';
 import { Badge, Button, PlantDetailsSkeleton } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 import type { PlantWithDetails } from '~/types/plant.types';

@@ -1,15 +1,14 @@
 import { PlantForm } from '~/features/plants/components';
+import { requireAuth } from '~/lib/auth/require-auth.server';
+import { updatePlant } from '~/lib/plants/crud.server';
+import { getPlantById } from '~/lib/plants/queries.server';
+import { getUserRooms } from '~/lib/rooms/rooms.server';
 import {
-  deletePlantPhoto,
   extractImageFromFormData,
   fileToBuffer,
-  getPlantById,
-  getUserRooms,
   processPlantImage,
-  requireAuth,
-  updatePlant,
-  uploadPlantPhoto,
-} from '~/lib';
+} from '~/lib/storage/image.server';
+import { deletePlantPhoto, uploadPlantPhoto } from '~/lib/storage/storage.server';
 import { Button } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 

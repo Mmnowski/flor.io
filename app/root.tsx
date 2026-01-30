@@ -1,5 +1,5 @@
 import { Navigation } from '~/layout/components';
-import { getUserId } from '~/lib';
+import { getUserId } from '~/lib/auth/session.server';
 import { NavigationProgressBar } from '~/shared/components';
 
 import {
