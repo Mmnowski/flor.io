@@ -2,11 +2,6 @@
   "buildCommand": "yarn build",
   "installCommand": "yarn install",
   "framework": null,
-  "functions": {
-    "api/index.ts": {
-      "runtime": "nodejs@20"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
