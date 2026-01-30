@@ -14,7 +14,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { action, loader } from '../dashboard.plants.new-ai';
 
 // Mock all dependencies
-vi.mock('~/lib');
+vi.mock('~/lib/auth/require-auth.server');
+vi.mock('~/lib/plants/ai.server');
+vi.mock('~/lib/rooms/rooms.server');
+vi.mock('~/lib/storage/image.server');
+vi.mock('~/lib/storage/storage.server');
+vi.mock('~/lib/usage-limits/usage-limits.server');
 vi.mock('~/shared/lib/logger');
 
 describe('AI Wizard Route - Error Handling', () => {

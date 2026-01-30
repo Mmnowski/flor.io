@@ -6,7 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { loader } from '../api.notifications';
 
 // Mock dependencies
-vi.mock('~/lib');
+vi.mock('~/lib/auth/require-auth.server');
+vi.mock('~/lib/watering/watering.server');
 
 describe('api.notifications - Loader', () => {
   const mockUserId = 'user-123';

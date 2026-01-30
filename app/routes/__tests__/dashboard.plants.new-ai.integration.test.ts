@@ -14,11 +14,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Route } from '../+types/dashboard.plants.new-ai';
 
 // Mock dependencies - must be before imports
-vi.mock('~/lib/auth', () => ({
+vi.mock('~/lib/auth/require-auth.server', () => ({
   requireAuth: vi.fn().mockResolvedValue('user-123'),
 }));
 
-vi.mock('~/lib/usage-limits', () => ({
+vi.mock('~/lib/usage-limits/usage-limits.server', () => ({
   checkAIGenerationLimit: vi.fn().mockResolvedValue({
     allowed: true,
     used: 5,
@@ -33,13 +33,13 @@ vi.mock('~/lib/usage-limits', () => ({
   incrementAIUsage: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('~/lib/rooms', () => ({
+vi.mock('~/lib/rooms/rooms.server', () => ({
   getUserRooms: vi
     .fn()
     .mockResolvedValue([{ id: 'room-1', name: 'Living Room', user_id: 'user-123' }]),
 }));
 
-vi.mock('~/lib/plants', () => ({
+vi.mock('~/lib/plants/ai.server', () => ({
   createAIPlant: vi.fn().mockResolvedValue({
     id: 'plant-123',
     user_id: 'user-123',
@@ -50,11 +50,11 @@ vi.mock('~/lib/plants', () => ({
   recordAIFeedback: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('~/lib/storage', () => ({
+vi.mock('~/lib/storage/storage.server', () => ({
   uploadPlantPhoto: vi.fn().mockResolvedValue('https://storage/plant-photo.jpg'),
 }));
 
-vi.mock('~/lib/storage', () => ({
+vi.mock('~/lib/storage/image.server', () => ({
   processPlantImage: vi.fn().mockResolvedValue(Buffer.from('compressed')),
 }));
 

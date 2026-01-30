@@ -14,11 +14,11 @@ import { loader } from '../api.notifications';
  * - Data formatting and error handling
  */
 
-vi.mock('~/lib/auth', () => ({
+vi.mock('~/lib/auth/require-auth.server', () => ({
   requireAuth: vi.fn(),
 }));
 
-vi.mock('~/lib/watering', () => ({
+vi.mock('~/lib/watering/watering.server', () => ({
   getPlantsNeedingWater: vi.fn(),
 }));
 
