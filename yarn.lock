@@ -2133,6 +2133,14 @@
     typescript5 "npm:typescript@5.9.3"
     undici "5.28.4"
 
+"@vercel/react-router@^1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@vercel/react-router/-/react-router-1.2.5.tgz#d9f8875d78d4d827361732925af621ed816f32c3"
+  integrity sha512-y1GSzt+pZZkO53oUzpJzmeYkdQwgWF4nI9i5OtuM1h6ItgOppkYgtGze9SmRwon3B6m0gOQXiiRhcTB1kM7Hxg==
+  dependencies:
+    "@vercel/static-config" "3.1.2"
+    ts-morph "12.0.0"
+
 "@vercel/static-config@3.1.2":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@vercel/static-config/-/static-config-3.1.2.tgz#813bd7584fe3ef003634c3a9fd5d72095d2003d6"

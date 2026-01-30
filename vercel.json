@@ -1,11 +1,4 @@
 {
-  "buildCommand": "yarn build",
-  "installCommand": "yarn install --production=false",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api"
-    }
-  ]
+  "framework": "react-router",
+  "installCommand": "yarn install --production=false"
 }
