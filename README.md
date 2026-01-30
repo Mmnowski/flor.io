@@ -74,8 +74,26 @@ yarn start     # Serve the production build locally
 
 ## Documentation
 
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Architecture and design patterns
-- **[STYLE_GUIDE.md](./STYLE_GUIDE.md)** - Code style and conventions
+Complete documentation is available in the `docs/` directory:
+
+### Reference
+
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[API.md](./docs/reference/API.md)** - API endpoints and request/response formats
+- **[DATABASE_SCHEMA.md](./docs/reference/DATABASE_SCHEMA.md)** - Database tables and relationships
+
+### Guides
+
+- **[STYLE_GUIDE.md](./docs/guides/STYLE_GUIDE.md)** - Code standards and conventions
+- **[TESTING.md](./docs/guides/TESTING.md)** - Testing patterns and requirements
+- **[SETUP.md](./docs/guides/SETUP.md)** - Development environment setup
+
+### Features
+
+- **[PLANTS.md](./docs/features/PLANTS.md)** - Plant management with AI integration
+- **[AI_WIZARD.md](./docs/features/AI_WIZARD.md)** - AI-powered plant creation (7-step wizard)
+- **[WATERING.md](./docs/features/WATERING.md)** - Watering tracking and notifications
+- **[ROOMS.md](./docs/features/ROOMS.md)** - Room-based plant organization
 
 ## Project Structure
 
@@ -90,14 +108,14 @@ app/
 └── root.tsx         # Root layout with error boundary
 ```
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed structure.
+See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed structure.
 
 ## Development Workflow
 
 1. Create a feature branch from `main`
-2. Implement changes following patterns in ARCHITECTURE.md
+2. Implement changes following patterns in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 3. Run `yarn quality` before committing
-4. Commit with format: `[TYPE](context): description`
+4. Commit with format: `[TYPE](context): description` (see [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md))
 5. Git hooks run pre-commit checks automatically
 6. Submit a PR and merge after review
 
@@ -119,9 +137,14 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed structure.
 
 ## Contributing
 
-- Follow patterns in ARCHITECTURE.md
-- Collocate tests with source code
+See [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) for detailed contribution guidelines.
+
+Quick checklist:
+
+- Follow patterns in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- Collocate tests with source code in `__tests__/` directories
 - Run `yarn quality` before committing
+- See [docs/guides/STYLE_GUIDE.md](./docs/guides/STYLE_GUIDE.md) for code standards
 
 ## Testing
 
