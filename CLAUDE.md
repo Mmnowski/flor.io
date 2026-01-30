@@ -18,9 +18,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **UI dashboard**: `yarn test:ui` (visual test interface)
 - **Coverage report**: `yarn test:coverage` (generates HTML report in `coverage/`)
 
-**Test Status**: 368/439 tests passing (84%)
+**Test Status**: 544/544 tests passing (100%)
 
-- See `.ai/TESTING.md` for comprehensive testing guide
+- See [docs/guides/TESTING.md](docs/guides/TESTING.md) for comprehensive testing guide
 - Test files in `app/**/__tests__/` directories
 
 ### Performance
@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Lighthouse**: Target scores >80 on all metrics
 - **Bundle analysis**: `yarn build` creates `dist/stats.html`
 - **Performance targets**: <200KB main bundle (gzipped), <2.5s LCP
-- See `.ai/DEPLOYMENT.md` for performance optimization details
+- See [docs/guides/DEPLOYMENT.md](docs/guides/DEPLOYMENT.md) for performance optimization details
 
 ### Code Quality
 
@@ -38,7 +38,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Commit Messages
 
-Follow the commit message template defined in `.ai/prompts/commit-message-rule.md`. Key principles:
+Follow the commit message template defined in [.ai/prompts/commit-message-rule.md](.ai/prompts/commit-message-rule.md). Key principles:
 
 - **Format**: `[TYPE]([CONTEXT]): [description]`
 - **Types**: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
@@ -47,11 +47,11 @@ Follow the commit message template defined in `.ai/prompts/commit-message-rule.m
   - ❌ "Improved type safety" (outcome)
 - **Character limit**: ~72 characters (guideline, not hard limit)
 - **Bullet points**: Use only if there are **2+ logical changes**. A single cohesive change (even affecting many files) doesn't need bullets.
-- **Process**: Reference `.ai/prompts/commit-message-rule.md` for decision tree and examples
+- **Process**: Reference [.ai/prompts/commit-message-rule.md](.ai/prompts/commit-message-rule.md) for decision tree and examples
 
 ### Component Generation
 
-Follow the standards in `.ai/prompts/component-generation-rule.md` when creating React components. Key requirements:
+Follow the standards in [.ai/prompts/component-generation-rule.md](.ai/prompts/component-generation-rule.md) when creating React components. Key requirements:
 
 - **TypeScript**: Props interface with JSDoc, explicit return types, no `any` types
 - **Styling**: Tailwind CSS only, mobile-first responsive design
@@ -59,6 +59,36 @@ Follow the standards in `.ai/prompts/component-generation-rule.md` when creating
 - **Design system**: Use color palette, spacing grid (8px), rounded corners (16px minimum)
 - **Quality**: Use validation checklist before considering component complete
 - **Process**: Follow the 6-step workflow in the prompt for consistency
+
+## Documentation
+
+Complete developer documentation is available in the `docs/` directory:
+
+### Getting Started
+
+- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - How to contribute and work with the codebase
+- **[docs/guides/SETUP.md](docs/guides/SETUP.md)** - Development environment setup
+
+### Reference
+
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[docs/guides/STYLE_GUIDE.md](docs/guides/STYLE_GUIDE.md)** - Code standards and formatting
+- **[docs/reference/DATABASE_SCHEMA.md](docs/reference/DATABASE_SCHEMA.md)** - Database structure
+- **[docs/reference/API.md](docs/reference/API.md)** - API endpoints reference
+- **[docs/reference/GLOSSARY.md](docs/reference/GLOSSARY.md)** - Key terms and definitions
+
+### Features
+
+- **[docs/features/PLANTS.md](docs/features/PLANTS.md)** - Plant management feature
+- **[docs/features/WATERING.md](docs/features/WATERING.md)** - Watering system and notifications
+- **[docs/features/ROOMS.md](docs/features/ROOMS.md)** - Room organization
+- **[docs/features/AI_WIZARD.md](docs/features/AI_WIZARD.md)** - AI plant creation wizard
+
+### Agent Guidance
+
+- **[.ai/prompts/commit-message-rule.md](.ai/prompts/commit-message-rule.md)** - Commit message conventions
+- **[.ai/prompts/component-generation-rule.md](.ai/prompts/component-generation-rule.md)** - Component standards
+- **[.ai/README.md](.ai/README.md)** - Overview of .ai/ directory
 
 ## Project Architecture
 
@@ -115,11 +145,32 @@ app/
   welcome/                    # Welcome component assets
   app.css                     # Global styles
 
+docs/
+  ARCHITECTURE.md             # Technical architecture overview
+  CONTRIBUTING.md             # How to contribute
+  guides/
+    SETUP.md                  # Development environment setup
+    STYLE_GUIDE.md            # Code standards and conventions
+    TESTING.md                # Testing guide and patterns
+    DEPLOYMENT.md             # Deployment and production setup
+  features/
+    PLANTS.md                 # Plants feature documentation
+    WATERING.md               # Watering system documentation
+    ROOMS.md                  # Rooms feature documentation
+    AI_WIZARD.md              # AI Wizard feature documentation
+  reference/
+    API.md                    # API endpoints reference
+    DATABASE_SCHEMA.md        # Database schema reference
+    MIGRATION_GUIDE.md        # Migration guide
+    GLOSSARY.md               # Key terms and definitions
+
 .ai/
-  IMPLEMENTATION_PLAN.md      # Full implementation roadmap
-  PHASE_6_PLAN.md             # Phase 6 detailed plan
-  TESTING.md                  # Testing guide and patterns
-  DEPLOYMENT.md               # Deployment and production setup
+  prompts/                    # Agent rules and guidance
+    commit-message-rule.md    # Git commit message format
+    component-generation-rule.md  # Component generation standards
+  documentation/
+    prd.md                    # Product Requirements Document
+  archive/                    # Historical implementation notes
 ```
 
 ## Key Patterns & Conventions
