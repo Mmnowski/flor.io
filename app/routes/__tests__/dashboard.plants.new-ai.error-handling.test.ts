@@ -1,14 +1,13 @@
+import { requireAuth } from '~/lib/auth/require-auth.server';
+import { createAIPlant, recordAIFeedback } from '~/lib/plants/ai.server';
+import { getUserRooms } from '~/lib/rooms/rooms.server';
+import { processPlantImage } from '~/lib/storage/image.server';
+import { uploadPlantPhoto } from '~/lib/storage/storage.server';
 import {
   checkAIGenerationLimit,
   checkPlantLimit,
-  createAIPlant,
-  getUserRooms,
   incrementAIUsage,
-  processPlantImage,
-  recordAIFeedback,
-  requireAuth,
-  uploadPlantPhoto,
-} from '~/lib';
+} from '~/lib/usage-limits/usage-limits.server';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

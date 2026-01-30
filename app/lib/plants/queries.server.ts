@@ -1,4 +1,5 @@
-import { MS_PER_DAY, type Row } from '~/lib';
+import { MS_PER_DAY } from '~/lib';
+import { type Row } from '~/lib/infrastructure/supabase-helpers';
 import { callRpc, fetchMany, fetchOne } from '~/lib/infrastructure/supabase-helpers';
 import { supabaseServer } from '~/lib/infrastructure/supabase.server';
 import type { PlantWithDetails, PlantWithWatering, WateringHistory } from '~/types/plant.types';

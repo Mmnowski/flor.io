@@ -1,11 +1,11 @@
+import { fetchMany, fetchOne } from '~/lib/infrastructure/supabase-helpers';
 import {
   LIMITS,
   checkAIGenerationLimit,
   checkPlantLimit,
   getDetailedUsage,
   getUserUsageLimits,
-} from '~/lib';
-import { fetchMany, fetchOne } from '~/lib/infrastructure/supabase-helpers';
+} from '~/lib/usage-limits/usage-limits.server';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
