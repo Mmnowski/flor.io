@@ -1,5 +1,6 @@
 import { Navigation } from '~/layout/components';
-import { getUserId } from '~/lib/auth/session.server';
+import { getUserById } from '~/lib/auth/auth.server';
+import { getUserEmail, getUserId } from '~/lib/auth/session.server';
 import { NavigationProgressBar } from '~/shared/components';
 
 import {
@@ -30,7 +31,25 @@ export const links: Route.LinksFunction = () => [
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await getUserId(request);
-  return { userId };
+
+  if (!userId) {
+    return { userId: null, userEmail: null };
+  }
+
+  // Try to get email from session first
+  let userEmail = await getUserEmail(request);
+
+  // If not in session, fetch from Supabase
+  if (!userEmail) {
+    try {
+      const user = await getUserById(userId);
+      userEmail = user?.email ?? null;
+    } catch {
+      userEmail = null;
+    }
+  }
+
+  return { userId, userEmail };
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -73,13 +92,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { userId } = useLoaderData<typeof loader>();
+  const { userId, userEmail } = useLoaderData<typeof loader>();
 
   return (
     <>
       <NavigationProgressBar />
-      <Navigation isAuthenticated={!!userId} />
-      <main className="min-h-screen">
+      <Navigation isAuthenticated={!!userId} userEmail={userEmail ?? undefined} />
+      <main>
         <Outlet />
       </main>
     </>

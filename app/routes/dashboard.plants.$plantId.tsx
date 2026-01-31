@@ -12,7 +12,7 @@ import type { PlantWithDetails } from '~/types/plant.types';
 import { useState } from 'react';
 import { Link, redirect, useLoaderData, useNavigation } from 'react-router';
 
-import { Bug, Droplet, Leaf, Leaf as LeafIcon, Pencil, Sun } from 'lucide-react';
+import { Bug, Droplet, Droplets, Leaf, Leaf as LeafIcon, Pencil, Sun } from 'lucide-react';
 
 import type { Route } from './+types/dashboard.plants.$plantId';
 
@@ -71,9 +71,12 @@ export default function PlantDetail() {
   const navigation = useNavigation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const isLoading = navigation.state === 'loading';
+  // Only show skeleton when navigating TO this plant's detail page, not away from it
+  const isNavigatingToThisPage =
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === `/dashboard/plants/${plant.id}`;
 
-  if (isLoading) {
+  if (isNavigatingToThisPage) {
     return <PlantDetailsSkeleton />;
   }
 
@@ -102,6 +105,25 @@ export default function PlantDetail() {
       year: 'numeric',
     });
   };
+
+  const getWateringAmountDisplay = () => {
+    switch (plant.watering_amount) {
+      case 'low':
+        return { label: 'Light', icon: Droplet, color: 'text-slate-600 dark:text-slate-400' };
+      case 'mid':
+        return {
+          label: 'Moderate',
+          icon: Droplet,
+          color: 'text-emerald-600 dark:text-emerald-400',
+        };
+      case 'heavy':
+        return { label: 'Heavy', icon: Droplets, color: 'text-blue-600 dark:text-blue-400' };
+      default:
+        return { label: 'Unknown', icon: Droplet, color: 'text-slate-400 dark:text-slate-500' };
+    }
+  };
+
+  const wateringAmount = getWateringAmountDisplay();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -164,6 +186,15 @@ export default function PlantDetail() {
                 <span className="text-slate-600 dark:text-slate-400">Watering Frequency:</span>
                 <span className="ml-2 font-semibold text-slate-900 dark:text-white">
                   Every {plant.watering_frequency_days} days
+                </span>
+              </p>
+              <p className="text-sm flex items-center">
+                <span className="text-slate-600 dark:text-slate-400">Watering Amount:</span>
+                <span
+                  className={cn('ml-2 font-semibold flex items-center gap-1', wateringAmount.color)}
+                >
+                  <wateringAmount.icon className="w-4 h-4" />
+                  {wateringAmount.label}
                 </span>
               </p>
               <p className="text-sm">

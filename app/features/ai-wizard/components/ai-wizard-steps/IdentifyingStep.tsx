@@ -113,21 +113,27 @@ export function IdentifyingStep({ onComplete, onError }: IdentifyingStepProps) {
           <div className="space-y-6 text-center">
             {/* Spinner */}
             <div className="flex justify-center">
-              <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-600 dark:border-slate-700 dark:border-t-emerald-500" />
             </div>
 
             {/* Status text */}
             <div>
-              <p className="text-lg font-semibold text-gray-900">Analyzing your plant...</p>
-              <p className="mt-1 text-sm text-gray-600">This should take about 2 seconds</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                Analyzing your plant...
+              </p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                This should take about 2 seconds
+              </p>
               {state.retryCount > 0 && (
-                <p className="mt-2 text-xs text-amber-600">Attempt {state.retryCount + 1}/3</p>
+                <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  Attempt {state.retryCount + 1}/3
+                </p>
               )}
             </div>
 
             {/* Progress bar */}
-            <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200">
-              <div className="h-1 w-full animate-pulse rounded-full bg-blue-600" />
+            <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200 dark:bg-slate-700">
+              <div className="h-1 w-full animate-pulse rounded-full bg-emerald-600 dark:bg-emerald-500" />
             </div>
           </div>
         </div>

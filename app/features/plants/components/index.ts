@@ -3,3 +3,4 @@ export { DeletePlantDialog } from './delete-plant-dialog';
 export { PlantCard } from './plant-card';
 export { PlantForm } from './plant-form';
 export { PlantInfoSection } from './plant-info-section';
+export { SortSelector, type SortOption } from './sort-selector';

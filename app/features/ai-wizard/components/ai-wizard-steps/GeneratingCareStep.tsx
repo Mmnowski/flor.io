@@ -129,52 +129,62 @@ export function GeneratingCareStep({ onComplete, onError }: GeneratingCareStepPr
                   <path
                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
                     fill="currentColor"
-                    className="text-gray-300"
+                    className="text-gray-300 dark:text-slate-600"
                   />
                   <path
                     d="M12 6v6l5 3"
                     stroke="currentColor"
                     strokeWidth={2}
                     strokeLinecap="round"
-                    className="text-blue-600"
+                    className="text-emerald-600 dark:text-emerald-500"
                   />
                 </svg>
 
                 {/* Center dot */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-3 w-3 rounded-full bg-green-500" />
+                  <div className="h-3 w-3 rounded-full bg-emerald-500" />
                 </div>
               </div>
             </div>
 
             {/* Status text */}
             <div>
-              <p className="text-lg font-semibold text-gray-900">Creating care instructions...</p>
-              <p className="mt-1 text-sm text-gray-600">This should take about 3 seconds</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                Creating care instructions...
+              </p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                This should take about 3 seconds
+              </p>
               {state.retryCount > 0 && (
-                <p className="mt-2 text-xs text-amber-600">Attempt {state.retryCount + 1}/3</p>
+                <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  Attempt {state.retryCount + 1}/3
+                </p>
               )}
             </div>
 
             {/* Progress indicators */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500" />
-                <span className="text-sm text-gray-600">Analyzing plant type</span>
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Analyzing plant type
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-                <span className="text-sm text-gray-600">Generating instructions</span>
+                <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Generating instructions
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-gray-300" />
-                <span className="text-sm text-gray-400">Preparing preview</span>
+                <div className="h-2 w-2 rounded-full bg-gray-300 dark:bg-slate-600" />
+                <span className="text-sm text-gray-400 dark:text-gray-500">Preparing preview</span>
               </div>
             </div>
 
             {/* Progress bar */}
-            <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200">
-              <div className="h-1 w-full animate-pulse rounded-full bg-blue-600" />
+            <div className="mx-auto w-full max-w-xs rounded-full bg-gray-200 dark:bg-slate-700">
+              <div className="h-1 w-full animate-pulse rounded-full bg-emerald-600 dark:bg-emerald-500" />
             </div>
           </div>
         </div>

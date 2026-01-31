@@ -19,9 +19,10 @@ import {
   checkPlantLimit,
   incrementAIUsage,
 } from '~/lib/usage-limits/usage-limits.server';
+import { AIWizardSkeleton } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 
-import { redirect, useLoaderData } from 'react-router';
+import { redirect, useLoaderData, useNavigation } from 'react-router';
 
 import type { Route } from './+types/dashboard.plants.new-ai';
 
@@ -151,6 +152,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
           const plant = await createAIPlant(userId, {
             name,
             watering_frequency_days: wateringFrequencyDays,
+            watering_amount: (wateringAmount as 'low' | 'mid' | 'heavy') || null,
             light_requirements: lightRequirements,
             fertilizing_tips: fertilizingTips,
             pruning_tips: pruningTips,
@@ -201,6 +203,15 @@ export const action = async ({ request }: Route.ActionArgs) => {
  */
 export default function AIWizardRoute() {
   const loaderData = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+
+  // Only show skeleton when navigating TO this page, not away from it
+  const isNavigatingToThisPage =
+    navigation.state === 'loading' && navigation.location?.pathname === '/dashboard/plants/new-ai';
+
+  if (isNavigatingToThisPage) {
+    return <AIWizardSkeleton />;
+  }
 
   const handleComplete = (plantId: string) => {
     // Navigate to plant details page

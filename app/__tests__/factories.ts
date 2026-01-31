@@ -19,6 +19,7 @@ export function createMockPlant(overrides?: Partial<Plant>): Plant {
     name: 'Mock Plant',
     photo_url: null,
     watering_frequency_days: 7,
+    watering_amount: null,
     room_id: null,
     light_requirements: null,
     fertilizing_tips: null,

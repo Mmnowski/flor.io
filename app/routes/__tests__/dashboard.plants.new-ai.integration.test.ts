@@ -183,6 +183,7 @@ describe('AI Wizard Integration Tests', () => {
       expect(createAIPlant).toHaveBeenCalledWith('user-123', {
         name: 'Monstera deliciosa',
         watering_frequency_days: 7,
+        watering_amount: null,
         light_requirements: 'Bright indirect light',
         fertilizing_tips: ['Fertilize monthly'],
         pruning_tips: ['Prune in spring'],

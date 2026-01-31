@@ -10,6 +10,7 @@ export interface Database {
           name: string;
           photo_url: string | null;
           watering_frequency_days: number;
+          watering_amount: 'low' | 'mid' | 'heavy' | null;
           room_id: string | null;
           light_requirements: string | null;
           fertilizing_tips: string | null;
@@ -25,6 +26,7 @@ export interface Database {
           name: string;
           photo_url?: string | null;
           watering_frequency_days: number;
+          watering_amount?: 'low' | 'mid' | 'heavy' | null;
           room_id?: string | null;
           light_requirements?: string | null;
           fertilizing_tips?: string | null;
@@ -40,6 +42,7 @@ export interface Database {
           name?: string;
           photo_url?: string | null;
           watering_frequency_days?: number;
+          watering_amount?: 'low' | 'mid' | 'heavy' | null;
           room_id?: string | null;
           light_requirements?: string | null;
           fertilizing_tips?: string | null;

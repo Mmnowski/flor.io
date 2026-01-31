@@ -151,14 +151,14 @@ export function PhotoUploadStep({ onContinue }: PhotoUploadStepProps) {
         <div
           onDragOver={handleDragOver}
           onDrop={handleDragDrop}
-          className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-12 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
+          className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-12 text-center transition-colors hover:border-emerald-400 hover:bg-emerald-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-950/30"
         >
           <div className="space-y-4">
             {/* Upload icon */}
             <div className="flex justify-center">
-              <div className="rounded-full bg-blue-100 p-4">
+              <div className="rounded-full bg-emerald-100 p-4 dark:bg-emerald-900/50">
                 <svg
-                  className="h-8 w-8 text-blue-600"
+                  className="h-8 w-8 text-emerald-600 dark:text-emerald-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

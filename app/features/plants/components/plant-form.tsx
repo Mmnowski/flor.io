@@ -45,10 +45,17 @@ export function PlantForm({
   const [selectedRoom, setSelectedRoom] = useState<string>(
     isEdit && plant?.room_id ? plant.room_id : ''
   );
+  const [selectedWateringAmount, setSelectedWateringAmount] = useState<string>(
+    isEdit && plant?.watering_amount ? plant.watering_amount : ''
+  );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(serverFieldErrors || {});
 
   const handleRoomChange = (value: string) => {
     setSelectedRoom(value);
+  };
+
+  const handleWateringAmountChange = (value: string) => {
+    setSelectedWateringAmount(value);
   };
 
   const validateField = useCallback(
@@ -81,10 +88,6 @@ export function PlantForm({
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     validateField(e.target.name, e.target.value);
   };
-
-  const isFormValid =
-    (Object.keys(fieldErrors).length === 0 && plant?.name) ||
-    (document.querySelector('input[name="name"]') as HTMLInputElement)?.value?.trim() !== '';
 
   return (
     <Form method="post" encType="multipart/form-data" className="space-y-6 max-w-2xl">
@@ -165,6 +168,25 @@ export function PlantForm({
         {!fieldErrors.watering_frequency_days && (
           <p className="text-sm text-slate-500 mt-1">How often to water in days (1-365)</p>
         )}
+      </div>
+
+      {/* Watering Amount */}
+      <div>
+        <Label htmlFor="watering_amount" className="text-base">
+          Watering Amount (Optional)
+        </Label>
+        <Select value={selectedWateringAmount} onValueChange={handleWateringAmountChange}>
+          <SelectTrigger id="watering_amount" className="mt-2">
+            <SelectValue placeholder="Select watering amount" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Light - Small amount of water</SelectItem>
+            <SelectItem value="mid">Moderate - Medium amount of water</SelectItem>
+            <SelectItem value="heavy">Heavy - Thorough watering</SelectItem>
+          </SelectContent>
+        </Select>
+        <input type="hidden" name="watering_amount" value={selectedWateringAmount} />
+        <p className="text-sm text-slate-500 mt-1">How much water to give each time</p>
       </div>
 
       {/* Room */}

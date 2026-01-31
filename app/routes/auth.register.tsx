@@ -42,7 +42,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       return { error: 'Failed to create account' };
     }
 
-    return createUserSession(user.id);
+    return createUserSession(user.id, user.email);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Registration failed';
     if (message.includes('already registered')) {

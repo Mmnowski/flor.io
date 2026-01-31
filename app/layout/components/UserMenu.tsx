@@ -25,10 +25,13 @@ export function UserMenu({ userEmail }: UserMenuProps): React.ReactNode {
           <Menu className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem disabled>
-          <span className="text-xs text-gray-500 dark:text-slate-400 truncate">{userEmail}</span>
-        </DropdownMenuItem>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-2 border-b border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400">Signed in as</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+            {userEmail || 'Unknown user'}
+          </p>
+        </div>
         <DropdownMenuItem asChild>
           <form action="/auth/logout" method="post" className="w-full">
             <button

@@ -9,10 +9,10 @@ import {
   processPlantImage,
 } from '~/lib/storage/image.server';
 import { deletePlantPhoto, uploadPlantPhoto } from '~/lib/storage/storage.server';
-import { Button } from '~/shared/components';
+import { Button, PlantFormSkeleton } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 
-import { Link, redirect, useActionData, useLoaderData } from 'react-router';
+import { Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 
 import type { Route } from './+types/dashboard.plants.$plantId.edit';
 
@@ -51,6 +51,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     // Extract fields
     const name = formData.get('name');
     const wateringFrequencyStr = formData.get('watering_frequency_days');
+    const wateringAmount = formData.get('watering_amount');
     const roomId = formData.get('room_id');
     const lightRequirements = formData.get('light_requirements');
     const fertilizingTips = formData.get('fertilizing_tips');
@@ -101,6 +102,10 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     const updateData: any = {
       name: name.trim(),
       watering_frequency_days: wateringFrequency,
+      watering_amount:
+        wateringAmount && typeof wateringAmount === 'string' && wateringAmount !== ''
+          ? (wateringAmount as 'low' | 'mid' | 'heavy')
+          : null,
       room_id: roomId && typeof roomId === 'string' && roomId !== '' ? roomId : null,
       light_requirements:
         lightRequirements && typeof lightRequirements === 'string'
@@ -138,6 +143,16 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 export default function EditPlant() {
   const { plant, rooms } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+
+  // Only show skeleton when navigating TO this edit page, not away from it
+  const isNavigatingToThisPage =
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === `/dashboard/plants/${plant.id}/edit`;
+
+  if (isNavigatingToThisPage) {
+    return <PlantFormSkeleton />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
