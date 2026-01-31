@@ -12,6 +12,7 @@ describe('openai.server', () => {
       const result = await generateCareInstructions('Monstera deliciosa');
 
       expect(result).toHaveProperty('wateringFrequencyDays');
+      expect(result).toHaveProperty('wateringAmount');
       expect(result).toHaveProperty('lightRequirements');
       expect(result).toHaveProperty('fertilizingTips');
       expect(result).toHaveProperty('pruningTips');
@@ -24,6 +25,13 @@ describe('openai.server', () => {
       expect(typeof result.wateringFrequencyDays).toBe('number');
       expect(result.wateringFrequencyDays).toBeGreaterThanOrEqual(1);
       expect(result.wateringFrequencyDays).toBeLessThanOrEqual(365);
+    });
+
+    it('returns a valid watering amount (low, mid, or heavy)', async () => {
+      const result = await generateCareInstructions('Monstera deliciosa');
+
+      expect(typeof result.wateringAmount).toBe('string');
+      expect(['low', 'mid', 'heavy']).toContain(result.wateringAmount);
     });
 
     it('returns non-empty light requirements', async () => {

@@ -49,6 +49,7 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
         'wateringFrequencyDays',
         state.careInstructions?.wateringFrequencyDays.toString() || '7'
       );
+      formData.append('wateringAmount', state.careInstructions?.wateringAmount || 'mid');
       formData.append('lightRequirements', state.careInstructions?.lightRequirements || '');
       formData.append(
         'fertilizingTips',

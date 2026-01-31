@@ -11,6 +11,7 @@
 
 export interface CareInstructions {
   wateringFrequencyDays: number;
+  wateringAmount: 'low' | 'mid' | 'heavy';
   lightRequirements: string;
   fertilizingTips: string[];
   pruningTips: string[];
@@ -21,6 +22,7 @@ export interface CareInstructions {
 const mockCareDatabase: Record<string, CareInstructions> = {
   'Monstera deliciosa': {
     wateringFrequencyDays: 7,
+    wateringAmount: 'mid',
     lightRequirements:
       'Bright indirect light, 6-8 hours daily. Avoid direct sun which can scorch leaves.',
     fertilizingTips: [
@@ -46,6 +48,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Epipremnum aureum': {
     wateringFrequencyDays: 7,
+    wateringAmount: 'mid',
     lightRequirements:
       'Tolerates low to bright indirect light. Grows faster in brighter conditions.',
     fertilizingTips: [
@@ -70,6 +73,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Sansevieria trifasciata': {
     wateringFrequencyDays: 14,
+    wateringAmount: 'low',
     lightRequirements:
       'Very adaptable. Prefers bright indirect light but tolerates low light well.',
     fertilizingTips: [
@@ -94,6 +98,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Chlorophytum comosum': {
     wateringFrequencyDays: 5,
+    wateringAmount: 'mid',
     lightRequirements:
       'Bright, indirect light is best. Can tolerate some shade but prefers brighter conditions.',
     fertilizingTips: [
@@ -118,6 +123,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Philodendron hederaceum': {
     wateringFrequencyDays: 7,
+    wateringAmount: 'mid',
     lightRequirements:
       'Prefers bright, indirect light. Can survive in low light but grows more slowly.',
     fertilizingTips: [
@@ -142,6 +148,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Ficus elastica': {
     wateringFrequencyDays: 10,
+    wateringAmount: 'low',
     lightRequirements:
       'Bright, indirect light. Direct morning sun is acceptable. Adapts to medium light.',
     fertilizingTips: [
@@ -166,6 +173,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Spathiphyllum wallisii': {
     wateringFrequencyDays: 5,
+    wateringAmount: 'mid',
     lightRequirements:
       'Prefers moderate indirect light. Tolerates low light well. Avoid direct sun.',
     fertilizingTips: [
@@ -190,6 +198,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Ficus lyrata': {
     wateringFrequencyDays: 10,
+    wateringAmount: 'low',
     lightRequirements: 'Bright, indirect light. Needs 6+ hours of bright indirect light daily.',
     fertilizingTips: [
       'Fertilize once per month during growing season',
@@ -213,6 +222,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Zamioculcas zamiifolia': {
     wateringFrequencyDays: 14,
+    wateringAmount: 'low',
     lightRequirements: 'Tolerates low to bright indirect light. Prefers moderate indirect light.',
     fertilizingTips: [
       'Fertilize sparingly, once or twice during growing season',
@@ -236,6 +246,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Pilea peperomioides': {
     wateringFrequencyDays: 5,
+    wateringAmount: 'mid',
     lightRequirements:
       'Bright, indirect light. Rotate regularly for even growth. Some direct morning sun OK.',
     fertilizingTips: [
@@ -260,6 +271,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
 
   'Calathea orbifolia': {
     wateringFrequencyDays: 5,
+    wateringAmount: 'mid',
     lightRequirements:
       'Bright, indirect light. Sensitive to direct sun. Thrives in moderate light.',
     fertilizingTips: [
@@ -285,6 +297,7 @@ const mockCareDatabase: Record<string, CareInstructions> = {
   // Fallback for unknown plants
   'Unknown Plant': {
     wateringFrequencyDays: 7,
+    wateringAmount: 'mid',
     lightRequirements: 'Prefers bright, indirect light.',
     fertilizingTips: [
       'Fertilize every 4-6 weeks during the growing season',
@@ -342,13 +355,15 @@ async function generateCareInstructionsWithApi(plantName: string): Promise<CareI
 Please respond with ONLY a valid JSON object (no markdown, no code blocks) with this exact structure:
 {
   "wateringFrequencyDays": <number between 1-30>,
+  "wateringAmount": <one of "low", "mid", "heavy">,
   "lightRequirements": "<string describing light needs>",
   "fertilizingTips": ["<tip1>", "<tip2>", "<tip3>", "<tip4>"],
   "pruningTips": ["<tip1>", "<tip2>", "<tip3>", "<tip4>"],
   "troubleshooting": ["<issue1>", "<issue2>", "<issue3>", "<issue4>"]
 }
 
-Be specific to this plant species. Each array should have exactly 4 items.`;
+Be specific to this plant species. Each array should have exactly 4 items.
+- "wateringAmount" should be "low" for drought-tolerant plants (like succulents, Snake plant, ZZ plant), "mid" for typical houseplants, or "heavy" for water-loving plants.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -407,6 +422,7 @@ Be specific to this plant species. Each array should have exactly 4 items.`;
     // Validate required fields
     if (
       !parsedResponse.wateringFrequencyDays ||
+      !parsedResponse.wateringAmount ||
       !parsedResponse.lightRequirements ||
       !Array.isArray(parsedResponse.fertilizingTips) ||
       !Array.isArray(parsedResponse.pruningTips) ||
@@ -415,8 +431,15 @@ Be specific to this plant species. Each array should have exactly 4 items.`;
       throw new Error('Missing required fields in API response');
     }
 
+    // Validate watering amount is one of the allowed values
+    const validWateringAmounts = ['low', 'mid', 'heavy'];
+    const wateringAmount = validWateringAmounts.includes(parsedResponse.wateringAmount)
+      ? parsedResponse.wateringAmount
+      : 'mid'; // Default to mid if invalid
+
     return {
       wateringFrequencyDays: Math.max(1, Math.min(365, parsedResponse.wateringFrequencyDays)),
+      wateringAmount: wateringAmount as 'low' | 'mid' | 'heavy',
       lightRequirements: String(parsedResponse.lightRequirements),
       fertilizingTips: Array.isArray(parsedResponse.fertilizingTips)
         ? parsedResponse.fertilizingTips.map(String)
@@ -472,6 +495,7 @@ async function generateCareInstructionsMocked(plantName: string): Promise<CareIn
 
   return {
     wateringFrequencyDays: care.wateringFrequencyDays,
+    wateringAmount: care.wateringAmount,
     lightRequirements: care.lightRequirements,
     fertilizingTips: [...care.fertilizingTips],
     pruningTips: [...care.pruningTips],
@@ -514,6 +538,7 @@ export async function generateCareInstructionsInstant(
 
   return {
     wateringFrequencyDays: care.wateringFrequencyDays,
+    wateringAmount: care.wateringAmount,
     lightRequirements: care.lightRequirements,
     fertilizingTips: [...care.fertilizingTips],
     pruningTips: [...care.pruningTips],

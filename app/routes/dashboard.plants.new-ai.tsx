@@ -119,6 +119,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
         // Parse plant data from form
         const name = formData.get('name') as string;
         const wateringFrequencyDays = parseInt(formData.get('wateringFrequencyDays') as string, 10);
+        const wateringAmount = formData.get('wateringAmount') as string;
         const lightRequirements = formData.get('lightRequirements') as string;
         const roomId = formData.get('roomId') as string | null;
 
