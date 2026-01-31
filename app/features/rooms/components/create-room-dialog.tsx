@@ -12,7 +12,7 @@ import {
 import { Input } from '~/shared/components/ui/input';
 import { Label } from '~/shared/components/ui/label';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFetcher } from 'react-router';
 
 import { AlertCircle, Plus } from 'lucide-react';
@@ -21,6 +21,7 @@ export function CreateRoomDialog() {
   const fetcher = useFetcher();
   const [open, setOpen] = useState(false);
   const [roomName, setRoomName] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const isSubmitting = fetcher.state === 'submitting';
   const error = fetcher.data?.error as string | undefined;
@@ -29,6 +30,7 @@ export function CreateRoomDialog() {
     e.preventDefault();
     if (!roomName.trim()) return;
 
+    setHasSubmitted(true);
     const formData = new FormData();
     formData.append('_method', 'POST');
     formData.append('name', roomName);
@@ -40,10 +42,21 @@ export function CreateRoomDialog() {
   };
 
   // Close dialog and reset form on success
-  if (fetcher.state === 'idle' && fetcher.data?.room && open) {
-    setOpen(false);
-    setRoomName('');
-  }
+  useEffect(() => {
+    if (fetcher.state === 'idle' && hasSubmitted && !error) {
+      setOpen(false);
+      setRoomName('');
+      setHasSubmitted(false);
+    }
+  }, [fetcher.state, hasSubmitted, error]);
+
+  // Reset state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setHasSubmitted(false);
+      setRoomName('');
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

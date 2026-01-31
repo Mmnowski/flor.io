@@ -10,7 +10,6 @@
 import { roomNameSchema } from '~/lib';
 import { requireAuth } from '~/lib/auth/require-auth.server';
 import {
-  countPlantsInRoom,
   createRoom,
   deleteRoom,
   getRoomById,
@@ -91,23 +90,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
       case 'DELETE': {
         // Delete room
+        // Note: Plants in this room will have room_id set to NULL (ON DELETE SET NULL in DB)
         const roomId = String(formData.get('roomId'));
 
         // Verify room ownership
         const room = await getRoomById(roomId, userId);
         if (!room) {
           throw new Response(JSON.stringify({ error: 'Room not found' }), { status: 404 });
-        }
-
-        // Check if room has plants
-        const plantCount = await countPlantsInRoom(roomId, userId);
-        if (plantCount > 0) {
-          throw new Response(
-            JSON.stringify({
-              error: `Cannot delete room with ${plantCount} plant${plantCount !== 1 ? 's' : ''}. Move plants to another room first.`,
-            }),
-            { status: 400 }
-          );
         }
 
         await deleteRoom(roomId);

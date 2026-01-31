@@ -12,7 +12,13 @@ import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
 import type { PlantWithWatering, Room } from '~/types/plant.types';
 
 import { useMemo, useState } from 'react';
-import { useLoaderData, useNavigate, useNavigation, useSearchParams } from 'react-router';
+import {
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useNavigation,
+  useSearchParams,
+} from 'react-router';
 
 import { Leaf, Plus } from 'lucide-react';
 
@@ -38,20 +44,37 @@ export default function DashboardIndex() {
   const { plants, rooms, activeRoomId } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>('watering');
 
-  // Only show skeleton when navigating TO the dashboard, not away from it
+  // Get sort from URL params, default to 'watering'
+  const sortBy = (searchParams.get('sort') as SortOption) || 'watering';
+
+  // Only show skeleton when navigating TO dashboard from another page, not for param changes
   const isNavigatingToDashboard =
-    navigation.state === 'loading' && navigation.location?.pathname === '/dashboard';
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === '/dashboard' &&
+    location.pathname !== '/dashboard';
 
   const handleFilterChange = (newRoomId: string | null) => {
+    const params = new URLSearchParams(searchParams);
     if (newRoomId) {
-      navigate(`?room=${newRoomId}`);
+      params.set('room', newRoomId);
     } else {
-      navigate('');
+      params.delete('room');
     }
+    navigate(`?${params.toString()}`);
+  };
+
+  const handleSortChange = (newSort: SortOption) => {
+    const params = new URLSearchParams(searchParams);
+    if (newSort === 'watering') {
+      params.delete('sort'); // default value, keep URL clean
+    } else {
+      params.set('sort', newSort);
+    }
+    navigate(`?${params.toString()}`);
   };
 
   // Sort plants based on selected option
@@ -69,6 +92,17 @@ export default function DashboardIndex() {
     }
     return sorted;
   }, [plants, sortBy]);
+
+  // Calculate plant counts per room for RoomFilter
+  const plantCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const plant of plants) {
+      if (plant.room_id) {
+        counts[plant.room_id] = (counts[plant.room_id] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [plants]);
 
   if (isNavigatingToDashboard) {
     return <DashboardSkeleton />;
@@ -95,16 +129,15 @@ export default function DashboardIndex() {
 
       <AddPlantDialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen} />
 
-      {/* Room Filter */}
-      {rooms.length > 0 && (
-        <div className="mb-6">
-          <RoomFilter
-            rooms={rooms}
-            activeRoomId={activeRoomId}
-            onFilterChange={handleFilterChange}
-          />
-        </div>
-      )}
+      {/* Room Filter - always show to allow creating first room */}
+      <div className="mb-6">
+        <RoomFilter
+          rooms={rooms}
+          activeRoomId={activeRoomId}
+          onFilterChange={handleFilterChange}
+          plantCounts={plantCounts}
+        />
+      </div>
 
       {plants.length === 0 ? (
         <EmptyState
@@ -120,7 +153,7 @@ export default function DashboardIndex() {
             <p className="text-sm text-slate-600 dark:text-slate-400">
               {plants.length} {plants.length === 1 ? 'plant' : 'plants'} in your collection
             </p>
-            <SortSelector activeSort={sortBy} onSortChange={setSortBy} />
+            <SortSelector activeSort={sortBy} onSortChange={handleSortChange} />
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedPlants.map((plant) => (
