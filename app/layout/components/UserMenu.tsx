@@ -9,9 +9,14 @@ import {
 import { Menu } from 'lucide-react';
 
 interface UserMenuProps {
+  /** Current user's email address */
   userEmail?: string;
 }
 
+/**
+ * UserMenu - Dropdown menu displaying user info and logout option
+ * Shows email and provides logout functionality
+ */
 export function UserMenu({ userEmail }: UserMenuProps): React.ReactNode {
   return (
     <DropdownMenu>

@@ -9,12 +9,20 @@ import { useCallback, useState } from 'react';
 import { X } from 'lucide-react';
 
 interface RoomFilterProps {
+  /** List of user's rooms */
   rooms: Room[];
+  /** Currently selected room ID, or null for all plants */
   activeRoomId: string | null;
+  /** Callback when room filter changes */
   onFilterChange: (roomId: string | null) => void;
+  /** Plant count per room for display */
   plantCounts?: Record<string, number>;
 }
 
+/**
+ * RoomFilter - Horizontal scrolling room filter chips
+ * Allows filtering plants by room and creating/deleting rooms
+ */
 export function RoomFilter({
   rooms,
   activeRoomId,
@@ -30,10 +38,10 @@ export function RoomFilter({
     [onFilterChange]
   );
 
-  const handleDeleteClick = (e: React.MouseEvent, room: Room) => {
+  const handleDeleteClick = useCallback((e: React.MouseEvent, room: Room) => {
     e.stopPropagation(); // Prevent room selection
     setRoomToDelete(room);
-  };
+  }, []);
 
   const handleDeleteDialogChange = useCallback((open: boolean) => {
     if (!open) {

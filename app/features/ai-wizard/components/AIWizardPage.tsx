@@ -5,9 +5,10 @@
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { logger } from '~/shared/lib/logger';
 
-import { useEffect, useRef, useState } from 'react';
-import { Form, useFetcher } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useFetcher, useNavigate } from 'react-router';
 
+import { buildFeedbackFormData, buildPlantFormData, fileToBase64 } from '../lib';
 import { AIWizard, type WizardStep, useAIWizard } from './ai-wizard';
 import {
   CarePreviewStep,
@@ -20,21 +21,26 @@ import {
 } from './ai-wizard-steps';
 
 interface AIWizardPageProps {
+  /** Current user's ID */
   userId: string;
+  /** Number of AI generations remaining this month */
   aiRemaining: number;
+  /** Available rooms for plant assignment */
   rooms?: Array<{ id: string; name: string }>;
+  /** Callback when wizard completes successfully */
   onComplete?: (plantId: string) => void;
 }
 
 /**
- * Inner component that uses wizard context
+ * AIWizardPageContent - Inner component that uses wizard context
+ * Handles step rendering and form submissions
  */
 function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AIWizardPageProps) {
   const { state, goToStep, updateState } = useAIWizard();
   const fetcher = useFetcher();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastAction, setLastAction] = useState<'save-plant' | 'save-feedback' | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
   // Watch for fetcher data to handle response
   useEffect(() => {
@@ -63,13 +69,13 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
     if (fetcher.state === 'idle' && lastAction === 'save-feedback') {
       // Feedback was submitted, navigate to plant details
       if (fetcher.data?.redirect) {
-        window.location.href = fetcher.data.redirect;
+        navigate(fetcher.data.redirect);
       } else {
         onComplete?.(state.plantId ?? '');
       }
       setLastAction(null);
     }
-  }, [fetcher.state, lastAction, fetcher.data, state.plantId, onComplete]);
+  }, [fetcher.state, lastAction, fetcher.data, state.plantId, onComplete, navigate]);
 
   const handleSavePlant = async () => {
     try {
@@ -77,63 +83,17 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       updateState({ error: null });
 
       // Convert file to base64 if exists
-      let photoBase64: string | null = null;
-      if (state.photoFile) {
-        photoBase64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result as string;
-            // Remove data:image/jpeg;base64, prefix
-            const base64Only = result.split(',')[1];
-            resolve(base64Only);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(state.photoFile!);
-        });
-      }
+      const photoBase64 = state.photoFile ? await fileToBase64(state.photoFile) : null;
 
-      if (!formRef.current) {
-        throw new Error('Form not available');
-      }
-
-      // Clear form and build new form data
-      formRef.current.innerHTML = '';
-
-      // Add hidden inputs
-      const fields: Record<string, string> = {
-        _action: 'save-plant',
-        name: state.manualPlantName,
-        wateringFrequencyDays: state.careInstructions?.wateringFrequencyDays.toString() || '7',
-        wateringAmount: state.careInstructions?.wateringAmount || 'mid',
-        lightRequirements: state.careInstructions?.lightRequirements || '',
-        fertilizingTips: JSON.stringify(state.careInstructions?.fertilizingTips || []),
-        pruningTips: JSON.stringify(state.careInstructions?.pruningTips || []),
-        troubleshooting: JSON.stringify(state.careInstructions?.troubleshooting || []),
-        roomId: state.selectedRoomId || '',
-      };
-
-      if (photoBase64) {
-        fields.photoBase64 = photoBase64;
-      }
-
-      for (const [key, value] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        formRef.current.appendChild(input);
-      }
+      // Build form data using utility function
+      const formData = buildPlantFormData(state, photoBase64);
 
       // Track this action for proper response handling
       setLastAction('save-plant');
-      // Submit form using React Router's fetcher
-      fetcher.submit(formRef.current, { method: 'POST' });
+      // Submit using React Router's fetcher
+      fetcher.submit(formData, { method: 'POST' });
     } catch (error) {
-      let errorMessage = 'Failed to save plant';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save plant';
       updateState({
         error: errorMessage,
         isLoading: false,
@@ -156,17 +116,15 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       setIsSubmitting(true);
       updateState({ error: null });
 
-      const formData = new FormData();
-      formData.append('_action', 'save-feedback');
-      formData.append('plantId', plantId);
-      formData.append('feedbackType', feedbackData.feedbackType);
-      formData.append('comment', feedbackData.feedbackComment || '');
-      formData.append(
-        'aiResponseSnapshot',
-        JSON.stringify({
+      // Build form data using utility function
+      const formData = buildFeedbackFormData(
+        plantId,
+        feedbackData.feedbackType,
+        feedbackData.feedbackComment,
+        {
           identification: state.identification,
           careInstructions: state.careInstructions,
-        })
+        }
       );
 
       // Track this action for proper response handling
@@ -174,12 +132,7 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       // Submit using React Router's fetcher
       fetcher.submit(formData, { method: 'POST' });
     } catch (error) {
-      let errorMessage = 'Failed to save feedback';
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save feedback';
       logger.error('Feedback error', error);
       updateState({ error: errorMessage });
 
@@ -275,13 +228,7 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
     );
   }
 
-  return (
-    <>
-      {stepContent}
-      {/* Hidden form for file uploads */}
-      <form ref={formRef} style={{ display: 'none' }} />
-    </>
-  );
+  return <>{stepContent}</>;
 }
 
 /**

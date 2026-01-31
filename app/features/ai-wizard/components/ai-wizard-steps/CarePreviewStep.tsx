@@ -18,6 +18,7 @@ import { Textarea } from '~/shared/components/ui/textarea';
 import { useState } from 'react';
 
 import { useAIWizard } from '../ai-wizard';
+import { CareDetailCard, TipsSection } from './care-preview';
 
 interface CarePreviewStepProps {
   onContinue?: () => void;
@@ -221,95 +222,53 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       </div>
 
       {/* Light Requirements */}
-      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
-        <h3 className="text-lg font-bold dark:text-white">Light Requirements</h3>
-        <div className="mt-4 space-y-2">
-          {isEditing ? (
-            <>
-              <Label htmlFor="light">Light Requirements</Label>
-              <Textarea
-                id="light"
-                value={state.careInstructions.lightRequirements}
-                onChange={handleLightRequirementsChange}
-                rows={3}
-              />
-            </>
-          ) : (
-            <p className="text-gray-700 dark:text-gray-300">
-              {state.careInstructions.lightRequirements}
-            </p>
-          )}
-        </div>
-      </div>
+      <CareDetailCard title="Light Requirements">
+        {isEditing ? (
+          <>
+            <Label htmlFor="light">Light Requirements</Label>
+            <Textarea
+              id="light"
+              value={state.careInstructions.lightRequirements}
+              onChange={handleLightRequirementsChange}
+              rows={3}
+            />
+          </>
+        ) : (
+          <p className="text-gray-700 dark:text-gray-300">
+            {state.careInstructions.lightRequirements}
+          </p>
+        )}
+      </CareDetailCard>
 
       {/* Fertilizing Tips */}
-      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
-        <h3 className="text-lg font-bold dark:text-white">Fertilizing Tips</h3>
-        <div className="mt-4 space-y-2">
-          {state.careInstructions.fertilizingTips.map((tip, index) => (
-            <div key={index}>
-              {isEditing ? (
-                <Input
-                  value={tip}
-                  onChange={(e) => handleTipsChange('fertilizingTips', index, e.target.value)}
-                  className="mb-2"
-                />
-              ) : (
-                <div className="flex items-start gap-2">
-                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-blue-600 flex-shrink-0" />
-                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      <CareDetailCard title="Fertilizing Tips">
+        <TipsSection
+          tips={state.careInstructions.fertilizingTips}
+          isEditing={isEditing}
+          bulletColor="blue"
+          onTipChange={(index, value) => handleTipsChange('fertilizingTips', index, value)}
+        />
+      </CareDetailCard>
 
       {/* Pruning Tips */}
-      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
-        <h3 className="text-lg font-bold dark:text-white">Pruning Tips</h3>
-        <div className="mt-4 space-y-2">
-          {state.careInstructions.pruningTips.map((tip, index) => (
-            <div key={index}>
-              {isEditing ? (
-                <Input
-                  value={tip}
-                  onChange={(e) => handleTipsChange('pruningTips', index, e.target.value)}
-                  className="mb-2"
-                />
-              ) : (
-                <div className="flex items-start gap-2">
-                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-green-600 flex-shrink-0" />
-                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      <CareDetailCard title="Pruning Tips">
+        <TipsSection
+          tips={state.careInstructions.pruningTips}
+          isEditing={isEditing}
+          bulletColor="green"
+          onTipChange={(index, value) => handleTipsChange('pruningTips', index, value)}
+        />
+      </CareDetailCard>
 
       {/* Troubleshooting */}
-      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
-        <h3 className="text-lg font-bold dark:text-white">Troubleshooting</h3>
-        <div className="mt-4 space-y-2">
-          {state.careInstructions.troubleshooting.map((tip, index) => (
-            <div key={index}>
-              {isEditing ? (
-                <Input
-                  value={tip}
-                  onChange={(e) => handleTipsChange('troubleshooting', index, e.target.value)}
-                  className="mb-2"
-                />
-              ) : (
-                <div className="flex items-start gap-2">
-                  <span className="mt-1 inline-block h-2 w-2 rounded-full bg-red-600 flex-shrink-0" />
-                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      <CareDetailCard title="Troubleshooting">
+        <TipsSection
+          tips={state.careInstructions.troubleshooting}
+          isEditing={isEditing}
+          bulletColor="red"
+          onTipChange={(index, value) => handleTipsChange('troubleshooting', index, value)}
+        />
+      </CareDetailCard>
 
       {/* Info */}
       <Alert>

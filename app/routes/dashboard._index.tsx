@@ -11,7 +11,7 @@ import { getUserRooms } from '~/lib/rooms/rooms.server';
 import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
 import type { PlantWithWatering, Room } from '~/types/plant.types';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   useLoaderData,
   useLocation,
@@ -57,25 +57,31 @@ export default function DashboardIndex() {
     navigation.location?.pathname === '/dashboard' &&
     location.pathname !== '/dashboard';
 
-  const handleFilterChange = (newRoomId: string | null) => {
-    const params = new URLSearchParams(searchParams);
-    if (newRoomId) {
-      params.set('room', newRoomId);
-    } else {
-      params.delete('room');
-    }
-    navigate(`?${params.toString()}`);
-  };
+  const handleFilterChange = useCallback(
+    (newRoomId: string | null) => {
+      const params = new URLSearchParams(searchParams);
+      if (newRoomId) {
+        params.set('room', newRoomId);
+      } else {
+        params.delete('room');
+      }
+      navigate(`?${params.toString()}`);
+    },
+    [searchParams, navigate]
+  );
 
-  const handleSortChange = (newSort: SortOption) => {
-    const params = new URLSearchParams(searchParams);
-    if (newSort === 'watering') {
-      params.delete('sort'); // default value, keep URL clean
-    } else {
-      params.set('sort', newSort);
-    }
-    navigate(`?${params.toString()}`);
-  };
+  const handleSortChange = useCallback(
+    (newSort: SortOption) => {
+      const params = new URLSearchParams(searchParams);
+      if (newSort === 'watering') {
+        params.delete('sort'); // default value, keep URL clean
+      } else {
+        params.set('sort', newSort);
+      }
+      navigate(`?${params.toString()}`);
+    },
+    [searchParams, navigate]
+  );
 
   // Sort plants based on selected option
   const sortedPlants = useMemo(() => {

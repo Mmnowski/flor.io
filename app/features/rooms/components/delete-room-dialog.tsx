@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '~/shared/components/ui/dialog';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFetcher } from 'react-router';
 
 import { AlertCircle, AlertTriangle, Trash2 } from 'lucide-react';
@@ -44,7 +44,7 @@ export function DeleteRoomDialog({
   const isSubmitting = fetcher.state === 'submitting';
   const error = fetcher.data?.error as string | undefined;
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     setHasSubmitted(true);
     const formData = new FormData();
     formData.append('_method', 'DELETE');
@@ -54,7 +54,7 @@ export function DeleteRoomDialog({
       method: 'POST',
       action: '/api/rooms',
     });
-  };
+  }, [room.id, fetcher]);
 
   // Close dialog on success
   useEffect(() => {
