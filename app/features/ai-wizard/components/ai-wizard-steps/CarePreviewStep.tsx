@@ -61,6 +61,17 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
     }
   };
 
+  const handleWateringAmountChange = (value: string) => {
+    if (state.careInstructions && ['low', 'mid', 'heavy'].includes(value)) {
+      updateState({
+        careInstructions: {
+          ...state.careInstructions,
+          wateringAmount: value as 'low' | 'mid' | 'heavy',
+        } as typeof state.careInstructions,
+      });
+    }
+  };
+
   const handleTipsChange = (
     section: 'fertilizingTips' | 'pruningTips' | 'troubleshooting',
     index: number,
@@ -148,28 +159,64 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       {/* Watering */}
       <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
         <h3 className="text-lg font-bold dark:text-white">Watering</h3>
-        <div className="mt-4 space-y-2">
-          {isEditing ? (
-            <>
-              <Label htmlFor="watering-frequency">Watering Frequency (days)</Label>
-              <Input
-                id="watering-frequency"
-                type="number"
-                min="1"
-                max="365"
-                value={state.careInstructions.wateringFrequencyDays}
-                onChange={handleWateringFrequencyChange}
-              />
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Frequency</p>
-              <p className="text-lg text-gray-900 dark:text-white">
-                Every {state.careInstructions.wateringFrequencyDays} day
-                {state.careInstructions.wateringFrequencyDays !== 1 ? 's' : ''}
-              </p>
-            </>
-          )}
+        <div className="mt-4 space-y-4">
+          {/* Watering Frequency */}
+          <div>
+            {isEditing ? (
+              <>
+                <Label htmlFor="watering-frequency">Watering Frequency (days)</Label>
+                <Input
+                  id="watering-frequency"
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={state.careInstructions.wateringFrequencyDays}
+                  onChange={handleWateringFrequencyChange}
+                />
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Frequency</p>
+                <p className="text-lg text-gray-900 dark:text-white">
+                  Every {state.careInstructions.wateringFrequencyDays} day
+                  {state.careInstructions.wateringFrequencyDays !== 1 ? 's' : ''}
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* Watering Amount */}
+          <div>
+            {isEditing ? (
+              <>
+                <Label htmlFor="watering-amount">Watering Amount</Label>
+                <Select
+                  value={state.careInstructions.wateringAmount}
+                  onValueChange={handleWateringAmountChange}
+                >
+                  <SelectTrigger id="watering-amount">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Light watering</SelectItem>
+                    <SelectItem value="mid">Moderate watering</SelectItem>
+                    <SelectItem value="heavy">Heavy watering</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Amount</p>
+                <p className="text-lg text-gray-900 dark:text-white">
+                  {state.careInstructions.wateringAmount === 'low'
+                    ? 'Light watering'
+                    : state.careInstructions.wateringAmount === 'heavy'
+                      ? 'Heavy watering'
+                      : 'Moderate watering'}
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

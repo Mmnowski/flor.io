@@ -32,6 +32,7 @@ export interface PlantIdentification {
 
 export interface CareInstructionsData {
   wateringFrequencyDays: number;
+  wateringAmount: 'low' | 'mid' | 'heavy';
   lightRequirements: string;
   fertilizingTips: string[];
   pruningTips: string[];
