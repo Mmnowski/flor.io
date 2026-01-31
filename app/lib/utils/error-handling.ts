@@ -76,7 +76,7 @@ export function parseError(error: unknown): ErrorInfo {
         type: 'api_error',
         message: error.message,
         canRetry: true,
-        userMessage: 'Server error occurred. Please try again.',
+        userMessage: error.message, // Show actual error message for API errors
       };
     }
 

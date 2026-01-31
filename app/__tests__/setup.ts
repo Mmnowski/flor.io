@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, vi } from 'vitest';
 
 // Configure environment for tests - always use mocks for AI APIs
 process.env.USE_REAL_OPENAI_API = 'false';
-process.env.USE_REAL_PLANTNET_API = 'false';
+process.env.USE_REAL_PLANT_ID_API = 'false';
 
 // Cleanup after each test
 afterEach(() => {

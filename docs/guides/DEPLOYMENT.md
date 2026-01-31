@@ -26,7 +26,11 @@ SESSION_SECRET=$(openssl rand -base64 32)  # Generate secure random key
 
 # Optional: AI Service Keys (for production integration)
 OPENAI_API_KEY=sk-...
-PLANTNET_API_KEY=your-plantnet-key
+PLANT_ID_API_KEY=your-plant-id-key
+
+# Feature Flags (set to true to use real APIs, default is false for mocked data)
+USE_REAL_PLANT_ID_API=false
+USE_REAL_OPENAI_API=false
 ```
 
 **Security Notes**:

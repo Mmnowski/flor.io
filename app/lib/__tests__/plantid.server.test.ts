@@ -1,8 +1,8 @@
-import { identifyPlant, identifyPlantInstant } from '~/lib/ai/plantnet.server';
+import { identifyPlant, identifyPlantInstant } from '~/lib/ai/plantid.server';
 
 import { describe, expect, it } from 'vitest';
 
-describe('plantnet.server', () => {
+describe('plantid.server', () => {
   const dummyBuffer = Buffer.from('test-image-data');
 
   describe('identifyPlant', () => {

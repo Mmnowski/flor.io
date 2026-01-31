@@ -109,23 +109,23 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       )}
 
       {/* Plant info */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Plant Information</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Plant Information</h3>
         <div className="mt-4 space-y-4">
           {/* Plant name (display only) */}
           <div>
-            <p className="text-sm font-semibold text-gray-600">Name</p>
-            <p className="text-lg text-gray-900">{plantName}</p>
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Name</p>
+            <p className="text-lg text-gray-900 dark:text-white">{plantName}</p>
           </div>
 
           {/* Room selection */}
           <div>
             <Label htmlFor="room">Room (Optional)</Label>
             <Select
-              value={state.selectedRoomId || ''}
+              value={state.selectedRoomId || 'none'}
               onValueChange={(value) =>
                 updateState({
-                  selectedRoomId: value || null,
+                  selectedRoomId: value === 'none' ? null : value,
                 })
               }
             >
@@ -133,7 +133,7 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
                 <SelectValue placeholder="Select a room" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No room assigned</SelectItem>
+                <SelectItem value="none">No room assigned</SelectItem>
                 {rooms.map((room) => (
                   <SelectItem key={room.id} value={room.id}>
                     {room.name}
@@ -146,8 +146,8 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       </div>
 
       {/* Watering */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Watering</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Watering</h3>
         <div className="mt-4 space-y-2">
           {isEditing ? (
             <>
@@ -163,8 +163,8 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
             </>
           ) : (
             <>
-              <p className="text-sm font-semibold text-gray-600">Frequency</p>
-              <p className="text-lg text-gray-900">
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Frequency</p>
+              <p className="text-lg text-gray-900 dark:text-white">
                 Every {state.careInstructions.wateringFrequencyDays} day
                 {state.careInstructions.wateringFrequencyDays !== 1 ? 's' : ''}
               </p>
@@ -174,8 +174,8 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       </div>
 
       {/* Light Requirements */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Light Requirements</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Light Requirements</h3>
         <div className="mt-4 space-y-2">
           {isEditing ? (
             <>
@@ -188,14 +188,16 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
               />
             </>
           ) : (
-            <p className="text-gray-700">{state.careInstructions.lightRequirements}</p>
+            <p className="text-gray-700 dark:text-gray-300">
+              {state.careInstructions.lightRequirements}
+            </p>
           )}
         </div>
       </div>
 
       {/* Fertilizing Tips */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Fertilizing Tips</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Fertilizing Tips</h3>
         <div className="mt-4 space-y-2">
           {state.careInstructions.fertilizingTips.map((tip, index) => (
             <div key={index}>
@@ -208,7 +210,7 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
               ) : (
                 <div className="flex items-start gap-2">
                   <span className="mt-1 inline-block h-2 w-2 rounded-full bg-blue-600 flex-shrink-0" />
-                  <p className="text-gray-700">{tip}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
                 </div>
               )}
             </div>
@@ -217,8 +219,8 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       </div>
 
       {/* Pruning Tips */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Pruning Tips</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Pruning Tips</h3>
         <div className="mt-4 space-y-2">
           {state.careInstructions.pruningTips.map((tip, index) => (
             <div key={index}>
@@ -231,7 +233,7 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
               ) : (
                 <div className="flex items-start gap-2">
                   <span className="mt-1 inline-block h-2 w-2 rounded-full bg-green-600 flex-shrink-0" />
-                  <p className="text-gray-700">{tip}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
                 </div>
               )}
             </div>
@@ -240,8 +242,8 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
       </div>
 
       {/* Troubleshooting */}
-      <div className="rounded-lg border-2 border-gray-200 p-6">
-        <h3 className="text-lg font-bold">Troubleshooting</h3>
+      <div className="rounded-lg border-2 border-gray-200 p-6 dark:border-gray-700">
+        <h3 className="text-lg font-bold dark:text-white">Troubleshooting</h3>
         <div className="mt-4 space-y-2">
           {state.careInstructions.troubleshooting.map((tip, index) => (
             <div key={index}>
@@ -254,7 +256,7 @@ export function CarePreviewStep({ onContinue, rooms = [] }: CarePreviewStepProps
               ) : (
                 <div className="flex items-start gap-2">
                   <span className="mt-1 inline-block h-2 w-2 rounded-full bg-red-600 flex-shrink-0" />
-                  <p className="text-gray-700">{tip}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{tip}</p>
                 </div>
               )}
             </div>

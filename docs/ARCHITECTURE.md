@@ -72,7 +72,7 @@ app/
 │   ├── storage.server.ts       # Supabase Storage
 │   ├── image.server.ts         # Image processing
 │   ├── usage-limits.server.ts  # Usage tracking
-│   ├── plantnet.server.ts      # Plant identification (hybrid: mocked/real API)
+│   ├── plantnet.server.ts      # Plant identification via plant.id API (hybrid: mocked/real)
 │   ├── openai.server.ts        # Care instructions (hybrid: mocked/real API)
 │   ├── auth.server.ts          # Authentication
 │   ├── session.server.ts       # Session management

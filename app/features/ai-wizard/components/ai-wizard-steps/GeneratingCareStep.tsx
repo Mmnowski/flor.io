@@ -7,7 +7,8 @@ import { parseError, withTimeout } from '~/lib';
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { Button } from '~/shared/components/ui/button';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useFetcher } from 'react-router';
 
 import { useAIWizard } from '../ai-wizard';
 
@@ -21,74 +22,58 @@ const GENERATE_TIMEOUT_MS = 45000; // 45 second timeout for care generation
 export function GeneratingCareStep({ onComplete, onError }: GeneratingCareStepProps) {
   const { state, updateState, incrementRetry } = useAIWizard();
   const [isRetrying, setIsRetrying] = useState(false);
+  const hasAttemptedRef = useRef(false);
+  const fetcher = useFetcher();
 
   useEffect(() => {
-    // Generate care instructions
+    // Monitor fetcher state for care generation response
+    if (fetcher.state === 'idle' && fetcher.data) {
+      if (fetcher.data.error) {
+        updateState({
+          isLoading: false,
+          error: fetcher.data.error,
+        });
+        onError?.(fetcher.data.error);
+        setIsRetrying(false);
+      } else if (fetcher.data.careInstructions) {
+        updateState({
+          careInstructions: fetcher.data.careInstructions,
+          isLoading: false,
+          retryCount: 0,
+        });
+        onComplete?.();
+      }
+    }
+  }, [fetcher.state, fetcher.data, updateState, onComplete, onError]);
+
+  useEffect(() => {
+    // Generate care instructions via fetcher
     const generateCare = async () => {
-      const plantName = state.manualPlantName || state.identification?.commonNames[0];
+      const plantName = state.manualPlantName || state.identification?.commonNames?.[0];
 
       if (!plantName) {
         onError?.('No plant name provided');
         return;
       }
 
-      try {
-        updateState({ isLoading: true, error: null });
+      updateState({ isLoading: true, error: null });
 
-        // Simulate the 3-second delay from openai.server.ts with timeout
-        const apiCall = new Promise<void>((resolve) => {
-          setTimeout(resolve, 3000);
-        });
-
-        await withTimeout(
-          apiCall,
-          GENERATE_TIMEOUT_MS,
-          'Care instruction generation took too long'
-        );
-
-        // Mock: return care instructions based on plant name
-        const mockCareData = {
-          wateringFrequencyDays: 7,
-          lightRequirements: 'Bright indirect light, 6-8 hours daily. Avoid direct sun.',
-          fertilizingTips: [
-            'Fertilize every 4-6 weeks during growing season',
-            'Use balanced liquid fertilizer diluted to half strength',
-            'Reduce fertilizing in fall and winter',
-          ],
-          pruningTips: [
-            'Prune yellow or damaged leaves at the base',
-            'Trim aerial roots if they become unruly',
-            'Best time to prune is spring or early summer',
-          ],
-          troubleshooting: [
-            'Yellow leaves: Usually overwatering or too much direct sun',
-            'Brown leaf tips: Low humidity or underwatering',
-            'Slow growth: Insufficient light or nutrients',
-          ],
-        };
-
-        updateState({
-          careInstructions: mockCareData,
-          isLoading: false,
-          retryCount: 0,
-        });
-
-        onComplete?.();
-      } catch (error) {
-        const errorInfo = parseError(error);
-        updateState({
-          isLoading: false,
-          error: errorInfo.userMessage,
-        });
-        onError?.(errorInfo.userMessage);
-        setIsRetrying(false);
-      }
+      // Submit via fetcher
+      fetcher.submit(
+        {
+          _action: 'generate-care',
+          plantName,
+        },
+        { method: 'POST' }
+      );
     };
 
-    if (!isRetrying) {
+    // Only attempt once unless user explicitly retries
+    if (!hasAttemptedRef.current || isRetrying) {
+      hasAttemptedRef.current = true;
       generateCare();
     }
-  }, [state.manualPlantName, state.identification, updateState, onComplete, onError, isRetrying]);
+  }, [isRetrying, state.manualPlantName, state.identification?.commonNames]);
 
   const plantName = state.manualPlantName || state.identification?.commonNames[0] || 'plant';
 

@@ -50,7 +50,7 @@ app/features/ai-wizard/
 Located in `app/lib/plants.ai.server.ts`:
 
 ```typescript
-// Identify plant from image using PlantNet API
+// Identify plant from image using plant.id API
 export async function identifyPlantFromImage(imageBuffer: Buffer): Promise<PlantIdentification>;
 
 // Generate care instructions using OpenAI API
@@ -196,7 +196,7 @@ POST /dashboard/plants/new-ai     # Submit wizard (create plant)
 
 2. **IdentifyingStep**
    - Show loading state while processing
-   - Image sent to PlantNet API (hybrid: mocked/real)
+   - Image sent to plant.id API (hybrid: mocked/real)
    - Processing indication to user
 
 3. **IdentificationResultStep**
@@ -274,27 +274,28 @@ interface CareInstructions {
 
 ## API Integrations
 
-### PlantNet API
+### plant.id API
 
 **Location:** `app/lib/ai/plantnet.server.ts`
 
 **Implementation Type:** HYBRID (Mocked by default, real API available)
 
-**Feature Flag:** `USE_REAL_PLANTNET_API`
+**Feature Flag:** `USE_REAL_PLANT_ID_API`
 
 **Default Mode (Mocked):**
 
-- Uses internal database of 19 common houseplants
+- Uses internal database of 20 common houseplants
 - Functions: `identifyPlantMocked()`, `identifyPlantInstant()`
-- Fast response (< 100ms)
+- Fast response (< 100ms with simulated 2s delay for realism)
 - Suitable for development and testing
 
 **Real API Mode:**
 
-- Requires environment variable: `PLANTNET_API_KEY`
-- Uses actual PlantNet API for unlimited species identification
+- Requires environment variable: `PLANT_ID_API_KEY`
+- Uses actual plant.id API for unlimited species identification
 - Function: `identifyPlant()`
 - Computer vision based identification from photos
+- Endpoint: `https://api.plant.id/v2/identify`
 
 **Mock Database Examples:**
 
@@ -445,7 +446,7 @@ interface AIFeedback {
 
 - Improve AI model training
 - Identify problematic identifications
-- Track PlantNet/OpenAI quality
+- Track plant.id/OpenAI quality
 - Understand user preferences
 
 ### Analytics Tracked
@@ -542,7 +543,7 @@ All wizard components follow WCAG 2.1 AA:
 - **Image Size**: Max 10MB (validated client-side)
 - **API Timeouts**: 30 seconds per API call
 - **Confidence Threshold**: Show results if confidence > 0.3
-- **PlantNet Database**: 19 plants (mocked) or 500k+ species (real API)
+- **plant.id Database**: 20 plants (mocked) or 500k+ species (real API)
 - **OpenAI Model**: GPT-4o-mini (mocked profiles or dynamic generation)
 - **Monthly Limit**: 20 AI generations per user
 - **Overall Limit**: 100 plants per user

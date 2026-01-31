@@ -390,7 +390,19 @@ Be specific to this plant species. Each array should have exactly 4 items.`;
       jsonStr = content.split('```')[1].split('```')[0].trim();
     }
 
-    const parsedResponse = JSON.parse(jsonStr);
+    let parsedResponse;
+    try {
+      parsedResponse = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response:', {
+        originalContent: content,
+        extractedJsonStr: jsonStr,
+        parseError: parseError instanceof Error ? parseError.message : 'Unknown error',
+      });
+      throw new Error(
+        `Failed to parse OpenAI response as JSON. Response was: ${content.substring(0, 200)}...`
+      );
+    }
 
     // Validate required fields
     if (

@@ -6,7 +6,8 @@
  * Flow: Upload → Identify → Confirm → Generate → Preview → Feedback → Success
  */
 import { AIWizardPage } from '~/features/ai-wizard/components';
-import { identifyPlant } from '~/lib/ai/plantnet.server';
+import { generateCareInstructions } from '~/lib/ai/openai.server';
+import { identifyPlant } from '~/lib/ai/plantid.server';
 import { requireAuth } from '~/lib/auth/require-auth.server';
 import { base64ToBuffer } from '~/lib/file';
 import { createAIPlant, recordAIFeedback } from '~/lib/plants/ai.server';
@@ -88,6 +89,28 @@ export const action = async ({ request }: Route.ActionArgs) => {
           logger.error('Plant identification failed', error);
           return {
             error: error instanceof Error ? error.message : 'Plant identification failed',
+          };
+        }
+      }
+
+      case 'generate-care': {
+        // Generate care instructions for identified plant
+        const plantName = formData.get('plantName') as string;
+
+        if (!plantName) {
+          return { error: 'Plant name is required' };
+        }
+
+        try {
+          const careInstructions = await generateCareInstructions(plantName);
+          return {
+            success: true,
+            careInstructions,
+          };
+        } catch (error) {
+          logger.error('Care instruction generation failed', error);
+          return {
+            error: error instanceof Error ? error.message : 'Failed to generate care instructions',
           };
         }
       }

@@ -50,7 +50,11 @@ SESSION_SECRET=generate-a-random-32-character-string
 
 # External APIs (optional, can be mocked)
 OPENAI_API_KEY=sk-...
-PLANTNET_API_KEY=...
+PLANT_ID_API_KEY=...
+
+# Feature Flags (optional, defaults to false to use mocked data)
+USE_REAL_PLANT_ID_API=false
+USE_REAL_OPENAI_API=false
 ```
 
 ### Getting Supabase Credentials
