@@ -4,6 +4,8 @@ import { Button, Card, FormError, Input, Label } from '~/shared/components';
 
 import { Form, Link, redirect, useActionData } from 'react-router';
 
+import { Leaf } from 'lucide-react';
+
 import type { Route } from './+types/auth.login';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -52,8 +54,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-white dark:from-slate-950 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <Card className="w-full max-w-md shadow-lg border border-emerald-100 dark:border-emerald-900 bg-white dark:bg-slate-900">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-slate-100 mb-2">
-            Welcome to Flor
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-50 to-slate-100 dark:from-emerald-950 dark:to-slate-800">
+              <Leaf className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-center mb-2">
+            Welcome to <span className="text-emerald-600 dark:text-emerald-400">Flor</span>
+            <span className="text-slate-700 dark:text-white">.io</span>
           </h1>
           <p className="text-center text-gray-600 dark:text-slate-400 mb-8 leading-relaxed">
             Sign in to your plant care companion
