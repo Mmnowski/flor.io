@@ -17,7 +17,7 @@ A full-stack plant care management application built with React Router v7, TypeS
 
 - Server-side rendering (SSR) for improved performance
 - Type-safe database operations with generated types
-- Plant identification using PlantNet API (mocked by default, real API available)
+- Plant identification using plant.id API (mocked by default, real API available)
 - AI-powered care instructions via OpenAI GPT-4o-mini (mocked by default, real API available)
 - Watering reminders and tracking
 - Room-based plant organization

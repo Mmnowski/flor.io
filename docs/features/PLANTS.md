@@ -277,26 +277,27 @@ export type PlantUpdate = Database['public']['Tables']['plants']['Update'];
 Validation schemas for manual plant creation are defined in:
 
 - `app/lib/plants/crud.server.ts` - Plant input validation
-- `app/lib/ai/plantnet.server.ts` - PlantNet identification validation
+- `app/lib/ai/plantnet.server.ts` - plant.id identification validation
 - `app/lib/ai/openai.server.ts` - OpenAI care instructions validation
 
 ## AI Integration
 
 The Plants feature integrates with two AI services for intelligent plant creation:
 
-### PlantNet API
+### plant.id API
 
 **Purpose:** Identify plant species from photos
 
 **Location:** `app/lib/ai/plantnet.server.ts`
 
-**Feature Flag:** `USE_REAL_PLANTNET_API`
+**Feature Flag:** `USE_REAL_PLANT_ID_API`
 
 **Implementation:**
 
-- **Default (Mocked):** Uses a database of 19 common houseplants
-- **Real API:** Connects to PlantNet API for real plant identification
-- **Environment Variable:** `PLANTNET_API_KEY`
+- **Default (Mocked):** Uses a database of 20 common houseplants
+- **Real API:** Connects to plant.id API for real plant identification
+- **Environment Variable:** `PLANT_ID_API_KEY`
+- **Endpoint:** `https://api.plant.id/v2/identify`
 
 **Functions:**
 

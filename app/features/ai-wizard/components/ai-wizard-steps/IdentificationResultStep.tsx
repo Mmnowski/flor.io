@@ -68,8 +68,10 @@ export function IdentificationResultStep({
         <div className="space-y-4">
           {/* Scientific name */}
           <div>
-            <p className="text-sm font-semibold text-gray-600">Scientific Name</p>
-            <p className="text-xl font-bold text-gray-900">{scientificName}</p>
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              Scientific Name
+            </p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{scientificName}</p>
           </div>
 
           {/* Common names */}
