@@ -24,7 +24,7 @@ export function meta(_: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-emerald-50 via-white to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors">
       {/* Hero Section */}
       <section className="max-w-5xl mx-auto px-4 py-20 text-center">
         <div className="mb-8">

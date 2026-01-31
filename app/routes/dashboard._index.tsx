@@ -1,4 +1,9 @@
-import { AddPlantDialog, PlantCard } from '~/features/plants/components';
+import {
+  AddPlantDialog,
+  PlantCard,
+  type SortOption,
+  SortSelector,
+} from '~/features/plants/components';
 import { RoomFilter } from '~/features/rooms/components';
 import { requireAuth } from '~/lib/auth/require-auth.server';
 import { getUserPlants } from '~/lib/plants/queries.server';
@@ -6,7 +11,7 @@ import { getUserRooms } from '~/lib/rooms/rooms.server';
 import { Button, DashboardSkeleton, EmptyState } from '~/shared/components';
 import type { PlantWithWatering, Room } from '~/types/plant.types';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLoaderData, useNavigate, useNavigation, useSearchParams } from 'react-router';
 
 import { Leaf, Plus } from 'lucide-react';
@@ -35,8 +40,11 @@ export default function DashboardIndex() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('watering');
 
-  const isLoading = navigation.state === 'loading';
+  // Only show skeleton when navigating TO the dashboard, not away from it
+  const isNavigatingToDashboard =
+    navigation.state === 'loading' && navigation.location?.pathname === '/dashboard';
 
   const handleFilterChange = (newRoomId: string | null) => {
     if (newRoomId) {
@@ -46,7 +54,23 @@ export default function DashboardIndex() {
     }
   };
 
-  if (isLoading) {
+  // Sort plants based on selected option
+  const sortedPlants = useMemo(() => {
+    const sorted = [...plants];
+    if (sortBy === 'name') {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      // Sort by watering: overdue first, then by days until watering
+      sorted.sort((a, b) => {
+        const aDays = a.days_until_watering ?? Infinity;
+        const bDays = b.days_until_watering ?? Infinity;
+        return aDays - bDays;
+      });
+    }
+    return sorted;
+  }, [plants, sortBy]);
+
+  if (isNavigatingToDashboard) {
     return <DashboardSkeleton />;
   }
 
@@ -92,11 +116,14 @@ export default function DashboardIndex() {
         />
       ) : (
         <div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            {plants.length} {plants.length === 1 ? 'plant' : 'plants'} in your collection
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              {plants.length} {plants.length === 1 ? 'plant' : 'plants'} in your collection
+            </p>
+            <SortSelector activeSort={sortBy} onSortChange={setSortBy} />
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plants.map((plant) => (
+            {sortedPlants.map((plant) => (
               <PlantCard key={plant.id} plant={plant} />
             ))}
           </div>

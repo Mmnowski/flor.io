@@ -19,6 +19,7 @@ describe('api.water.$plantId - Action', () => {
     user_id: mockUserId,
     name: 'Test Plant',
     watering_frequency_days: 7,
+    watering_amount: null as 'low' | 'mid' | 'heavy' | null,
     photo_url: null,
     room_id: null,
     light_requirements: null,

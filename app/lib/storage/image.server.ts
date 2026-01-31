@@ -60,6 +60,11 @@ export async function extractImageFromFormData(
     return null;
   }
 
+  // Check for empty file (no file selected)
+  if (file.size === 0 || !file.name || file.name === '') {
+    return null;
+  }
+
   // Validate MIME type
   if (!ACCEPTED_FORMATS.includes(file.type)) {
     throw new Error('Invalid image format. Accepted formats: JPG, PNG, WEBP');

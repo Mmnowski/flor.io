@@ -33,6 +33,14 @@ export async function getUserId(request: Request): Promise<string | null> {
 }
 
 /**
+ * Get the user email from the session
+ */
+export async function getUserEmail(request: Request): Promise<string | null> {
+  const session = await getSession(request.headers.get('Cookie'));
+  return session.get('userEmail') ?? null;
+}
+
+/**
  * Require user to be authenticated, redirect to login if not
  */
 export async function requireUserId(request: Request): Promise<string> {
@@ -48,9 +56,16 @@ export async function requireUserId(request: Request): Promise<string> {
 /**
  * Create a session cookie for a user
  */
-export async function createUserSession(userId: string, redirectTo = '/dashboard') {
+export async function createUserSession(
+  userId: string,
+  userEmail?: string,
+  redirectTo = '/dashboard'
+) {
   const session = await getSession();
   session.set('userId', userId);
+  if (userEmail) {
+    session.set('userEmail', userEmail);
+  }
   return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await commitSession(session),

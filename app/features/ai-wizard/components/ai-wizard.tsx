@@ -199,8 +199,8 @@ export function AIWizard({ children, userId, aiRemaining }: AIWizardProps) {
 
         {/* Usage indicator */}
         {aiRemaining !== undefined && (
-          <div className="mt-8 rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-900">
+          <div className="mt-8 rounded-lg bg-emerald-50 p-4 dark:bg-emerald-950/50">
+            <p className="text-sm text-emerald-900 dark:text-emerald-100">
               AI generations remaining: <strong>{aiRemaining}/20</strong>
             </p>
           </div>
@@ -233,16 +233,18 @@ function WizardProgressBar({ currentStep }: { currentStep: WizardStep }) {
           <div
             key={step.id}
             className={`flex flex-col items-center ${
-              index <= currentIndex ? 'text-blue-600' : 'text-gray-400'
+              index <= currentIndex
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-gray-400 dark:text-gray-500'
             }`}
           >
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
                 index < currentIndex
-                  ? 'border-blue-600 bg-blue-600 text-white'
+                  ? 'border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500'
                   : index === currentIndex
-                    ? 'border-blue-600 bg-white text-blue-600'
-                    : 'border-gray-300 bg-white text-gray-300'
+                    ? 'border-emerald-600 bg-white text-emerald-600 dark:border-emerald-400 dark:bg-slate-800 dark:text-emerald-400'
+                    : 'border-gray-300 bg-white text-gray-300 dark:border-gray-600 dark:bg-slate-800 dark:text-gray-500'
               }`}
             >
               {index < currentIndex ? '✓' : index + 1}
@@ -253,9 +255,9 @@ function WizardProgressBar({ currentStep }: { currentStep: WizardStep }) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 w-full bg-gray-200">
+      <div className="h-1 w-full bg-gray-200 dark:bg-slate-700">
         <div
-          className="h-full bg-blue-600 transition-all duration-300"
+          className="h-full bg-emerald-600 transition-all duration-300 dark:bg-emerald-500"
           style={{
             width: `${((currentIndex + 1) / steps.length) * 100}%`,
           }}

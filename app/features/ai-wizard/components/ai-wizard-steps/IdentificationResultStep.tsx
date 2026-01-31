@@ -76,12 +76,12 @@ export function IdentificationResultStep({
 
           {/* Common names */}
           <div>
-            <p className="text-sm font-semibold text-gray-600">Common Names</p>
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Common Names</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {commonNames.map((name) => (
                 <span
                   key={name}
-                  className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-900"
+                  className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-100"
                 >
                   {name}
                 </span>

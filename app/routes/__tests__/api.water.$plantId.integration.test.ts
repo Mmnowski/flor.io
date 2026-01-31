@@ -31,6 +31,7 @@ describe('Water Plant API Integration', () => {
     photo_url: null,
     room_id: null,
     watering_frequency_days: 7,
+    watering_amount: null as 'low' | 'mid' | 'heavy' | null,
     light_requirements: null,
     fertilizing_tips: null,
     pruning_tips: null,

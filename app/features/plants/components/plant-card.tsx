@@ -7,7 +7,7 @@ import type { PlantWithWatering } from '~/types/plant.types';
 
 import { Link } from 'react-router';
 
-import { Leaf } from 'lucide-react';
+import { Droplet, Droplets, Leaf } from 'lucide-react';
 
 interface PlantCardProps {
   plant: PlantWithWatering;
@@ -28,11 +28,44 @@ export function PlantCard({ plant }: PlantCardProps) {
     return `In ${plant.days_until_watering} days`;
   };
 
+  const getWateringAmountBadge = () => {
+    switch (plant.watering_amount) {
+      case 'low':
+        return (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 text-xs font-medium">
+            <Droplet className="w-3 h-3" />
+            <span>Light</span>
+          </div>
+        );
+      case 'mid':
+        return (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs font-medium">
+            <Droplet className="w-3 h-3" />
+            <span>Moderate</span>
+          </div>
+        );
+      case 'heavy':
+        return (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs font-medium">
+            <Droplets className="w-3 h-3" />
+            <span>Heavy</span>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 text-xs font-medium">
+            <Droplet className="w-3 h-3" />
+            <span>Unknown</span>
+          </div>
+        );
+    }
+  };
+
   return (
     <Link to={`/dashboard/plants/${plant.id}`}>
       <Card className="overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow hover:scale-102">
         {/* Photo */}
-        <div className="relative aspect-video bg-slate-200 dark:bg-slate-700 overflow-hidden flex-shrink-0">
+        <div className="relative aspect-square bg-slate-200 dark:bg-slate-700 overflow-hidden flex-shrink-0 rounded-t-xl">
           {plant.photo_url ? (
             <img
               src={plant.photo_url}
@@ -46,24 +79,27 @@ export function PlantCard({ plant }: PlantCardProps) {
               role="img"
               aria-label={`No photo available for ${plant.name}`}
             >
-              <Leaf className="w-12 h-12 text-emerald-600 dark:text-emerald-400" />
+              <Leaf className="w-16 h-16 text-emerald-600 dark:text-emerald-400" />
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="p-4 flex flex-col flex-grow">
+        <div className="px-4 flex flex-col flex-grow">
           {/* Plant name */}
           <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 line-clamp-2">
             {plant.name}
           </h3>
 
-          {/* Room badge */}
-          {plant.room_name && (
-            <Badge variant="outline" className="w-fit mb-3 text-xs">
-              {plant.room_name}
-            </Badge>
-          )}
+          {/* Room and watering amount badges */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {plant.room_name && (
+              <Badge variant="outline" className="text-xs">
+                {plant.room_name}
+              </Badge>
+            )}
+            {getWateringAmountBadge()}
+          </div>
 
           {/* Watering status */}
           <div className="mt-auto">

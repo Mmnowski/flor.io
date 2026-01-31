@@ -9,10 +9,10 @@ import {
   processPlantImage,
 } from '~/lib/storage/image.server';
 import { uploadPlantPhoto } from '~/lib/storage/storage.server';
-import { Button } from '~/shared/components';
+import { Button, PlantFormSkeleton } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 
-import { Link, redirect, useActionData, useLoaderData } from 'react-router';
+import { Link, redirect, useActionData, useLoaderData, useNavigation } from 'react-router';
 
 import type { Route } from './+types/dashboard.plants.new';
 
@@ -32,6 +32,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const formData = await request.formData();
 
     // Extract fields
+    const wateringAmount = formData.get('watering_amount');
     const data = {
       name: String(formData.get('name')),
       watering_frequency_days: Number(formData.get('watering_frequency_days')),
@@ -76,6 +77,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const plant = await createPlant(userId, {
       name: validatedData.name,
       watering_frequency_days: Number(validatedData.watering_frequency_days),
+      watering_amount:
+        wateringAmount && typeof wateringAmount === 'string' && wateringAmount !== ''
+          ? (wateringAmount as 'low' | 'mid' | 'heavy')
+          : null,
       photo_url: photoUrl,
       room_id: validatedData.room_id || null,
       light_requirements: validatedData.light_requirements || null,
@@ -96,6 +101,15 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function NewPlant() {
   const { rooms } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+
+  // Only show skeleton when navigating TO this page, not away from it
+  const isNavigatingToThisPage =
+    navigation.state === 'loading' && navigation.location?.pathname === '/dashboard/plants/new';
+
+  if (isNavigatingToThisPage) {
+    return <PlantFormSkeleton />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">

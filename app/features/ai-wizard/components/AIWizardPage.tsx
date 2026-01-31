@@ -239,8 +239,8 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
         )}
         <CarePreviewStep onContinue={handleSavePlant} rooms={rooms} />
         {state.isLoading && (
-          <div className="rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-900">Saving your plant...</p>
+          <div className="rounded-lg bg-emerald-50 p-4 dark:bg-emerald-950/50">
+            <p className="text-sm text-emerald-900 dark:text-emerald-100">Saving your plant...</p>
           </div>
         )}
       </div>

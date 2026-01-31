@@ -35,6 +35,7 @@ export async function createAIPlant(
       name: data.name.trim(),
       photo_url: data.photo_url || null,
       watering_frequency_days: data.watering_frequency_days,
+      watering_amount: data.watering_amount || null,
       room_id: data.room_id || null,
       light_requirements: data.light_requirements || null,
       fertilizing_tips: data.fertilizing_tips || null,

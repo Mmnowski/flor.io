@@ -83,7 +83,7 @@ export function NotificationsModal({
             </p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto pr-4 space-y-3">
+          <div className="flex-1 overflow-y-auto space-y-3">
             {displayNotifications.map((notification) => (
               <div
                 key={notification.plant_id}

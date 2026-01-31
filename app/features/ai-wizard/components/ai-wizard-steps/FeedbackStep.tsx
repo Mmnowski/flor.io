@@ -63,16 +63,18 @@ export function FeedbackStep({ plantName = 'your plant', onSubmit, onSkip }: Fee
       </div>
 
       {/* Plant summary */}
-      <div className="rounded-lg bg-green-50 p-4">
-        <p className="text-sm font-semibold text-green-900">✓ Plant created successfully</p>
-        <p className="mt-1 text-green-800">
+      <div className="rounded-lg bg-green-50 p-4 dark:bg-green-950/50">
+        <p className="text-sm font-semibold text-green-900 dark:text-green-100">
+          ✓ Plant created successfully
+        </p>
+        <p className="mt-1 text-green-800 dark:text-green-200">
           <strong>{plantName}</strong> has been added to your collection.
         </p>
       </div>
 
       {/* Feedback buttons */}
       <div className="space-y-4">
-        <p className="text-sm font-semibold text-gray-700">
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Were the AI-generated care instructions helpful?
         </p>
 
@@ -82,12 +84,12 @@ export function FeedbackStep({ plantName = 'your plant', onSubmit, onSkip }: Fee
             onClick={handleThumbsUp}
             className={`rounded-lg border-2 p-6 transition-all ${
               state.feedbackType === 'thumbs_up'
-                ? 'border-green-500 bg-green-50'
-                : 'border-gray-200 hover:border-green-500 hover:bg-green-50'
+                ? 'border-green-500 bg-green-50 dark:border-green-400 dark:bg-green-950/50'
+                : 'border-gray-200 bg-white hover:border-green-500 hover:bg-green-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-green-400 dark:hover:bg-green-950/30'
             }`}
           >
             <div className="text-4xl">👍</div>
-            <p className="mt-2 font-semibold text-gray-900">Yes, helpful!</p>
+            <p className="mt-2 font-semibold text-gray-900 dark:text-white">Yes, helpful!</p>
           </button>
 
           <button
@@ -95,12 +97,12 @@ export function FeedbackStep({ plantName = 'your plant', onSubmit, onSkip }: Fee
             onClick={handleThumbsDown}
             className={`rounded-lg border-2 p-6 transition-all ${
               state.feedbackType === 'thumbs_down'
-                ? 'border-red-500 bg-red-50'
-                : 'border-gray-200 hover:border-red-500 hover:bg-red-50'
+                ? 'border-red-500 bg-red-50 dark:border-red-400 dark:bg-red-950/50'
+                : 'border-gray-200 bg-white hover:border-red-500 hover:bg-red-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-red-400 dark:hover:bg-red-950/30'
             }`}
           >
             <div className="text-4xl">👎</div>
-            <p className="mt-2 font-semibold text-gray-900">Not helpful</p>
+            <p className="mt-2 font-semibold text-gray-900 dark:text-white">Not helpful</p>
           </button>
         </div>
       </div>
@@ -134,7 +136,7 @@ export function FeedbackStep({ plantName = 'your plant', onSubmit, onSkip }: Fee
       </div>
 
       {/* Info text */}
-      <p className="text-center text-xs text-gray-600">
+      <p className="text-center text-xs text-gray-600 dark:text-gray-400">
         Your feedback is anonymous and helps improve AI accuracy
       </p>
     </div>
