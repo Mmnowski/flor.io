@@ -132,6 +132,9 @@ export function AIWizard({ children, userId, aiRemaining }: AIWizardProps) {
       error: null,
       retryCount: 0,
       lastAttemptedStep: undefined,
+      // Explicitly preserve photo data when navigating steps
+      photoFile: prev.photoFile,
+      photoPreviewUrl: prev.photoPreviewUrl,
     }));
     setStepHistory((prev) => [...prev, step]);
   };

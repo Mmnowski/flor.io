@@ -1,9 +1,9 @@
 import sharp from 'sharp';
 
 const MAX_INPUT_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_OUTPUT_SIZE = 500 * 1024; // 500KB
+const MAX_OUTPUT_SIZE = 1 * 1024 * 1024; // 1MB
 const MAX_WIDTH = 1920;
-const JPEG_QUALITY = 85;
+const JPEG_QUALITY = 75;
 const ACCEPTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
 /**

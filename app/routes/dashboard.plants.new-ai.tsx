@@ -116,52 +116,59 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
 
       case 'save-plant': {
-        // Parse plant data from form
-        const name = formData.get('name') as string;
-        const wateringFrequencyDays = parseInt(formData.get('wateringFrequencyDays') as string, 10);
-        const wateringAmount = formData.get('wateringAmount') as string;
-        const lightRequirements = formData.get('lightRequirements') as string;
-        const roomId = formData.get('roomId') as string | null;
+        try {
+          // Parse plant data from form
+          const name = formData.get('name') as string;
+          const wateringFrequencyDays = parseInt(
+            formData.get('wateringFrequencyDays') as string,
+            10
+          );
+          const wateringAmount = formData.get('wateringAmount') as string;
+          const lightRequirements = formData.get('lightRequirements') as string;
+          const roomId = formData.get('roomId') as string | null;
 
-        // Parse array fields (fertilizingTips, pruningTips, troubleshooting)
-        const fertilizingTips = JSON.parse(formData.get('fertilizingTips') as string);
-        const pruningTips = JSON.parse(formData.get('pruningTips') as string);
-        const troubleshooting = JSON.parse(formData.get('troubleshooting') as string);
+          // Parse array fields (fertilizingTips, pruningTips, troubleshooting)
+          const fertilizingTips = JSON.parse(formData.get('fertilizingTips') as string);
+          const pruningTips = JSON.parse(formData.get('pruningTips') as string);
+          const troubleshooting = JSON.parse(formData.get('troubleshooting') as string);
 
-        // Handle photo if provided
-        let photoUrl: string | null = null;
-        const photoFile = formData.get('photoFile') as File | null;
+          // Handle photo if provided
+          let photoUrl: string | null = null;
+          const photoBase64 = formData.get('photoBase64') as string | null;
 
-        if (photoFile && photoFile.size > 0) {
-          // Read file as buffer
-          const buffer = Buffer.from(await photoFile.arrayBuffer());
+          if (photoBase64) {
+            // Convert base64 to buffer
+            const buffer = Buffer.from(photoBase64, 'base64');
 
-          // Process image (compress, resize)
-          const processedBuffer = await processPlantImage(buffer);
+            // Process image (compress, resize)
+            const processedBuffer = await processPlantImage(buffer);
 
-          // Upload to storage
-          photoUrl = await uploadPlantPhoto(userId, processedBuffer, 'image/jpeg');
+            // Upload to storage
+            photoUrl = await uploadPlantPhoto(userId, processedBuffer, 'image/jpeg');
+          }
+
+          // Create plant with AI flag
+          const plant = await createAIPlant(userId, {
+            name,
+            watering_frequency_days: wateringFrequencyDays,
+            light_requirements: lightRequirements,
+            fertilizing_tips: fertilizingTips,
+            pruning_tips: pruningTips,
+            troubleshooting: troubleshooting,
+            photo_url: photoUrl,
+            room_id: roomId || null,
+          });
+
+          // Increment AI usage
+          await incrementAIUsage(userId);
+          return {
+            success: true,
+            plantId: plant.id,
+          };
+        } catch (error) {
+          logger.error('Save plant error', error);
+          throw error;
         }
-
-        // Create plant with AI flag
-        const plant = await createAIPlant(userId, {
-          name,
-          watering_frequency_days: wateringFrequencyDays,
-          light_requirements: lightRequirements,
-          fertilizing_tips: fertilizingTips,
-          pruning_tips: pruningTips,
-          troubleshooting: troubleshooting,
-          photo_url: photoUrl,
-          room_id: roomId || null,
-        });
-
-        // Increment AI usage
-        await incrementAIUsage(userId);
-
-        return {
-          success: true,
-          plantId: plant.id,
-        };
       }
 
       case 'save-feedback': {
