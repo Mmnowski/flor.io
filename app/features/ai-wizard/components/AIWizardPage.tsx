@@ -5,8 +5,8 @@
 import { Alert, AlertDescription } from '~/shared/components/ui/alert';
 import { logger } from '~/shared/lib/logger';
 
-import { useRef, useState } from 'react';
-import { Form } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Form, useFetcher } from 'react-router';
 
 import { AIWizard, type WizardStep, useAIWizard } from './ai-wizard';
 import {
@@ -31,88 +31,118 @@ interface AIWizardPageProps {
  */
 function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AIWizardPageProps) {
   const { state, goToStep, updateState } = useAIWizard();
-  const formRef = useRef<HTMLFormElement>(null);
+  const fetcher = useFetcher();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastAction, setLastAction] = useState<'save-plant' | 'save-feedback' | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Watch for fetcher data to handle response
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.data) {
+      if (fetcher.data.error) {
+        updateState({
+          error: fetcher.data.error,
+          isLoading: false,
+        });
+        setIsSubmitting(false);
+      } else if (fetcher.data.plantId && lastAction === 'save-plant') {
+        // Save plant succeeded, move to feedback step
+        updateState({
+          error: null,
+          plantId: fetcher.data.plantId,
+        });
+        goToStep('feedback');
+        setIsSubmitting(false);
+        setLastAction(null);
+      }
+    }
+  }, [fetcher.state, fetcher.data, lastAction, goToStep, updateState]);
+
+  // Watch for feedback submission
+  useEffect(() => {
+    if (fetcher.state === 'idle' && lastAction === 'save-feedback') {
+      // Feedback was submitted, navigate to plant details
+      if (fetcher.data?.redirect) {
+        window.location.href = fetcher.data.redirect;
+      } else {
+        onComplete?.(state.plantId ?? '');
+      }
+      setLastAction(null);
+    }
+  }, [fetcher.state, lastAction, fetcher.data, state.plantId, onComplete]);
 
   const handleSavePlant = async () => {
-    if (!formRef.current) return;
-
     try {
       setIsSubmitting(true);
       updateState({ error: null });
 
-      // Create FormData with all plant information
-      const formData = new FormData(formRef.current);
-      formData.append('_action', 'save-plant');
-      formData.append('name', state.manualPlantName);
-      formData.append(
-        'wateringFrequencyDays',
-        state.careInstructions?.wateringFrequencyDays.toString() || '7'
-      );
-      formData.append('wateringAmount', state.careInstructions?.wateringAmount || 'mid');
-      formData.append('lightRequirements', state.careInstructions?.lightRequirements || '');
-      formData.append(
-        'fertilizingTips',
-        JSON.stringify(state.careInstructions?.fertilizingTips || [])
-      );
-      formData.append('pruningTips', JSON.stringify(state.careInstructions?.pruningTips || []));
-      formData.append(
-        'troubleshooting',
-        JSON.stringify(state.careInstructions?.troubleshooting || [])
-      );
-      formData.append('roomId', state.selectedRoomId || '');
-
-      // Add photo file if exists
+      // Convert file to base64 if exists
+      let photoBase64: string | null = null;
       if (state.photoFile) {
-        formData.append('photoFile', state.photoFile);
+        photoBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            // Remove data:image/jpeg;base64, prefix
+            const base64Only = result.split(',')[1];
+            resolve(base64Only);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(state.photoFile!);
+        });
       }
 
-      // Submit to server with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-      const response = await fetch('', {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to save plant');
+      if (!formRef.current) {
+        throw new Error('Form not available');
       }
 
-      const result = await response.json();
-      updateState({
-        error: null,
-        plantId: result.plantId,
-      });
+      // Clear form and build new form data
+      formRef.current.innerHTML = '';
 
-      // Move to feedback step
-      goToStep('feedback');
+      // Add hidden inputs
+      const fields: Record<string, string> = {
+        _action: 'save-plant',
+        name: state.manualPlantName,
+        wateringFrequencyDays: state.careInstructions?.wateringFrequencyDays.toString() || '7',
+        wateringAmount: state.careInstructions?.wateringAmount || 'mid',
+        lightRequirements: state.careInstructions?.lightRequirements || '',
+        fertilizingTips: JSON.stringify(state.careInstructions?.fertilizingTips || []),
+        pruningTips: JSON.stringify(state.careInstructions?.pruningTips || []),
+        troubleshooting: JSON.stringify(state.careInstructions?.troubleshooting || []),
+        roomId: state.selectedRoomId || '',
+      };
+
+      if (photoBase64) {
+        fields.photoBase64 = photoBase64;
+      }
+
+      for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        formRef.current.appendChild(input);
+      }
+
+      // Track this action for proper response handling
+      setLastAction('save-plant');
+      // Submit form using React Router's fetcher
+      fetcher.submit(formRef.current, { method: 'POST' });
     } catch (error) {
       let errorMessage = 'Failed to save plant';
 
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          errorMessage = 'Request timed out. Please try again.';
-        } else {
-          errorMessage = error.message;
-        }
+        errorMessage = error.message;
       }
-
       updateState({
         error: errorMessage,
         isLoading: false,
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleSubmitFeedback = async (feedbackData: {
+  const handleSubmitFeedback = (feedbackData: {
     feedbackType: 'thumbs_up' | 'thumbs_down' | null;
     feedbackComment: string;
   }) => {
@@ -139,39 +169,17 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
         })
       );
 
-      // Submit with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const response = await fetch('', {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.redirected) {
-        // Server issued redirect, let browser handle it
-        window.location.href = response.url;
-      } else if (!response.ok) {
-        throw new Error('Failed to save feedback');
-      } else {
-        // Redirect to plant details
-        onComplete?.(plantId);
-      }
+      // Track this action for proper response handling
+      setLastAction('save-feedback');
+      // Submit using React Router's fetcher
+      fetcher.submit(formData, { method: 'POST' });
     } catch (error) {
       let errorMessage = 'Failed to save feedback';
 
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          errorMessage = 'Request timed out, but your plant was created successfully.';
-        } else {
-          errorMessage = error.message;
-        }
+        errorMessage = error.message;
       }
 
-      // Log error but still allow user to continue
       logger.error('Feedback error', error);
       updateState({ error: errorMessage });
 
@@ -179,55 +187,51 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
       setTimeout(() => {
         onComplete?.(state.plantId ?? '');
       }, 2000);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
+  // Render current step
+  let stepContent;
+
   // Step 1: Photo Upload
   if (state.currentStep === 'photo-upload') {
-    return <PhotoUploadStep onContinue={() => goToStep('identifying')} />;
+    stepContent = <PhotoUploadStep onContinue={() => goToStep('identifying')} />;
   }
-
   // Step 2: Identifying
-  if (state.currentStep === 'identifying') {
-    return (
+  else if (state.currentStep === 'identifying') {
+    stepContent = (
       <IdentifyingStep
         onComplete={() => goToStep('identification-result')}
         onError={(error) => updateState({ error })}
       />
     );
   }
-
   // Step 3: Identification Result
-  if (state.currentStep === 'identification-result') {
-    return (
+  else if (state.currentStep === 'identification-result') {
+    stepContent = (
       <IdentificationResultStep
         onConfirm={() => goToStep('generating-care')}
         onManualEntry={() => goToStep('manual-name')}
       />
     );
   }
-
   // Step 3b: Manual Name Entry
-  if (state.currentStep === 'manual-name') {
-    return <ManualNameStep onContinue={() => goToStep('generating-care')} />;
+  else if (state.currentStep === 'manual-name') {
+    stepContent = <ManualNameStep onContinue={() => goToStep('generating-care')} />;
   }
-
   // Step 4: Generating Care Instructions
-  if (state.currentStep === 'generating-care') {
-    return (
+  else if (state.currentStep === 'generating-care') {
+    stepContent = (
       <GeneratingCareStep
         onComplete={() => goToStep('care-preview')}
         onError={(error) => updateState({ error })}
       />
     );
   }
-
   // Step 5: Care Preview & Edit
-  if (state.currentStep === 'care-preview') {
-    return (
-      <form ref={formRef} className="space-y-6">
+  else if (state.currentStep === 'care-preview') {
+    stepContent = (
+      <div className="space-y-6">
         {state.error && (
           <Alert variant="destructive">
             <AlertDescription>{state.error}</AlertDescription>
@@ -239,15 +243,14 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
             <p className="text-sm text-blue-900">Saving your plant...</p>
           </div>
         )}
-      </form>
+      </div>
     );
   }
-
   // Step 6: Feedback
-  if (state.currentStep === 'feedback') {
+  else if (state.currentStep === 'feedback') {
     const plantName = state.manualPlantName || state.identification?.commonNames[0] || 'your plant';
 
-    return (
+    stepContent = (
       <FeedbackStep
         plantName={plantName}
         onSubmit={() =>
@@ -264,13 +267,20 @@ function AIWizardPageContent({ userId, aiRemaining, rooms = [], onComplete }: AI
         }
       />
     );
+  } else {
+    stepContent = (
+      <div className="rounded-lg bg-yellow-50 p-4">
+        <p className="text-sm text-yellow-900">Unknown step: {state.currentStep}</p>
+      </div>
+    );
   }
 
-  // Fallback
   return (
-    <div className="rounded-lg bg-yellow-50 p-4">
-      <p className="text-sm text-yellow-900">Unknown step: {state.currentStep}</p>
-    </div>
+    <>
+      {stepContent}
+      {/* Hidden form for file uploads */}
+      <form ref={formRef} style={{ display: 'none' }} />
+    </>
   );
 }
 
