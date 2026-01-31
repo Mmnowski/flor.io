@@ -205,8 +205,8 @@ describe('AI Wizard Route - Error Handling', () => {
       expect(result.error).not.toContain('constraint');
     });
 
-    it('allows saving plant without photo when photo processing fails', async () => {
-      const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+    it('returns error when photo processing fails', async () => {
+      // Send photoBase64 (the field the action expects) instead of photoFile
       const formData = new FormData();
       formData.append('_action', 'save-plant');
       formData.append('name', 'Test Plant');
@@ -215,7 +215,7 @@ describe('AI Wizard Route - Error Handling', () => {
       formData.append('fertilizingTips', '["tip1"]');
       formData.append('pruningTips', '[]');
       formData.append('troubleshooting', '[]');
-      formData.append('photoFile', mockFile);
+      formData.append('photoBase64', 'dGVzdCBpbWFnZSBkYXRh'); // base64 encoded "test image data"
 
       const request = new Request('http://localhost/api', {
         method: 'POST',

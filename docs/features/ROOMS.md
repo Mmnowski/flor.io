@@ -9,8 +9,7 @@ Users can:
 - Create rooms/locations
 - Assign plants to rooms
 - Filter plants by room
-- Edit room names
-- Delete empty rooms
+- Delete rooms (plants become unassigned)
 
 ## Architecture
 
@@ -19,16 +18,16 @@ Users can:
 ```
 app/features/rooms/
 ├── components/
-│   ├── RoomSelector.tsx    # Dropdown/select for room
-│   ├── RoomList.tsx        # List of rooms
+│   ├── create-room-dialog.tsx  # Dialog to create new room
+│   ├── delete-room-dialog.tsx  # Confirmation dialog for deletion
+│   ├── room-filter.tsx         # Filter bar with room chips
 │   └── index.ts
-└── lib/
-    └── rooms.server.ts     # Room operations
+└── (server functions in app/lib/rooms/)
 ```
 
 ### Server Functions
 
-Located in `app/lib/rooms.server.ts`:
+Located in `app/lib/rooms/rooms.server.ts`:
 
 ```typescript
 // Get all rooms for a user
@@ -38,10 +37,10 @@ export async function getUserRooms(userId: string): Promise<Room[]>;
 export async function createRoom(userId: string, name: string): Promise<Room>;
 
 // Update room name
-export async function updateRoom(roomId: string, userId: string, name: string): Promise<Room>;
+export async function updateRoom(roomId: string, name: string): Promise<Room>;
 
-// Delete a room (must be empty)
-export async function deleteRoom(roomId: string, userId: string): Promise<void>;
+// Delete a room (plants become unassigned via ON DELETE SET NULL)
+export async function deleteRoom(roomId: string): Promise<void>;
 ```
 
 ### Components
@@ -128,25 +127,21 @@ Plants can be filtered by room:
 
 **Creating a Room:**
 
-1. Click "Create Room" in settings
-2. Enter room name
+1. Click "New Room" button in the room filter bar on the dashboard
+2. Enter room name (1-50 characters)
 3. Room created and available for assignment
-
-**Editing a Room:**
-
-1. Click edit button next to room
-2. Update name
-3. Changes reflect immediately
+4. If no rooms exist, a simplified view with "New Room" button is shown
 
 **Deleting a Room:**
 
-1. Click delete button (only if empty)
-2. Confirm deletion
-3. Room removed
+1. Hover over a room chip to reveal the delete (X) button
+2. Click the delete button to open confirmation dialog
+3. If room has plants, a warning shows how many plants will be unassigned
+4. Confirm deletion - plants are unassigned (not deleted), room is removed
 
 ### Room Sorting
 
-Rooms are sorted by custom `order` field for consistent display.
+Rooms are sorted alphabetically by name for consistent display.
 
 ## API Routes
 
@@ -206,7 +201,7 @@ form data:
 
 ### POST /api/rooms (Delete)
 
-Delete a room (must be empty).
+Delete a room. Plants assigned to this room will have their `room_id` set to `null` (unassigned) via the database's `ON DELETE SET NULL` constraint.
 
 **Request:**
 
@@ -229,7 +224,7 @@ form data:
 
 **Errors:**
 
-- 400 - Room is not empty (still has plants)
+- 404 - Room not found or not owned by user
 
 ## Type Safety
 
@@ -290,8 +285,8 @@ Rooms feature integrates with:
 ## Constraints
 
 - **Max rooms**: Typically < 50 per user
-- **Room name length**: 100 characters max
-- **Delete constraint**: Can only delete empty rooms
+- **Room name length**: 50 characters max (validated in UI and server)
+- **Delete behavior**: Deleting a room unassigns plants (sets room_id to null)
 - **Colors**: Optional (for future UI enhancements)
 
 ## Future Enhancements

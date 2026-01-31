@@ -12,38 +12,58 @@ import {
 import { Input } from '~/shared/components/ui/input';
 import { Label } from '~/shared/components/ui/label';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFetcher } from 'react-router';
 
 import { AlertCircle, Plus } from 'lucide-react';
 
+/**
+ * CreateRoomDialog - Dialog for creating a new room
+ * Opens from a trigger button, submits to the rooms API
+ */
 export function CreateRoomDialog() {
   const fetcher = useFetcher();
   const [open, setOpen] = useState(false);
   const [roomName, setRoomName] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const isSubmitting = fetcher.state === 'submitting';
   const error = fetcher.data?.error as string | undefined;
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!roomName.trim()) return;
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!roomName.trim()) return;
 
-    const formData = new FormData();
-    formData.append('_method', 'POST');
-    formData.append('name', roomName);
+      setHasSubmitted(true);
+      const formData = new FormData();
+      formData.append('_method', 'POST');
+      formData.append('name', roomName);
 
-    fetcher.submit(formData, {
-      method: 'POST',
-      action: '/api/rooms',
-    });
-  };
+      fetcher.submit(formData, {
+        method: 'POST',
+        action: '/api/rooms',
+      });
+    },
+    [roomName, fetcher]
+  );
 
   // Close dialog and reset form on success
-  if (fetcher.state === 'idle' && fetcher.data?.room && open) {
-    setOpen(false);
-    setRoomName('');
-  }
+  useEffect(() => {
+    if (fetcher.state === 'idle' && hasSubmitted && !error) {
+      setOpen(false);
+      setRoomName('');
+      setHasSubmitted(false);
+    }
+  }, [fetcher.state, hasSubmitted, error]);
+
+  // Reset state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setHasSubmitted(false);
+      setRoomName('');
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -22,7 +22,7 @@ import {
 import { AIWizardSkeleton } from '~/shared/components';
 import { logger } from '~/shared/lib/logger';
 
-import { redirect, useLoaderData, useNavigation } from 'react-router';
+import { redirect, useLoaderData, useNavigate, useNavigation } from 'react-router';
 
 import type { Route } from './+types/dashboard.plants.new-ai';
 
@@ -204,6 +204,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function AIWizardRoute() {
   const loaderData = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  const navigate = useNavigate();
 
   // Only show skeleton when navigating TO this page, not away from it
   const isNavigatingToThisPage =
@@ -214,8 +215,8 @@ export default function AIWizardRoute() {
   }
 
   const handleComplete = (plantId: string) => {
-    // Navigate to plant details page
-    window.location.href = `/dashboard/plants/${plantId}`;
+    // Navigate to plant details page using React Router
+    navigate(`/dashboard/plants/${plantId}`);
   };
 
   return (

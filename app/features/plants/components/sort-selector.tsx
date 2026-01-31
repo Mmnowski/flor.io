@@ -4,13 +4,19 @@ import { cn } from '~/lib';
 
 import { ArrowDownAZ, Droplets } from 'lucide-react';
 
+/** Available sort options for the plant list */
 export type SortOption = 'watering' | 'name';
 
 interface SortSelectorProps {
+  /** Currently active sort option */
   activeSort: SortOption;
+  /** Callback when sort option changes */
   onSortChange: (sort: SortOption) => void;
 }
 
+/**
+ * SortSelector - Toggle buttons for sorting plants by watering time or name
+ */
 export function SortSelector({ activeSort, onSortChange }: SortSelectorProps) {
   return (
     <div className="flex items-center gap-2">

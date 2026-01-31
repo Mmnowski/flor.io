@@ -30,6 +30,7 @@ Project planning documents and phase plans:
 - `PHASE_5_PLAN.md` - Organization & polish planning
 - `PHASE_5_PROGRESS.md` - Phase 5 progress notes
 - `PHASE_6_PLAN.md` - Testing & optimization planning (most detailed)
+- `ROOM_MANAGEMENT_PLAN.md` - Room management improvements (2026-01-31)
 
 **Use:** Understanding how features were planned and what decisions were made
 
@@ -171,15 +172,15 @@ Files should be archived indefinitely. If cleanup is needed:
 
 ## Statistics
 
-- **Total archived files**: 31
-- **Phase plans**: 7
+- **Total archived files**: 32
+- **Phase plans**: 8
 - **Task notes**: 13
 - **Session summaries**: 2
 - **Phase summaries**: 3
 - **Completion records**: 5
 - **Supporting docs**: 1
 
-**Total size**: ~200KB
+**Total size**: ~205KB
 
 ---
 
@@ -187,4 +188,4 @@ Files should be archived indefinitely. If cleanup is needed:
 
 - Index created: 2026-01-30
 - Archive reorganized: 2026-01-30
-- Implementation notes cleanup: Complete
+- Room management plan added: 2026-01-31

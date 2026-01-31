@@ -12,13 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/shared/components/ui/select';
-import { Textarea } from '~/shared/components/ui/textarea';
 import type { PlantWithDetails, Room } from '~/types/plant.types';
 
 import { useCallback, useState } from 'react';
-import { Form } from 'react-router';
+import { Form, useNavigate } from 'react-router';
 
-import { AlertCircle } from 'lucide-react';
+import { FieldError, TextareaField } from './form-fields';
 
 interface FieldErrors {
   [key: string]: string[] | undefined;
@@ -27,13 +26,22 @@ interface FieldErrors {
 }
 
 interface PlantFormProps {
+  /** Existing plant data for edit mode */
   plant?: PlantWithDetails;
+  /** Available rooms for assignment */
   rooms: Room[];
+  /** Server-side error message */
   error?: string | null;
+  /** Server-side field validation errors */
   fieldErrors?: FieldErrors;
+  /** Form mode: create new plant or edit existing */
   mode: 'create' | 'edit';
 }
 
+/**
+ * PlantForm - Form component for creating and editing plants
+ * Handles validation, image upload, and room/watering amount selection
+ */
 export function PlantForm({
   plant,
   rooms,
@@ -41,6 +49,7 @@ export function PlantForm({
   fieldErrors: serverFieldErrors,
   mode,
 }: PlantFormProps) {
+  const navigate = useNavigate();
   const isEdit = mode === 'edit';
   const [selectedRoom, setSelectedRoom] = useState<string>(
     isEdit && plant?.room_id ? plant.room_id : ''
@@ -50,13 +59,13 @@ export function PlantForm({
   );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(serverFieldErrors || {});
 
-  const handleRoomChange = (value: string) => {
+  const handleRoomChange = useCallback((value: string) => {
     setSelectedRoom(value);
-  };
+  }, []);
 
-  const handleWateringAmountChange = (value: string) => {
+  const handleWateringAmountChange = useCallback((value: string) => {
     setSelectedWateringAmount(value);
-  };
+  }, []);
 
   const validateField = useCallback(
     (fieldName: string, value: string | number) => {
@@ -85,9 +94,12 @@ export function PlantForm({
     [fieldErrors]
   );
 
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateField(e.target.name, e.target.value);
-  };
+  const handleFieldChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      validateField(e.target.name, e.target.value);
+    },
+    [validateField]
+  );
 
   return (
     <Form method="post" encType="multipart/form-data" className="space-y-6 max-w-2xl">
@@ -117,16 +129,7 @@ export function PlantForm({
           aria-invalid={!!fieldErrors.name}
           aria-describedby={fieldErrors.name ? 'name-error' : undefined}
         />
-        {fieldErrors.name && (
-          <div
-            id="name-error"
-            className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm mt-2"
-            role="alert"
-          >
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {Array.isArray(fieldErrors.name) ? fieldErrors.name[0] : fieldErrors.name}
-          </div>
-        )}
+        {fieldErrors.name && <FieldError id="name-error" message={fieldErrors.name} />}
         {!fieldErrors.name && <p className="text-sm text-slate-500 mt-1">Maximum 100 characters</p>}
       </div>
 
@@ -154,16 +157,7 @@ export function PlantForm({
           }
         />
         {fieldErrors.watering_frequency_days && (
-          <div
-            id="watering-frequency-error"
-            className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm mt-2"
-            role="alert"
-          >
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-            {Array.isArray(fieldErrors.watering_frequency_days)
-              ? fieldErrors.watering_frequency_days[0]
-              : fieldErrors.watering_frequency_days}
-          </div>
+          <FieldError id="watering-frequency-error" message={fieldErrors.watering_frequency_days} />
         )}
         {!fieldErrors.watering_frequency_days && (
           <p className="text-sm text-slate-500 mt-1">How often to water in days (1-365)</p>
@@ -210,71 +204,43 @@ export function PlantForm({
       </div>
 
       {/* Light Requirements */}
-      <div>
-        <Label htmlFor="light_requirements" className="text-base">
-          Light Requirements (Optional)
-        </Label>
-        <Textarea
-          id="light_requirements"
-          name="light_requirements"
-          placeholder="e.g., Bright indirect light"
-          defaultValue={isEdit ? plant?.light_requirements || '' : ''}
-          className="mt-2"
-          rows={3}
-        />
-      </div>
+      <TextareaField
+        id="light_requirements"
+        label="Light Requirements"
+        placeholder="e.g., Bright indirect light"
+        defaultValue={isEdit ? plant?.light_requirements || '' : ''}
+      />
 
       {/* Fertilizing Tips */}
-      <div>
-        <Label htmlFor="fertilizing_tips" className="text-base">
-          Fertilizing Tips (Optional)
-        </Label>
-        <Textarea
-          id="fertilizing_tips"
-          name="fertilizing_tips"
-          placeholder="e.g., Fertilize monthly during growing season"
-          defaultValue={isEdit ? plant?.fertilizing_tips || '' : ''}
-          className="mt-2"
-          rows={3}
-        />
-      </div>
+      <TextareaField
+        id="fertilizing_tips"
+        label="Fertilizing Tips"
+        placeholder="e.g., Fertilize monthly during growing season"
+        defaultValue={isEdit ? plant?.fertilizing_tips || '' : ''}
+      />
 
       {/* Pruning Tips */}
-      <div>
-        <Label htmlFor="pruning_tips" className="text-base">
-          Pruning Tips (Optional)
-        </Label>
-        <Textarea
-          id="pruning_tips"
-          name="pruning_tips"
-          placeholder="e.g., Prune in spring for bushier growth"
-          defaultValue={isEdit ? plant?.pruning_tips || '' : ''}
-          className="mt-2"
-          rows={3}
-        />
-      </div>
+      <TextareaField
+        id="pruning_tips"
+        label="Pruning Tips"
+        placeholder="e.g., Prune in spring for bushier growth"
+        defaultValue={isEdit ? plant?.pruning_tips || '' : ''}
+      />
 
       {/* Troubleshooting */}
-      <div>
-        <Label htmlFor="troubleshooting" className="text-base">
-          Troubleshooting (Optional)
-        </Label>
-        <Textarea
-          id="troubleshooting"
-          name="troubleshooting"
-          placeholder="e.g., Brown leaf tips indicate underwatering"
-          defaultValue={isEdit ? plant?.troubleshooting || '' : ''}
-          className="mt-2"
-          rows={3}
-        />
-      </div>
+      <TextareaField
+        id="troubleshooting"
+        label="Troubleshooting"
+        placeholder="e.g., Brown leaf tips indicate underwatering"
+        defaultValue={isEdit ? plant?.troubleshooting || '' : ''}
+      />
 
       {/* Form Actions */}
       <div className="flex gap-3 pt-4">
         <Button type="submit" className="flex-1" disabled={Object.keys(fieldErrors).length > 0}>
           {isEdit ? 'Save Changes' : 'Create Plant'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => window.history.back()}>
+        <Button type="button" variant="outline" onClick={() => navigate(-1)}>
           Cancel
         </Button>
       </div>

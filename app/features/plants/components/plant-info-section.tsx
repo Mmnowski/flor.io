@@ -11,9 +11,13 @@ import type { ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface PlantInfoSectionProps {
+  /** Section title */
   title: string;
+  /** Content to display (plain text or JSON array) */
   content: string | null;
+  /** Lucide icon component for the section */
   icon: React.ComponentType<{ className?: string }>;
+  /** Whether section is expanded by default */
   defaultOpen?: boolean;
 }
 
@@ -40,6 +44,10 @@ function parseContent(content: string | null): string | string[] {
   return content;
 }
 
+/**
+ * PlantInfoSection - Collapsible section for displaying plant care info
+ * Parses content as either plain text or JSON array for bullet points
+ */
 export function PlantInfoSection({
   title,
   content,

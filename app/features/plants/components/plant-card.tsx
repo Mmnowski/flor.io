@@ -5,30 +5,36 @@ import { Badge } from '~/shared/components/ui/badge';
 import { Card } from '~/shared/components/ui/card';
 import type { PlantWithWatering } from '~/types/plant.types';
 
+import { useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { Droplet, Droplets, Leaf } from 'lucide-react';
 
 interface PlantCardProps {
+  /** Plant data including watering status */
   plant: PlantWithWatering;
 }
 
+/**
+ * PlantCard - Displays a plant in the dashboard grid
+ * Shows photo, name, room, watering amount and status badges
+ */
 export function PlantCard({ plant }: PlantCardProps) {
-  const getWateringColor = () => {
+  const wateringColor = useMemo(() => {
     if (plant.is_overdue) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
     if (plant.days_until_watering === 0)
       return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
     return 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200';
-  };
+  }, [plant.is_overdue, plant.days_until_watering]);
 
-  const getWateringText = () => {
+  const wateringText = useMemo(() => {
     if (plant.is_overdue) return `${Math.abs(plant.days_until_watering || 0)} days overdue`;
     if (plant.days_until_watering === 0) return 'Water today';
     if (plant.days_until_watering === 1) return 'Tomorrow';
     return `In ${plant.days_until_watering} days`;
-  };
+  }, [plant.is_overdue, plant.days_until_watering]);
 
-  const getWateringAmountBadge = () => {
+  const wateringAmountBadge = useMemo(() => {
     switch (plant.watering_amount) {
       case 'low':
         return (
@@ -59,7 +65,7 @@ export function PlantCard({ plant }: PlantCardProps) {
           </div>
         );
     }
-  };
+  }, [plant.watering_amount]);
 
   return (
     <Link to={`/dashboard/plants/${plant.id}`}>
@@ -98,18 +104,15 @@ export function PlantCard({ plant }: PlantCardProps) {
                 {plant.room_name}
               </Badge>
             )}
-            {getWateringAmountBadge()}
+            {wateringAmountBadge}
           </div>
 
           {/* Watering status */}
           <div className="mt-auto">
             <div
-              className={cn(
-                'px-3 py-2 rounded-md text-sm font-medium text-center',
-                getWateringColor()
-              )}
+              className={cn('px-3 py-2 rounded-md text-sm font-medium text-center', wateringColor)}
             >
-              {getWateringText()}
+              {wateringText}
             </div>
           </div>
         </div>
